@@ -6,6 +6,7 @@ export default {
         "./resources/**/*.js",
         "./resources/**/*.vue",
     ],
+    darkMode: "false",
     theme: {
         extend: {
             fontFamily: {

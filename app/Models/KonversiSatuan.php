@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class KonversiSatuan extends Model
 {
     use HasFactory;
-    protected $fillable = ['kode_item', 'satuan', 'jumlah'];
+    protected $fillable = ['kode_item', 'satuan', 'jumlah', 'harga_pokok', 'harga_jual'];
 
     public function barang()
     {

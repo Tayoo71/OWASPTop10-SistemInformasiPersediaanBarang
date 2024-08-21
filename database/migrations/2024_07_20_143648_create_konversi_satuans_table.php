@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedInteger('kode_item');
             $table->string('satuan');
             $table->integer('jumlah');
+            $table->decimal('harga_pokok', 15, 2)->default(0);
+            $table->decimal('harga_jual', 15, 2)->default(0);
 
             $table->foreign('kode_item')->references('kode_item')->on('barangs')->onDelete('cascade');
         });

@@ -21,8 +21,6 @@ class BarangSeeder extends Seeder
                 'rak' => 'SH/GDPN | TK/GBAN',
                 'jenis_id' => 1,
                 'merek_id' => 2,
-                'harga_pokok' => '215000.00',
-                'harga_jual' => '250000.00',
                 'stok_minimum' => 0,
             ],
             [
@@ -32,8 +30,6 @@ class BarangSeeder extends Seeder
                 'rak' => 'SH/GDPN | TK/GBLK',
                 'jenis_id' => 3,
                 'merek_id' => 3,
-                'harga_pokok' => '230000.00',
-                'harga_jual' => '245000.00',
                 'stok_minimum' => 6,
             ],
             [
@@ -43,8 +39,6 @@ class BarangSeeder extends Seeder
                 'rak' => 'SH/GDPN | TK/GBLK',
                 'jenis_id' => 3,
                 'merek_id' => null,
-                'harga_pokok' => '0.00',
-                'harga_jual' => '0.00',
                 'stok_minimum' => 0,
             ],
         ]);

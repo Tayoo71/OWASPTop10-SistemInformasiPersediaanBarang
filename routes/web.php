@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BarangController;
+use App\Models\Barang;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -7,11 +9,7 @@ Route::get('/', function () {
         'title' => 'Halaman Utama'
     ]);
 });
-Route::get('/daftarbarang', function () {
-    return view('daftarbarang', [
-        'title' => 'Daftar Barang',
-    ]);
-});
+Route::get('/daftarbarang', [BarangController::class, 'index']);
 Route::get('/daftargudang', function () {
     return view('daftargudang', [
         'title' => 'Daftar Gudang',

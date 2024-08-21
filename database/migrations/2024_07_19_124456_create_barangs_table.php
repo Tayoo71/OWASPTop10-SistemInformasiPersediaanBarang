@@ -14,12 +14,10 @@ return new class extends Migration
         Schema::create('barangs', function (Blueprint $table) {
             $table->increments('kode_item');
             $table->string('nama_item')->unique();
-            $table->text('keterangan')->nullable();
-            $table->string('rak')->nullable();
+            $table->text('keterangan')->default('-');
+            $table->string('rak')->default('-');
             $table->foreignId('jenis_id')->nullable()->constrained('jenises')->nullOnDelete();
             $table->foreignId('merek_id')->nullable()->constrained('mereks')->nullOnDelete();
-            $table->decimal('harga_pokok', 15, 2)->default(0);
-            $table->decimal('harga_jual', 15, 2)->default(0);
             $table->integer('stok_minimum')->default(0);
         });
     }
