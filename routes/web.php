@@ -15,6 +15,16 @@ Route::get('/daftargudang', function () {
         'title' => 'Daftar Gudang',
     ]);
 });
+Route::get('/daftarjenis', function () {
+    return view('daftarjenis', [
+        'title' => 'Daftar Jenis',
+    ]);
+});
+Route::get('/daftarmerek', function () {
+    return view('daftarmerek', [
+        'title' => 'Daftar Merek',
+    ]);
+});
 Route::get('/kartustok', function () {
     return view('kartustok', [
         'title' => 'Kartu Stok',

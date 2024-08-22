@@ -5,6 +5,8 @@ export default {
         "./resources/**/*.blade.php",
         "./resources/**/*.js",
         "./resources/**/*.vue",
+        "./node_modules/flowbite/**/*.js",
+        "./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php",
     ],
     darkMode: "false",
     theme: {
@@ -14,5 +16,5 @@ export default {
             },
         },
     },
-    plugins: [],
+    plugins: [require("flowbite/plugin")],
 };
