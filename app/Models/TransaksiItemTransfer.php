@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class TransaksiItemTransfer extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'nomor_transaksi';
     const CREATED_AT = 'tanggal_transaksi';
     const UPDATED_AT = null;
-    protected $fillable = ['gudang_asal', 'gudang_tujuan', 'kode_item', 'jumlah', 'keterangan', 'user_id'];
+    protected $fillable = ['gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah', 'keterangan', 'user_buat_id'];
 
     public function gudangAsal()
     {
@@ -25,11 +24,11 @@ class TransaksiItemTransfer extends Model
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'kode_item', 'kode_item');
+        return $this->belongsTo(Barang::class);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_buat_id', 'id');
     }
 }

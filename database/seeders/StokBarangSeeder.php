@@ -14,12 +14,12 @@ class StokBarangSeeder extends Seeder
     public function run(): void
     {
         DB::table('stok_barangs')->insert([
-            ['kode_item' => 1, 'kode_gudang' => 'SH', 'stok' => 10],
-            ['kode_item' => 1, 'kode_gudang' => 'TK', 'stok' => 20],
-            ['kode_item' => 2, 'kode_gudang' => 'SH', 'stok' => 120],
-            ['kode_item' => 2, 'kode_gudang' => 'TK', 'stok' => 60],
-            ['kode_item' => 3, 'kode_gudang' => 'SH', 'stok' => 180],
-            ['kode_item' => 3, 'kode_gudang' => 'TK', 'stok' => 60],
+            ['barang_id' => 1, 'kode_gudang' => 'SH', 'stok' => 10],
+            ['barang_id' => 1, 'kode_gudang' => 'TK', 'stok' => 20],
+            ['barang_id' => 2, 'kode_gudang' => 'SH', 'stok' => 120],
+            ['barang_id' => 2, 'kode_gudang' => 'TK', 'stok' => 60],
+            ['barang_id' => 3, 'kode_gudang' => 'SH', 'stok' => 180],
+            ['barang_id' => 3, 'kode_gudang' => 'TK', 'stok' => 60],
         ]);
     }
 }

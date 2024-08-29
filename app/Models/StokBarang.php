@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class StokBarang extends Model
 {
     use HasFactory;
-    protected $primaryKey = ['kode_item', 'kode_gudang'];
+    protected $primaryKey = ['barang_id', 'kode_gudang'];
     public $incrementing = false;
-    protected $fillable = ['kode_item', 'kode_gudang', 'stok'];
+    public $timestamps = false;
+    protected $fillable = ['barang_id', 'kode_gudang', 'stok'];
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'kode_item', 'kode_item');
+        return $this->belongsTo(Barang::class);
     }
 
     public function gudang()

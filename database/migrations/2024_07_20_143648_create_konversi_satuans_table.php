@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('konversi_satuans', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('kode_item');
+            $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->string('satuan');
             $table->integer('jumlah');
-            $table->decimal('harga_pokok', 15, 2)->default(0);
-            $table->decimal('harga_jual', 15, 2)->default(0);
-
-            $table->foreign('kode_item')->references('kode_item')->on('barangs')->onDelete('cascade');
+            $table->bigInteger('harga_pokok');
+            $table->bigInteger('harga_jual');
         });
     }
 

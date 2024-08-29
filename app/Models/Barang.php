@@ -8,17 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Barang extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'kode_item';
     protected $fillable = [
         'nama_item',
         'keterangan',
         'rak',
         'jenis_id',
         'merek_id',
-        'harga_pokok',
-        'harga_jual',
         'stok_minimum',
     ];
+    public $timestamps = false;
     public function jenis()
     {
         return $this->belongsTo(Jenis::class, 'jenis_id');
@@ -31,17 +29,17 @@ class Barang extends Model
 
     public function stokBarangs()
     {
-        return $this->hasMany(StokBarang::class, 'kode_item', 'kode_item');
+        return $this->hasMany(StokBarang::class);
     }
 
     public function konversiSatuans()
     {
-        return $this->hasMany(KonversiSatuan::class, 'kode_item', 'kode_item');
+        return $this->hasMany(KonversiSatuan::class);
     }
     public function scopeSearch($query, array $filters)
     {
         $query->when($filters['search'] ?? false, function ($query, $search) {
-            return $query->where('kode_item', 'like', '%' . $search . '%')
+            return $query->where('id', 'like', '%' . $search . '%')
                 ->orWhere('nama_item', 'like', '%' . $search . '%')
                 ->orWhere('rak', 'like', '%' . $search . '%')
                 ->orWhere('keterangan', 'like', '%' . $search . '%')
@@ -54,9 +52,14 @@ class Barang extends Model
         });
 
         $query->when($filters['gudang'] ?? false, function ($query, $gudang) {
-            return $query->whereHas('stokBarangs', function ($query) use ($gudang) {
+            // Menggunakan whereHas untuk barang yang memiliki stok di gudang tertentu
+            $query->whereHas('stokBarangs', function ($query) use ($gudang) {
                 $query->where('kode_gudang', $gudang);
-            });
+            })
+                // Menggunakan orWhereDoesntHave untuk barang yang tidak memiliki stok di gudang tertentu
+                ->orWhereDoesntHave('stokBarangs', function ($query) use ($gudang) {
+                    $query->where('kode_gudang', $gudang);
+                });
         });
     }
 
@@ -67,35 +70,17 @@ class Barang extends Model
             ->when($gudang, fn($query) => $query->where('kode_gudang', $gudang))
             ->sum('stok');
 
-        $konversiSatuans = $this->konversiSatuans->sortBy('satuan');
+        $konversiSatuans = $this->konversiSatuans->sortByDesc('jumlah');
 
         $stokDisplay = [];
         $hargaPokokDisplay = [];
         $hargaJualDisplay = [];
 
         foreach ($konversiSatuans as $konversi) {
-            $stokTerkonversi = $konversi->jumlah > 0 ? $totalStok / $konversi->jumlah : 0;
-
-            $stokDisplay[] = $stokTerkonversi == floor($stokTerkonversi)
-                ? number_format($stokTerkonversi, 0, ',', '.') . ' ' . $konversi->satuan
-                : number_format($stokTerkonversi, 2, ',', '.') . ' ' . $konversi->satuan;
-
-            $hargaPokokDisplay[] = $konversi->harga_pokok == floor($konversi->harga_pokok)
-                ? number_format($konversi->harga_pokok, 0, ',', '.') . ' (' . $konversi->satuan . ')'
-                : number_format($konversi->harga_pokok, 2, ',', '.') . ' (' . $konversi->satuan . ')';
-
-            $hargaJualDisplay[] = $konversi->harga_jual == floor($konversi->harga_jual)
-                ? number_format($konversi->harga_jual, 0, ',', '.') . ' (' . $konversi->satuan . ')'
-                : number_format($konversi->harga_jual, 2, ',', '.') . ' (' . $konversi->satuan . ')';
-        }
-
-        if (empty($stokDisplay)) {
-            $stokDisplay[] = $totalStok == floor($totalStok)
-                ? number_format($totalStok, 0, ',', '.') . ' PCS'
-                : number_format($totalStok, 2, ',', '.') . ' PCS';
-
-            $hargaPokokDisplay[] = '0';
-            $hargaJualDisplay[] = '0';
+            $stokTerkonversi =  $totalStok / $konversi->jumlah;
+            $stokDisplay[] = $this->formatNumber($stokTerkonversi) . ' ' . $konversi->satuan;
+            $hargaPokokDisplay[] = $this->formatNumber($konversi->harga_pokok) . ' (' . $konversi->satuan . ')';
+            $hargaJualDisplay[] = $this->formatNumber($konversi->harga_jual) . ' (' . $konversi->satuan . ')';
         }
 
         return [
@@ -103,5 +88,11 @@ class Barang extends Model
             'harga_pokok' => implode(' / ', $hargaPokokDisplay),
             'harga_jual' => implode(' / ', $hargaJualDisplay),
         ];
+    }
+
+    private function formatNumber($number)
+    {
+        $decimal = is_float($number) ? 2 : 0;
+        return number_format($number, $decimal, ',', '.');
     }
 }

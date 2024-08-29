@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class KonversiSatuan extends Model
 {
     use HasFactory;
-    protected $fillable = ['kode_item', 'satuan', 'jumlah', 'harga_pokok', 'harga_jual'];
-
+    protected $fillable = ['barang_id', 'satuan', 'jumlah', 'harga_pokok', 'harga_jual'];
+    public $timestamps = false;
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'kode_item', 'kode_item');
+        return $this->belongsTo(Barang::class);
     }
 }

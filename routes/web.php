@@ -9,7 +9,7 @@ Route::get('/', function () {
         'title' => 'Halaman Utama'
     ]);
 });
-Route::get('/daftarbarang', [BarangController::class, 'index']);
+Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::get('/daftargudang', function () {
     return view('daftargudang', [
         'title' => 'Daftar Gudang',

@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class TransaksiBarangMasuk extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'nomor_transaksi';
     const CREATED_AT = 'tanggal_transaksi';
     const UPDATED_AT = null;
-    protected $fillable = ['kode_gudang', 'user_id', 'kode_item', 'jumlah', 'keterangan'];
+    protected $fillable = ['kode_gudang', 'user_buat_id', 'barang_id', 'jumlah_stok_masuk', 'keterangan'];
 
     public function gudang()
     {
@@ -25,6 +24,6 @@ class TransaksiBarangMasuk extends Model
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'kode_item', 'kode_item');
+        return $this->belongsTo(Barang::class);
     }
 }

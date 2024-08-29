@@ -15,7 +15,6 @@ class BarangSeeder extends Seeder
     {
         DB::table('barangs')->insert([
             [
-                'kode_item' => 1,
                 'nama_item' => 'Ban Luar 90/90-14 Maxxiss Diamond MA-3DN Tubeless',
                 'keterangan' => 'Ukuran 90mmx90mm-14inch Diamond Tubeless',
                 'rak' => 'SH/GDPN | TK/GBAN',
@@ -24,7 +23,6 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => 0,
             ],
             [
-                'kode_item' => 2,
                 'nama_item' => 'Aki Kering YTZ5-S Yuasa MF',
                 'keterangan' => 'MF-YTZ5S/GTZ5S ',
                 'rak' => 'SH/GDPN | TK/GBLK',
@@ -33,7 +31,6 @@ class BarangSeeder extends Seeder
                 'stok_minimum' => 6,
             ],
             [
-                'kode_item' => 3,
                 'nama_item' => 'Aki Kering GTZ5-S GS MF',
                 'keterangan' => null,
                 'rak' => 'SH/GDPN | TK/GBLK',

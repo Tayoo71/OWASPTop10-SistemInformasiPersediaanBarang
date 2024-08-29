@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('barangs', function (Blueprint $table) {
-            $table->increments('kode_item');
+            $table->id();
             $table->string('nama_item')->unique();
-            $table->text('keterangan')->default('-');
-            $table->string('rak')->default('-');
+            $table->text('keterangan')->nullable();
+            $table->string('rak')->nullable();
             $table->foreignId('jenis_id')->nullable()->constrained('jenises')->nullOnDelete();
             $table->foreignId('merek_id')->nullable()->constrained('mereks')->nullOnDelete();
-            $table->integer('stok_minimum')->default(0);
+            $table->integer('stok_minimum');
         });
     }
 

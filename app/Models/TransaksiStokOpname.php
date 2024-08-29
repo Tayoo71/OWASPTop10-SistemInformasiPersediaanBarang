@@ -8,17 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class TransaksiStokOpname extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'nomor_transaksi';
     const CREATED_AT = 'tanggal_transaksi';
     const UPDATED_AT = null;
     protected $fillable = [
-        'tanggal_transaksi',
         'kode_gudang',
-        'kode_item',
+        'barang_id',
         'stok_buku',
         'stok_fisik',
         'keterangan',
-        'user_id',
+        'user_buat_id',
     ];
 
     public function gudang()
@@ -28,11 +26,11 @@ class TransaksiStokOpname extends Model
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'kode_item', 'kode_item');
+        return $this->belongsTo(Barang::class);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_buat_id', 'id');
     }
 }

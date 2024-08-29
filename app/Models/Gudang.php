@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Gudang extends Model
 {
     use HasFactory;
-    protected $fillable = ['kode_gudang', 'nama', 'keterangan'];
+    protected $fillable = ['kode_gudang', 'nama_gudang'];
     protected $primaryKey = 'kode_gudang';
     public $incrementing = false;
+    public $timestamps = false;
 
     public function stokBarangs()
     {
@@ -34,11 +35,11 @@ class Gudang extends Model
 
     public function itemTransfersAsal()
     {
-        return $this->hasMany(ItemTransfer::class, 'gudang_asal', 'kode_gudang');
+        return $this->hasMany(TransaksiItemTransfer::class, 'gudang_asal', 'kode_gudang');
     }
 
     public function itemTransfersTujuan()
     {
-        return $this->hasMany(ItemTransfer::class, 'gudang_tujuan', 'kode_gudang');
+        return $this->hasMany(TransaksiItemTransfer::class, 'gudang_tujuan', 'kode_gudang');
     }
 }

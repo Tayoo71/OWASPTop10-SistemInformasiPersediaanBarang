@@ -12,19 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transaksi_item_transfers', function (Blueprint $table) {
-            $table->increments('nomor_transaksi');
+            $table->id();
             $table->string('user_buat_id');
             $table->string('gudang_asal');
             $table->string('gudang_tujuan');
-            $table->unsignedInteger('kode_item');
+            $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->integer('jumlah');
             $table->text('keterangan')->nullable();
-            $table->timestamp('tanggal_transaksi')->useCurrent();
+            $table->timestamp('tanggal_transaksi');
 
             $table->foreign('user_buat_id')->references('id')->on('users')->onDelete('restrict');
             $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onDelete('cascade');
             $table->foreign('gudang_tujuan')->references('kode_gudang')->on('gudangs')->onDelete('cascade');
-            $table->foreign('kode_item')->references('kode_item')->on('barangs')->onDelete('cascade');
         });
     }
 
