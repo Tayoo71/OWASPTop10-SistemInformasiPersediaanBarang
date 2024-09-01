@@ -57,6 +57,8 @@
                             </li>
                         @endforeach
                     </ul>
+                    <input type="hidden" name="gudang" id="gudang" value="{{ request('gudang') }}"
+                        x-bind:disabled="dropdownOpen">
                 </div>
 
                 <!-- Search Bar -->
@@ -93,7 +95,7 @@
             <thead class="text-xs text-gray-700 bg-gray-50 sticky top-0 shadow-md">
                 <tr>
                     <th scope="col" class="px-6 py-3 bg-gray-50">KODE ITEM</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">NAMA ITEM</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">NAMA BARANG</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">STOK</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">JENIS</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">MEREK</th>

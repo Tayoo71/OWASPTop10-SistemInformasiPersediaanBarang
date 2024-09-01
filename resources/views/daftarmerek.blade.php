@@ -28,7 +28,7 @@
                 <div class="relative w-full flex">
                     <input type="search" id="search-dropdown" name="search"
                         class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-l-lg border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Cari Jenis" value="{{ request('search') }}" />
+                        placeholder="Cari Merek" value="{{ request('search') }}" />
                     <button type="submit"
                         class="p-2.5 text-sm font-medium text-white bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-0 transition-none flex-shrink-0">
                         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">

@@ -5,6 +5,7 @@ use App\Http\Controllers\JenisController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\MerekController;
+use App\Http\Controllers\BarangMasukController;
 
 Route::get('/', function () {
     return view('home', [
@@ -23,11 +24,7 @@ Route::get('/kartustok', function () {
         'title' => 'Kartu Stok',
     ]);
 });
-Route::get('/barangmasuk', function () {
-    return view('barangmasuk', [
-        'title' => 'Barang Masuk',
-    ]);
-});
+Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::get('/barangkeluar', function () {
     return view('barangkeluar', [
         'title' => 'Barang Keluar',

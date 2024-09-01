@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TransaksiItemTransfer extends Model
 {
-    use HasFactory;
     const CREATED_AT = 'tanggal_transaksi';
     const UPDATED_AT = null;
     protected $fillable = ['gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah', 'keterangan', 'user_buat_id'];

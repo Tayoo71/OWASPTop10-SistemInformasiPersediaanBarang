@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Barang extends Model
 {
-    use HasFactory;
     protected $fillable = [
         'nama_item',
         'keterangan',
@@ -69,22 +67,18 @@ class Barang extends Model
         $totalStok = $this->stokBarangs
             ->when($gudang, fn($query) => $query->where('kode_gudang', $gudang))
             ->sum('stok');
+        $stokDisplay = KonversiSatuan::getFormattedConvertedStok($this, $totalStok);
 
-        $konversiSatuans = $this->konversiSatuans->sortByDesc('jumlah');
-
-        $stokDisplay = [];
         $hargaPokokDisplay = [];
         $hargaJualDisplay = [];
 
-        foreach ($konversiSatuans as $konversi) {
-            $stokTerkonversi =  $totalStok / $konversi->jumlah;
-            $stokDisplay[] = $this->formatNumber($stokTerkonversi) . ' ' . $konversi->satuan;
+        foreach ($this->konversiSatuans->sortByDesc('jumlah') as $konversi) {
             $hargaPokokDisplay[] = $this->formatNumber($konversi->harga_pokok) . ' (' . $konversi->satuan . ')';
             $hargaJualDisplay[] = $this->formatNumber($konversi->harga_jual) . ' (' . $konversi->satuan . ')';
         }
 
         return [
-            'stok' => implode(' / ', $stokDisplay),
+            'stok' => $stokDisplay,
             'harga_pokok' => implode(' / ', $hargaPokokDisplay),
             'harga_jual' => implode(' / ', $hargaJualDisplay),
         ];
