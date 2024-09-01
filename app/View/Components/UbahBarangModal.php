@@ -18,6 +18,6 @@ class UbahBarangModal extends Component
 
     public function render()
     {
-        return view('components.ubah-barang-modal');
+        return view('components.master_data.ubah-barang-modal');
     }
 }

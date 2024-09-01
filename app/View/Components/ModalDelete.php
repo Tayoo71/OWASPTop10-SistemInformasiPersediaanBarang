@@ -17,6 +17,6 @@ class ModalDelete extends Component
 
     public function render()
     {
-        return view('components.modal-delete');
+        return view('components.modal.modal-delete');
     }
 }

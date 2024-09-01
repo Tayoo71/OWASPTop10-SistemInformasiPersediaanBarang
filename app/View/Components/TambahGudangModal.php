@@ -15,6 +15,6 @@ class TambahGudangModal extends Component
 
     public function render(): View|Closure|string
     {
-        return view('components.tambah-gudang-modal');
+        return view('components.master_data.tambah-gudang-modal');
     }
 }

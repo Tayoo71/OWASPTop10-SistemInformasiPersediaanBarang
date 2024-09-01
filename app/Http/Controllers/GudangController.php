@@ -20,7 +20,7 @@ class GudangController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
-            return view('daftargudang', [
+            return view('master_data/daftargudang', [
                 'title' => 'Daftar Gudang',
                 'gudangs' => $gudangs,
                 'editGudang' => $request->has('edit') ? Gudang::find($request->edit) : null,

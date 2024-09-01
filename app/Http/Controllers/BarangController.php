@@ -40,7 +40,7 @@ class BarangController extends Controller
                 ];
             });
 
-            return view('daftarbarang', [
+            return view('master_data/daftarbarang', [
                 'title' => 'Daftar Barang',
                 'barangs' => $barangs,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),

@@ -21,6 +21,6 @@ class UbahMerekModal extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ubah-merek-modal');
+        return view('components.master_data.ubah-merek-modal');
     }
 }

@@ -20,7 +20,7 @@ class MerekController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
-            return view('daftarmerek', [
+            return view('master_data/daftarmerek', [
                 'title' => 'Daftar Merek',
                 'mereks' => $mereks,
                 'editMerek' => $request->has('edit') ? Merek::find($request->edit) : null,

@@ -21,6 +21,6 @@ class TambahMerekModal extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.tambah-merek-modal');
+        return view('components.master_data.tambah-merek-modal');
     }
 }

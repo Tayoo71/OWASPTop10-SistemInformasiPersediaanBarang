@@ -34,7 +34,7 @@ class BarangMasukController extends Controller
                 ];
             });
 
-            return view('barangmasuk', [
+            return view('transaksi/barangmasuk', [
                 'title' => 'Barang Masuk',
                 'transaksies' => $transaksies,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),

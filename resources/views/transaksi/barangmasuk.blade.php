@@ -1,25 +1,6 @@
 <x-layout>
     <x-slot:title>{{ $title }}</x-slot:title>
 
-    {{-- Display Validation and Exception Errors --}}
-    @if ($errors->any())
-        <x-alert type="error">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </x-alert>
-    @elseif (session('success'))
-        <x-alert type="success">
-            {{ session('success') }}
-        </x-alert>
-    @elseif (session('error'))
-        <x-alert type="error">
-            {{ session('error') }}
-        </x-alert>
-    @endif
-
     <!-- Search Box -->
     <form class="w-full max-w-lg lg:max-w-3xl xl:max-w-4xl mx-auto mb-4" method="GET" action="">
         <!-- Datepicker -->

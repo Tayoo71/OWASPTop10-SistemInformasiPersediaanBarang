@@ -21,6 +21,6 @@ class TambahJenisModal extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.tambah-jenis-modal');
+        return view('components.master_data.tambah-jenis-modal');
     }
 }

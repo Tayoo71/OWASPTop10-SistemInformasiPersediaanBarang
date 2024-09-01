@@ -20,7 +20,7 @@ class JenisController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
-            return view('daftarjenis', [
+            return view('master_data/daftarjenis', [
                 'title' => 'Daftar Jenis',
                 'jenises' => $jenises,
                 'editJenis' => $request->has('edit') ? Jenis::find($request->edit) : null,
