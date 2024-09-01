@@ -22,8 +22,8 @@ return new class extends Migration
             $table->timestamp('tanggal_transaksi');
 
             $table->foreign('user_buat_id')->references('id')->on('users')->onDelete('restrict');
-            $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onDelete('cascade');
-            $table->foreign('gudang_tujuan')->references('kode_gudang')->on('gudangs')->onDelete('cascade');
+            $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('gudang_tujuan')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
