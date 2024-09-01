@@ -8,13 +8,11 @@ use Illuminate\View\Component;
 
 class TambahBarangModal extends Component
 {
-    public $jenises;
-    public $mereks;
-    public function __construct($jenises, $mereks)
-    {
-        $this->jenises = $jenises;
-        $this->mereks = $mereks;
-    }
+
+    public function __construct(
+        public $jenises,
+        public $mereks
+    ) {}
 
     public function render()
     {

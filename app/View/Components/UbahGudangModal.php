@@ -6,19 +6,15 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class Alert extends Component
+class UbahGudangModal extends Component
 {
-    /**
-     * Create a new component instance.
-     */
-
-    public function __construct(public $type,) {}
+    public function __construct(public $gudang,) {}
 
     /**
      * Get the view / contents that represent the component.
      */
     public function render(): View|Closure|string
     {
-        return view('components.alert');
+        return view('components.ubah-gudang-modal');
     }
 }

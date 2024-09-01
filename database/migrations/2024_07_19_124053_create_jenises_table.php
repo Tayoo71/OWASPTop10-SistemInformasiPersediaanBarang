@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('jenises', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jenis')->unique();
+            $table->text('keterangan')->nullable();
         });
     }
 

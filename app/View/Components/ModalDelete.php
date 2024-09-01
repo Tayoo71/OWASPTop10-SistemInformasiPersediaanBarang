@@ -8,14 +8,12 @@ use Illuminate\View\Component;
 
 class ModalDelete extends Component
 {
-    public $message;
-    public $action;
 
-    public function __construct($message, $action)
-    {
-        $this->message = $message;
-        $this->action = $action;
-    }
+
+    public function __construct(
+        public $message,
+        public $action
+    ) {}
 
     public function render()
     {

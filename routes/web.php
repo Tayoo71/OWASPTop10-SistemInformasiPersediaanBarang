@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\BarangController;
-use App\Models\Barang;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\JenisController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\GudangController;
+use App\Http\Controllers\MerekController;
 
 Route::get('/', function () {
     return view('home', [
@@ -10,21 +12,12 @@ Route::get('/', function () {
     ]);
 });
 Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::get('/daftargudang', function () {
-    return view('daftargudang', [
-        'title' => 'Daftar Gudang',
-    ]);
-});
-Route::get('/daftarjenis', function () {
-    return view('daftarjenis', [
-        'title' => 'Daftar Jenis',
-    ]);
-});
-Route::get('/daftarmerek', function () {
-    return view('daftarmerek', [
-        'title' => 'Daftar Merek',
-    ]);
-});
+Route::resource('daftargudang', GudangController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::resource('daftarjenis', JenisController::class)->parameters([
+    // Menghindari Pemangkasan Plural 's'
+    'daftarjenis' => 'daftarjenis'
+])->only(['index', 'store', 'update', 'destroy']);
+Route::resource('daftarmerek', MerekController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::get('/kartustok', function () {
     return view('kartustok', [
         'title' => 'Kartu Stok',

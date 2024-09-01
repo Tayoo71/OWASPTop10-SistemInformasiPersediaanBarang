@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Gudang extends Model
 {
     use HasFactory;
-    protected $fillable = ['kode_gudang', 'nama_gudang'];
+    protected $fillable = ['kode_gudang', 'nama_gudang', 'keterangan'];
     protected $primaryKey = 'kode_gudang';
     public $incrementing = false;
     public $timestamps = false;
@@ -41,5 +42,13 @@ class Gudang extends Model
     public function itemTransfersTujuan()
     {
         return $this->hasMany(TransaksiItemTransfer::class, 'gudang_tujuan', 'kode_gudang');
+    }
+    public function scopeSearch($query, array $filters)
+    {
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('kode_gudang', 'like', '%' . $search . '%')
+                ->orWhere('nama_gudang', 'like', '%' . $search . '%')
+                ->orWhere('keterangan', 'like', '%' . $search . '%');
+        });
     }
 }

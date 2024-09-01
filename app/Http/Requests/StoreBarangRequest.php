@@ -73,8 +73,8 @@ class StoreBarangRequest extends FormRequest
 
             // Pesan untuk 'konversiSatuan'
             'konversiSatuan.required' => 'Konversi satuan wajib diisi.',
-            'konversiSatuan.array' => 'Konversi satuan wajib diisi.',
-            'konversiSatuan.min' => 'Setidaknya harus ada satu konversi satuan.',
+            'konversiSatuan.array' => 'Konversi satuan harus berupa array.',
+            'konversiSatuan.min' => 'Setidaknya satu konversi satuan harus diisi.',
 
             // Pesan untuk 'konversiSatuan.*.harga_pokok'
             'konversiSatuan.*.harga_pokok.numeric' => 'Harga pokok harus berupa angka.',
@@ -91,15 +91,15 @@ class StoreBarangRequest extends FormRequest
             'nama_item.unique' => 'Nama item sudah digunakan, pilih nama item yang lain.',
 
             // Pesan tambahan untuk aturan update
-            'konversiSatuan.*.satuan.required' => 'Kolom nama satuan diperlukan untuk konversi satuan.',
-            'konversiSatuan.*.satuan.string' => 'Kolom nama satuan harus berupa teks.',
-            'konversiSatuan.*.satuan.max' => 'Kolom nama satuan tidak boleh lebih dari 255 karakter.',
-            'konversiSatuan.*.satuan.distinct' => 'Kolom nama satuan harus unik.',
+            'konversiSatuan.*.satuan.required' => 'Nama satuan wajib diisi.',
+            'konversiSatuan.*.satuan.string' => 'Nama satuan harus berupa teks.',
+            'konversiSatuan.*.satuan.max' => 'Nama satuan tidak boleh lebih dari 255 karakter.',
+            'konversiSatuan.*.satuan.distinct' => 'Nama satuan harus unik.',
 
-            'konversiSatuan.*.jumlah.required' => 'Kolom jumlah diperlukan untuk konversi satuan.',
-            'konversiSatuan.*.jumlah.integer' => 'Kolom jumlah harus berupa angka.',
-            'konversiSatuan.*.jumlah.min' => 'Jumlah tidak boleh kurang dari 1.',
-            'konversiSatuan.*.jumlah.distinct' => 'Kolom jumlah harus unik.',
+            'konversiSatuan.*.jumlah.required' => 'Jumlah satuan wajib diisi.',
+            'konversiSatuan.*.jumlah.integer' => 'Jumlah satuan harus berupa angka.',
+            'konversiSatuan.*.jumlah.min' => 'Jumlah satuan tidak boleh kurang dari 1.',
+            'konversiSatuan.*.jumlah.distinct' => 'Jumlah satuan harus unik.',
 
             'konversiSatuan.*.id' => 'ID konversi satuan tidak valid.',
         ];

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('gudangs', function (Blueprint $table) {
             $table->string('kode_gudang')->primary();
             $table->string('nama_gudang');
+            $table->text('keterangan')->nullable();
         });
     }
 

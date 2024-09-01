@@ -51,6 +51,7 @@ class BarangController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('(BarangController.php) function[index] Error: ' . $e->getMessage(), [
+                'request_data' => $request->all(),
                 'exception_trace' => $e->getTraceAsString(),
             ]);
             return redirect('/')->withErrors('Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang.');
@@ -78,7 +79,6 @@ class BarangController extends Controller
                     'harga_jual' => $konversi['harga_jual'] ?? 0,
                 ]);
             }
-
             DB::commit();
             return redirect()->route('daftarbarang.index', [
                 'search' => $request->input('search'),
@@ -139,8 +139,7 @@ class BarangController extends Controller
     {
         DB::beginTransaction();
         try {
-            $barang = Barang::findOrFail($kode_item);
-            $barang->delete();
+            Barang::findOrFail($kode_item)->delete();
             DB::commit();
             return redirect()->route('daftarbarang.index', [
                 'search' => $request->input('search'),
@@ -148,7 +147,7 @@ class BarangController extends Controller
             ])->with('success', 'Barang berhasil dihapus.');
         } catch (\Exception $e) {
             Log::error('(BarangController.php) function[destroy] Error: ' . $e->getMessage(), [
-                'request_data' => ['id' => $kode_item],
+                'request_data' => $request->all(),
                 'exception_trace' => $e->getTraceAsString(),
             ]);
             DB::rollBack();
