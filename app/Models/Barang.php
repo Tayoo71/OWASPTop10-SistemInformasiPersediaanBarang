@@ -61,7 +61,6 @@ class Barang extends Model
         });
     }
 
-    // Method untuk menghitung stok dan mengembalikan data format
     public function getFormattedStokAndPrices($gudang = null)
     {
         $totalStok = $this->stokBarangs

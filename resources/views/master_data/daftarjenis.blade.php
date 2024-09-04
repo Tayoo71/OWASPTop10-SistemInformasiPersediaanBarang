@@ -55,7 +55,7 @@
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search']), ['edit' => $jenis['id']])) }}"
-                                    class="font-medium text-blue-600 hover:underline">
+                                    class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
                                 <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search']), ['delete' => $jenis['id']])) }}"

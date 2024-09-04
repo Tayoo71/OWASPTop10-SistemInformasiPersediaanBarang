@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransaksiItemTransfer extends Model
 {
-    const CREATED_AT = 'tanggal_transaksi';
-    const UPDATED_AT = null;
     protected $fillable = ['gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah', 'keterangan', 'user_buat_id'];
 
     public function gudangAsal()

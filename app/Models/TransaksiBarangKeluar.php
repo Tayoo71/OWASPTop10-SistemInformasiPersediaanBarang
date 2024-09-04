@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransaksiBarangKeluar extends Model
 {
-    const CREATED_AT = 'tanggal_transaksi';
-    const UPDATED_AT = null;
     protected $fillable = ['kode_gudang', 'user_buat_id', 'barang_id', 'jumlah_stok_keluar', 'keterangan'];
 
     public function gudang()

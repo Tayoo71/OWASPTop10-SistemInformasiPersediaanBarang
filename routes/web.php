@@ -25,6 +25,8 @@ Route::get('/kartustok', function () {
     ]);
 });
 Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::get('/barangmasuk/search', [BarangController::class, 'search']);
+
 Route::get('/barangkeluar', function () {
     return view('barangkeluar', [
         'title' => 'Barang Keluar',

@@ -31,4 +31,15 @@ class KonversiSatuan extends Model
 
         return implode(' / ', array_reverse($stokDisplay));
     }
+    public static function convertToSatuanDasar($barangId, $selectedSatuanId, $jumlahMasuk)
+    {
+        $satuanDasar = self::where('barang_id', $barangId)
+            ->orderBy('jumlah', 'asc')
+            ->first();
+        $selectedSatuan = self::findOrFail($selectedSatuanId);
+        if ($satuanDasar->id !== $selectedSatuan->id) {
+            $jumlahMasuk = $jumlahMasuk * $selectedSatuan->jumlah;
+        }
+        return $jumlahMasuk;
+    }
 }

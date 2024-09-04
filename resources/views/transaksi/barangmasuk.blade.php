@@ -108,7 +108,8 @@
             <thead class="text-xs text-gray-700 bg-gray-50 sticky top-0 shadow-md">
                 <tr>
                     <th scope="col" class="px-6 py-3 bg-gray-50">NOMOR TRANSAKSI</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">TANGGAL</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">TANGGAL BUAT</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">TANGGAL UBAH</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">GUDANG</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">NAMA BARANG</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">JUMLAH STOK MASUK</th>
@@ -121,7 +122,8 @@
                 @foreach ($transaksies as $transaksi)
                     <tr class="odd:bg-white even:bg-gray-50 border-b">
                         <td class="px-6 py-4 align-middle">{{ $transaksi['id'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $transaksi['tanggal_transaksi'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $transaksi['created_at'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $transaksi['updated_at'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['kode_gudang'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['nama_item'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['jumlah_stok_masuk'] }}</td>
@@ -130,7 +132,7 @@
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 <a href="{{ route('barangmasuk.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['edit' => $transaksi['id']])) }}"
-                                    class="font-medium text-blue-600 hover:underline">
+                                    class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
                                 <a href="{{ route('barangmasuk.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
@@ -149,4 +151,18 @@
     <div class="py-4 px-4 mt-4">
         {{ $transaksies->links() }}
     </div>
+
+    {{-- Modal Tambah Barang --}}
+    <x-tambah-barang-masuk-modal :gudangs="$gudangs" />
+    @if ($editTransaksi && !$errors->any() && !session('error'))
+        {{-- Modal Ubah Barang --}}
+        {{-- <x-ubah-barang-masuk-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" /> --}}
+    @elseif ($deleteTransaksi && !$errors->any() && !session('error'))
+        {{-- Modal Hapus Barang --}}
+        <x-modal-delete :action="route(
+            'barangmasuk.destroy',
+            ['barangmasuk' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
+        )"
+            message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus transaksi barang keluar dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}" | Jumlah Stok Masuk "{{ $deleteTransaksi->jumlah_stok_masuk }}"?' />
+    @endif
 </x-layout>

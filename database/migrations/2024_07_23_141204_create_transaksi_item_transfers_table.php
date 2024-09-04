@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->integer('jumlah');
             $table->text('keterangan')->nullable();
-            $table->timestamp('tanggal_transaksi');
+            $table->timestamps();
 
             $table->foreign('user_buat_id')->references('id')->on('users')->onDelete('restrict');
             $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');

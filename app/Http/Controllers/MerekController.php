@@ -44,7 +44,7 @@ class MerekController extends Controller
             DB::commit();
             return redirect()->route('daftarmerek.index', [
                 'search' => $request->input('search'),
-            ])->with('success', 'Data merek berhasil ditambahkan.');
+            ])->with('success', 'Data Merek berhasil ditambahkan.');
         } catch (\Exception $e) {
             Log::error('(MerekController.php) function[store] Error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -53,21 +53,22 @@ class MerekController extends Controller
             DB::rollBack();
             return redirect()->route('daftarmerek.index', [
                 'search' => $request->all(),
-            ])->withErrors('Terjadi kesalahan saat menambah data merek.');
+            ])->withErrors('Terjadi kesalahan saat menambah data Merek.');
         }
     }
     public function update(StoreMerekRequest $request, $id)
     {
         DB::beginTransaction();
         try {
-            Merek::findOrFail($id)->update([
+            $merek = Merek::where('id', $id)->lockForUpdate()->firstOrFail();
+            $merek->update([
                 'nama_merek' => $request->nama_merek,
                 'keterangan' => $request->keterangan,
             ]);
             DB::commit();
             return redirect()->route('daftarmerek.index', [
                 'search' => $request->input('search'),
-            ])->with('success', 'Data merek berhasil diubah.');
+            ])->with('success', 'Data Merek berhasil diubah.');
         } catch (\Exception $e) {
             Log::error('(MerekController.php) function[update] Error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -76,7 +77,7 @@ class MerekController extends Controller
             DB::rollBack();
             return redirect()->route('daftarmerek.index', [
                 'search' => $request->all(),
-            ])->withErrors('Terjadi kesalahan saat mengubah data merek.');
+            ])->withErrors('Terjadi kesalahan saat mengubah data Merek.');
         }
     }
     public function destroy(Request $request, $id)
@@ -87,7 +88,7 @@ class MerekController extends Controller
             DB::commit();
             return redirect()->route('daftarmerek.index', [
                 'search' => $request->input('search'),
-            ])->with('success', 'Data merek berhasil dihapus.');
+            ])->with('success', 'Data Merek berhasil dihapus.');
         } catch (\Exception $e) {
             Log::error('(MerekController.php) function[destroy] Error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -96,7 +97,7 @@ class MerekController extends Controller
             DB::rollBack();
             return redirect()->route('daftarmerek.index', [
                 'search' => $request->input('search'),
-            ])->withErrors('Terjadi kesalahan saat menghapus data merek.');
+            ])->withErrors('Terjadi kesalahan saat menghapus data Merek.');
         }
     }
 }

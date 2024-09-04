@@ -31,13 +31,10 @@ class StoreJenisRequest extends FormRequest
     public function messages(): array
     {
         return [
-            // Pesan untuk 'nama_jenis'
             'nama_jenis.required' => 'Nama jenis wajib diisi.',
             'nama_jenis.string' => 'Nama jenis harus berupa teks.',
             'nama_jenis.max' => 'Nama jenis tidak boleh lebih dari 255 karakter.',
             'nama_jenis.unique' => 'Nama jenis sudah digunakan, pilih nama jenis yang lain.',
-
-            // Pesan untuk 'keterangan'
             'keterangan.string' => 'Keterangan harus berupa teks.',
             'keterangan.max' => 'Keterangan tidak boleh lebih dari 1000 karakter.',
         ];

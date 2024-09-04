@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransaksiBarangMasuk extends Model
 {
-    const CREATED_AT = 'tanggal_transaksi';
-    const UPDATED_AT = null;
     protected $fillable = ['kode_gudang', 'user_buat_id', 'barang_id', 'jumlah_stok_masuk', 'keterangan'];
+    public $timestamps = true;
 
     public function gudang()
     {

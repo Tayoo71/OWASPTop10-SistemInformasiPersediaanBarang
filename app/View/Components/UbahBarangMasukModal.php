@@ -6,12 +6,12 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class ModalCreate extends Component
+class UbahBarangMasukModal extends Component
 {
     /**
      * Create a new component instance.
      */
-    public function __construct(public $title,)
+    public function __construct()
     {
         //
     }
@@ -21,6 +21,6 @@ class ModalCreate extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.modal.modal-create');
+        return view('components.transaksi.ubah-barang-masuk-modal');
     }
 }

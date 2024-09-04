@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->string('kode_gudang');
             $table->integer('stok');
+            $table->timestamps();
 
             $table->primary(['barang_id', 'kode_gudang']);
             $table->foreign('kode_gudang')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');

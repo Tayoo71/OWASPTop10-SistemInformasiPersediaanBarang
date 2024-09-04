@@ -101,7 +101,7 @@
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['edit' => $barang['id']])) }}"
-                                    class="font-medium text-blue-600 hover:underline">
+                                    class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
                                 <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['delete' => $barang['id']])) }}"
@@ -133,6 +133,6 @@
             'daftarbarang.destroy',
             ['daftarbarang' => $deleteBarang->id] + request()->only('search', 'gudang'),
         )"
-            message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus barang "{{ $deleteBarang->nama_item }}"?' />
+            message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus barang dengan Nama Item "{{ $deleteBarang->nama_item }}"?' />
     @endif
 </x-layout>

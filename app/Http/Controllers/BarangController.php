@@ -54,7 +54,7 @@ class BarangController extends Controller
                 'request_data' => $request->all(),
                 'exception_trace' => $e->getTraceAsString(),
             ]);
-            return redirect('/')->withErrors('Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang.');
+            return redirect('/')->withErrors('Terjadi kesalahan saat memuat data Barang pada halaman Daftar Barang.');
         }
     }
 
@@ -83,7 +83,7 @@ class BarangController extends Controller
             return redirect()->route('daftarbarang.index', [
                 'search' => $request->input('search'),
                 'gudang' => $request->input('gudang'),
-            ])->with('success', 'Barang berhasil ditambahkan.');
+            ])->with('success', 'Data Barang berhasil ditambahkan.');
         } catch (\Exception $e) {
             Log::error('(BarangController.php) function[store] Error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -93,14 +93,14 @@ class BarangController extends Controller
             return redirect()->route('daftarbarang.index', [
                 'search' => $request->input('search'),
                 'gudang' => $request->input('gudang'),
-            ])->withErrors('Terjadi kesalahan saat menambah data barang.');
+            ])->withErrors('Terjadi kesalahan saat menambah data Barang.');
         }
     }
     public function update(StoreBarangRequest $request, $kode_item)
     {
         DB::beginTransaction();
         try {
-            $barang = Barang::findOrFail($kode_item);
+            $barang = Barang::where('id', $kode_item)->lockForUpdate()->firstOrFail();
             $barang->update([
                 'nama_item' => $request->nama_item,
                 'jenis_id' => $request->jenis,
@@ -122,7 +122,7 @@ class BarangController extends Controller
             return redirect()->route('daftarbarang.index', [
                 'search' => $request->input('search'),
                 'gudang' => $request->input('gudang'),
-            ])->with('success', 'Barang berhasil diubah.');
+            ])->with('success', 'Data Barang berhasil diubah.');
         } catch (\Exception $e) {
             Log::error('(BarangController.php) function[update] Error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -132,7 +132,7 @@ class BarangController extends Controller
             return redirect()->route('daftarbarang.index', [
                 'search' => $request->input('search'),
                 'gudang' => $request->input('gudang'),
-            ])->withErrors('Terjadi kesalahan saat mengubah data barang.');
+            ])->withErrors('Terjadi kesalahan saat mengubah data Barang.');
         }
     }
     public function destroy(Request $request, $kode_item)
@@ -144,14 +144,28 @@ class BarangController extends Controller
             return redirect()->route('daftarbarang.index', [
                 'search' => $request->input('search'),
                 'gudang' => $request->input('gudang'),
-            ])->with('success', 'Barang berhasil dihapus.');
+            ])->with('success', 'Data Barang berhasil dihapus.');
         } catch (\Exception $e) {
             Log::error('(BarangController.php) function[destroy] Error: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
                 'exception_trace' => $e->getTraceAsString(),
             ]);
             DB::rollBack();
-            return redirect()->route('daftarbarang.index')->withErrors('Terjadi kesalahan saat menghapus barang.');
+            return redirect()->route('daftarbarang.index')->withErrors('Terjadi kesalahan saat menghapus data Barang.');
         }
+    }
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+
+        // Query to find barang and load konversi_satuans
+        $barangs = Barang::with('konversiSatuans:id,barang_id,satuan,jumlah')
+            ->where('nama_item', 'LIKE', "%{$search}%")
+            ->select('id', 'nama_item')  // Select only necessary columns
+            ->limit(5)
+            ->get();
+
+        // Return the data as JSON for use in Alpine.js
+        return response()->json($barangs);
     }
 }
