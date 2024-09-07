@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransaksiBarangMasuk extends Model
 {
-    protected $fillable = ['kode_gudang', 'user_buat_id', 'barang_id', 'jumlah_stok_masuk', 'keterangan'];
+    protected $fillable = ['kode_gudang', 'user_buat_id', 'user_update_id', 'barang_id', 'jumlah_stok_masuk', 'keterangan'];
     public $timestamps = true;
 
     public function gudang()
@@ -31,6 +31,7 @@ class TransaksiBarangMasuk extends Model
             return $query->where(function ($query) use ($search) {
                 $query->where('id', 'like', '%' . $search . '%')
                     ->orWhere('user_buat_id', 'like', '%' . $search . '%')
+                    ->orWhere('user_update_id', 'like', '%' . $search . '%')
                     ->orWhere('keterangan', 'like', '%' . $search . '%')
                     ->orWhereHas('barang', function ($query) use ($search) {
                         $query->where('nama_item', 'like', '%' . $search . '%');
@@ -43,15 +44,32 @@ class TransaksiBarangMasuk extends Model
             return $query->where('kode_gudang', 'like', '%' . $gudang . '%');
         });
 
-        // Filter by tanggal_transaksi start and end date
-        $query->when($filters['start'] ?? false, function ($query, $start) {
-            $startDate = Carbon::createFromFormat('d/m/Y', $start)->startOfDay();
-            return $query->where('tanggal_transaksi', '>=', $startDate);
-        });
+        $query->when(($filters['start'] ?? false) || ($filters['end'] ?? false), function ($query) use ($filters) {
+            $query->where(function ($query) use ($filters) {
+                // Filter by created_at start and end date
+                if ($filters['start'] ?? false) {
+                    $startDate = Carbon::createFromFormat('d/m/Y', $filters['start'])->startOfDay();
+                    $query->where('created_at', '>=', $startDate);
+                }
 
-        $query->when($filters['end'] ?? false, function ($query, $end) {
-            $endDate = Carbon::createFromFormat('d/m/Y', $end)->endOfDay();
-            return $query->where('tanggal_transaksi', '<=', $endDate);
+                if ($filters['end'] ?? false) {
+                    $endDate = Carbon::createFromFormat('d/m/Y', $filters['end'])->endOfDay();
+                    $query->where('created_at', '<=', $endDate);
+                }
+
+                // OR condition for updated_at
+                $query->orWhere(function ($query) use ($filters) {
+                    if ($filters['start'] ?? false) {
+                        $updatedStartDate = Carbon::createFromFormat('d/m/Y', $filters['start'])->startOfDay();
+                        $query->where('updated_at', '>=', $updatedStartDate);
+                    }
+
+                    if ($filters['end'] ?? false) {
+                        $updatedEndDate = Carbon::createFromFormat('d/m/Y', $filters['end'])->endOfDay();
+                        $query->where('updated_at', '<=', $updatedEndDate);
+                    }
+                });
+            });
         });
     }
 }

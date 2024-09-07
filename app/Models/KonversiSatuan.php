@@ -14,22 +14,35 @@ class KonversiSatuan extends Model
     }
     public static function getFormattedConvertedStok($barang, $jumlahStok)
     {
-        $konversiSatuans = $barang->konversiSatuans->sortBy('jumlah');
+        $konversiSatuans = $barang->konversiSatuans->sortByDesc('jumlah');
 
         $stokDisplay = [];
-        $isFirst = true;
 
         foreach ($konversiSatuans as $konversi) {
             $stokTerkonversi = $jumlahStok / $konversi->jumlah;
 
-            if ($stokTerkonversi >= 1 || $isFirst) {
+            if ($stokTerkonversi >= 1) {
                 $decimal = is_float($stokTerkonversi) ? 2 : 0;
                 $stokDisplay[] = number_format($stokTerkonversi, $decimal, ',', '.') . ' ' . $konversi->satuan;
-                $isFirst = false;
             }
         }
 
-        return implode(' / ', array_reverse($stokDisplay));
+        return implode(' / ', $stokDisplay);
+    }
+    public static function getSatuanToEdit($barang, $jumlahStok)
+    {
+        $konversiSatuans = $barang->konversiSatuans->sortByDesc('jumlah');
+        foreach ($konversiSatuans as $konversi) {
+            $stokTerkonversi = $jumlahStok / $konversi->jumlah;
+            if (floor($stokTerkonversi) == $stokTerkonversi) {
+                return [
+                    'id' => $konversi->id,
+                    'satuan' => $konversi->satuan,
+                    'jumlah' => $stokTerkonversi
+                ];
+            }
+        }
+        return null;
     }
     public static function convertToSatuanDasar($barangId, $selectedSatuanId, $jumlahMasuk)
     {

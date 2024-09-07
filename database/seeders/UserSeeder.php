@@ -22,5 +22,14 @@ class UserSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ]);
+        DB::table('users')->insert([
+            [
+                'id' => 'antony',
+                'password' => 'antony',
+                'remember_token' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
     }
 }

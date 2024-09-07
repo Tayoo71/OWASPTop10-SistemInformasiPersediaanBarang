@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="robots" content="noindex,nofollow,noarchive">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    @vite(['resources/css/app.css', 'resources/css/inter.css', 'resources/js/app.js'])
     <title>{{ $title }} - Aplikasi Persediaan Toko X</title>
 </head>
 
@@ -21,7 +20,6 @@
         </header>
         <main>
             <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                {{-- Display Validation and Exception Errors --}}
                 @if ($errors->any())
                     <x-alert type="error">
                         <ul>
@@ -39,9 +37,7 @@
                         {{ session('error') }}
                     </x-alert>
                 @endif
-
                 {{ $slot }}
-
             </div>
         </main>
     </div>

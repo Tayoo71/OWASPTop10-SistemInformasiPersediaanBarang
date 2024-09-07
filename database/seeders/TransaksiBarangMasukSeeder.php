@@ -16,6 +16,7 @@ class TransaksiBarangMasukSeeder extends Seeder
         DB::table('transaksi_barang_masuks')->insert([
             [
                 'user_buat_id' => 'admin',
+                'user_update_id' => 'admin',
                 'kode_gudang' => 'SH',
                 'barang_id' => 3,
                 'jumlah_stok_masuk' => 6,
@@ -25,6 +26,7 @@ class TransaksiBarangMasukSeeder extends Seeder
             ],
             [
                 'user_buat_id' => 'admin',
+                'user_update_id' => 'admin',
                 'kode_gudang' => 'TK',
                 'barang_id' => 1,
                 'jumlah_stok_masuk' => 2,

@@ -115,6 +115,7 @@
                     <th scope="col" class="px-6 py-3 bg-gray-50">JUMLAH STOK MASUK</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">KETERANGAN</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">USER BUAT</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">USER UPDATE</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
                 </tr>
             </thead>
@@ -129,6 +130,7 @@
                         <td class="px-6 py-4 align-middle">{{ $transaksi['jumlah_stok_masuk'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['keterangan'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['user_buat_id'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $transaksi['user_update_id'] }}</td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 <a href="{{ route('barangmasuk.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['edit' => $transaksi['id']])) }}"
@@ -156,7 +158,7 @@
     <x-tambah-barang-masuk-modal :gudangs="$gudangs" />
     @if ($editTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Ubah Barang --}}
-        {{-- <x-ubah-barang-masuk-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" /> --}}
+        <x-ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />
     @elseif ($deleteTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Hapus Barang --}}
         <x-modal-delete :action="route(

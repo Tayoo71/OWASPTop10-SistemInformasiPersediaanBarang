@@ -22,7 +22,7 @@ class StoreBarangMasukRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
+        return [
             'selected_gudang' => [
                 'required',
                 'string',
@@ -41,23 +41,6 @@ class StoreBarangMasukRequest extends FormRequest
             'jumlah_stok_masuk' => 'required|integer|min:1',
             'keterangan' => 'nullable|string|max:1000',
         ];
-        if ($this->isMethod('put')) {
-            $rules['barang_id'] = [
-                'required',
-                'integer',
-                Rule::exists('barangs', 'id')->where(function ($query) {
-                    return $query->where('id', $this->route('barangmasuk'));
-                }),
-            ];
-            $rules['satuan'] = [
-                'required',
-                'integer',
-                Rule::exists('konversi_satuans', 'id')->where(function ($query) {
-                    return $query->where('barang_id', $this->route('barangmasuk'));
-                }),
-            ];
-        }
-        return $rules;
     }
     public function messages()
     {

@@ -21,7 +21,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Barang</label>
                 <input type="text" id="barang" x-model="search" @input.debounce.500ms="searchBarang"
                     placeholder="Cari Barang..."
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5" />
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5" required />
                 <div x-show="barangList.length > 0"
                     class="absolute z-10 bg-white border border-gray-300 rounded-lg mt-1 w-full max-h-48 overflow-y-auto">
                     <template x-for="barang in barangList" :key="barang.id">
@@ -37,6 +37,7 @@
                     Stok</label>
                 <select name="satuan" id="satuan" x-model="selectedKonversiSatuan"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5" required>
+                    <option value="">Pilih Satuan</option>
                     <template x-for="satuan in konversiSatuan" :key="satuan.id">
                         <option :value="satuan.id" x-text="satuan.satuan"></option>
                     </template>

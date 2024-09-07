@@ -16,6 +16,7 @@ class TransaksiItemTransferSeeder extends Seeder
         DB::table('transaksi_item_transfers')->insert([
             [
                 'user_buat_id' => 'admin',
+                'user_update_id' => 'admin',
                 'gudang_asal' => 'SH',
                 'gudang_tujuan' => 'TK',
                 'barang_id' => 1,
@@ -26,6 +27,7 @@ class TransaksiItemTransferSeeder extends Seeder
             ],
             [
                 'user_buat_id' => 'admin',
+                'user_update_id' => 'admin',
                 'gudang_asal' => 'TK',
                 'gudang_tujuan' => 'SH',
                 'barang_id' => 2,
