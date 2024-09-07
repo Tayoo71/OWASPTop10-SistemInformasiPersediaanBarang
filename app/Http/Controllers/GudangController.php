@@ -27,13 +27,10 @@ class GudangController extends Controller
                 'deleteGudang' => $request->has('delete') ? Gudang::select('kode_gudang', 'nama_gudang')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            Log::error('(GudangController.php) function[index] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
-            return redirect('/')->withErrors('Terjadi kesalahan saat memuat data Gudang pada halaman Daftar Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Gudang pada halaman Daftar Gudang.');
         }
     }
+
     public function store(StoreGudangRequest $request)
     {
         DB::beginTransaction();
@@ -48,16 +45,11 @@ class GudangController extends Controller
                 'search' => $request->input('search'),
             ])->with('success', 'Data Gudang berhasil ditambahkan.');
         } catch (\Exception $e) {
-            Log::error('(GudangController.php) function[store] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftargudang.index', [
-                'search' => $request->input('search'),
-            ])->withErrors('Terjadi kesalahan saat menambah data Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Gudang.');
         }
     }
+
     public function update(StoreGudangRequest $request, $kode_gudang)
     {
         DB::beginTransaction();
@@ -73,16 +65,11 @@ class GudangController extends Controller
                 'search' => $request->input('search'),
             ])->with('success', 'Data Gudang berhasil diubah.');
         } catch (\Exception $e) {
-            Log::error('(GudangController.php) function[update] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftargudang.index', [
-                'search' => $request->input('search'),
-            ])->withErrors('Terjadi kesalahan saat mengubah data Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Gudang.');
         }
     }
+
     public function destroy(Request $request, $kode_gudang)
     {
         DB::beginTransaction();
@@ -93,14 +80,22 @@ class GudangController extends Controller
                 'search' => $request->input('search'),
             ])->with('success', 'Data Gudang berhasil dihapus.');
         } catch (\Exception $e) {
-            Log::error('(GudangController.php) function[destroy] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftargudang.index', [
-                'search' => $request->input('search'),
-            ])->withErrors('Terjadi kesalahan saat menghapus data Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Gudang.');
         }
+    }
+
+    /**
+     * Helper function to handle exceptions and log the error.
+     */
+    private function handleException(\Exception $e, Request $request, $customMessage)
+    {
+        Log::error('Error in GudangController: ' . $e->getMessage(), [
+            'request_data' => $request->all(),
+            'exception_trace' => $e->getTraceAsString(),
+        ]);
+        return redirect()->route('daftargudang.index', [
+            'search' => $request->input('search'),
+        ])->withErrors($customMessage);
     }
 }

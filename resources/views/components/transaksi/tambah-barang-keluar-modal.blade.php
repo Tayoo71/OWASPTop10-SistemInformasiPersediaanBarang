@@ -1,6 +1,6 @@
-<x-modal-create title="Tambah Transaksi Barang Masuk">
+<x-modal-create title="Tambah Transaksi Barang Keluar">
     <form method="POST"
-        action="{{ route('barangmasuk.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
+        action="{{ route('barangkeluar.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
         class="p-4 md:p-5">
         @csrf
         <div class="mb-4">
@@ -44,12 +44,12 @@
                 </select>
             </div>
             <div class="mb-4" x-show="selectedBarang.id !== '' && konversiSatuan.length > 0">
-                <label for="jumlah_stok_masuk"
+                <label for="jumlah_stok_keluar"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah
-                    Stok Masuk</label>
-                <input type="number" name="jumlah_stok_masuk" id="jumlah_stok_masuk" min="1" step = "1"
+                    Stok Keluar</label>
+                <input type="number" name="jumlah_stok_keluar" id="jumlah_stok_keluar" min="1" step = "1"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
-                    placeholder="Masukkan jumlah stok masuk" required>
+                    placeholder="Masukkan jumlah stok keluar" required>
             </div>
         </div>
         <div class="grid gap-4 mb-4">

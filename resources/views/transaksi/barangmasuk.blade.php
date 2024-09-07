@@ -154,17 +154,17 @@
         {{ $transaksies->links() }}
     </div>
 
-    {{-- Modal Tambah Barang --}}
+    {{-- Modal Tambah Transaksi --}}
     <x-tambah-barang-masuk-modal :gudangs="$gudangs" />
     @if ($editTransaksi && !$errors->any() && !session('error'))
-        {{-- Modal Ubah Barang --}}
+        {{-- Modal Ubah Transaksi --}}
         <x-ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />
     @elseif ($deleteTransaksi && !$errors->any() && !session('error'))
-        {{-- Modal Hapus Barang --}}
+        {{-- Modal Hapus Transaksi --}}
         <x-modal-delete :action="route(
             'barangmasuk.destroy',
             ['barangmasuk' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
         )"
-            message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus transaksi barang keluar dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}" | Jumlah Stok Masuk "{{ $deleteTransaksi->jumlah_stok_masuk }}"?' />
+            message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus transaksi barang masuk dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' />
     @endif
 </x-layout>

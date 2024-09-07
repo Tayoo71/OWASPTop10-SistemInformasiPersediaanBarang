@@ -8,31 +8,31 @@ use Illuminate\Http\Request;
 use App\Models\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\TransaksiBarangMasuk;
-use App\Http\Requests\StoreBarangMasukRequest;
+use App\Models\TransaksiBarangKeluar;
+use App\Http\Requests\StoreBarangKeluarRequest;
 
-class BarangMasukController extends Controller
+class BarangKeluarController extends Controller
 {
     public function index(Request $request)
     {
         try {
             $filters = $request->only(['search', 'gudang', 'start', 'end']);
 
-            $transaksies = TransaksiBarangMasuk::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
+            $transaksies = TransaksiBarangKeluar::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
                 ->search($filters)
                 ->orderBy('created_at', 'desc')
                 ->paginate(20)
                 ->withQueryString();
 
             $transaksies->getCollection()->transform(function ($transaksi) {
-                $convertedStok = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->jumlah_stok_masuk);
+                $convertedStok = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->jumlah_stok_keluar);
                 return [
                     'id' => $transaksi->id,
                     'created_at' => $transaksi->created_at->format('d/m/Y'),
-                    'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y'),
+                    'updated_at' => $transaksi->updated_at ==  $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y'),
                     'kode_gudang' => $transaksi->kode_gudang,
                     'nama_item' => $transaksi->barang->nama_item,
-                    'jumlah_stok_masuk' => $convertedStok,
+                    'jumlah_stok_keluar' => $convertedStok,
                     'keterangan' => $transaksi->keterangan ?? '-',
                     'user_buat_id' => $transaksi->user_buat_id,
                     'user_update_id' => $transaksi->user_update_id ?? '-'
@@ -42,64 +42,62 @@ class BarangMasukController extends Controller
             $editTransaksi = null;
             $editTransaksiSatuan = null;
             if ($request->has('edit')) {
-                $editTransaksi = TransaksiBarangMasuk::select('id', 'kode_gudang', 'barang_id', 'jumlah_stok_masuk', 'keterangan')
+                $editTransaksi = TransaksiBarangKeluar::select('id', 'kode_gudang', 'barang_id', 'jumlah_stok_keluar', 'keterangan')
                     ->with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
                     ->find($request->edit);
                 if ($editTransaksi) {
-                    $editTransaksiSatuan = KonversiSatuan::getSatuanToEdit($editTransaksi->barang, $editTransaksi->jumlah_stok_masuk);
+                    $editTransaksiSatuan = KonversiSatuan::getSatuanToEdit($editTransaksi->barang, $editTransaksi->jumlah_stok_keluar);
                 }
             }
 
-            return view('transaksi/barangmasuk', [
-                'title' => 'Barang Masuk',
+            return view('transaksi/barangkeluar', [
+                'title' => 'Barang Keluar',
                 'transaksies' => $transaksies,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
                 'editTransaksi' => $editTransaksi,
                 'editTransaksiSatuan' => $editTransaksiSatuan,
                 'deleteTransaksi' => $request->has('delete') ?
-                    TransaksiBarangMasuk::with(['barang:id,nama_item'])
+                    TransaksiBarangKeluar::with(['barang:id,nama_item'])
                     ->where('id', $request->delete)
-                    ->select('id', 'barang_id')
+                    ->select('id', 'jumlah_stok_keluar', 'barang_id')
                     ->first()
                     : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Masuk pada halaman Barang Masuk.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Keluar pada halaman Barang Keluar.');
         }
     }
-
-    public function store(StoreBarangMasukRequest $request)
+    public function store(StoreBarangKeluarRequest $request)
     {
         DB::beginTransaction();
         try {
-            $this->processTransaction($request, 'masuk', 'admin');
+            $this->processTransaction($request, 'keluar', 'admin');
             DB::commit();
-            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
-                ->with('success', 'Transaksi Barang Masuk berhasil ditambahkan.');
+            return redirect()->route('barangkeluar.index', $this->buildQueryParams($request))
+                ->with('success', 'Transaksi Barang Keluar berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Transaksi Barang Masuk.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Transaksi Barang Keluar.');
         }
     }
-
-    public function update(StoreBarangMasukRequest $request, $idTransaksi)
+    public function update(StoreBarangKeluarRequest $request, $idTransaksi)
     {
         DB::beginTransaction();
         try {
-            $old_transaksi = TransaksiBarangMasuk::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
+            $old_transaksi = TransaksiBarangKeluar::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
 
             // Revert old transaction stock before updating
-            $this->processStock($old_transaksi, 'delete_masuk');
+            $this->processStock($old_transaksi, 'delete_keluar');
 
             // Process new transaction data
-            $this->processTransaction($request, 'masuk', 'antony', $old_transaksi);
+            $this->processTransaction($request, 'keluar', 'antony', $old_transaksi);
 
             DB::commit();
-            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
-                ->with('success', 'Transaksi Barang Masuk berhasil diubah.');
+            return redirect()->route('barangkeluar.index', $this->buildQueryParams($request))
+                ->with('success', 'Transaksi Barang Keluar berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah Transaksi Barang Masuk.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah Transaksi Barang Keluar.');
         }
     }
 
@@ -107,48 +105,48 @@ class BarangMasukController extends Controller
     {
         DB::beginTransaction();
         try {
-            $transaksi = TransaksiBarangMasuk::findOrFail($id);
-            $this->processStock($transaksi, 'delete_masuk');
+            $transaksi = TransaksiBarangKeluar::findOrFail($id);
+            $this->processStock($transaksi, 'delete_keluar');
             $transaksi->delete();
             DB::commit();
-            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
-                ->with('success', 'Transaksi Barang Masuk berhasil dihapus.');
+            return redirect()->route('barangkeluar.index', $this->buildQueryParams($request))
+                ->with('success', 'Transaksi Barang Keluar berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus Transaksi Barang Masuk.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus Transaksi Barang Keluar.');
         }
     }
 
     private function processStock($transaksi, $operation)
     {
-        StokBarang::updateStok($transaksi->barang_id, $transaksi->kode_gudang, $transaksi->jumlah_stok_masuk, $operation);
+        StokBarang::updateStok($transaksi->barang_id, $transaksi->kode_gudang, $transaksi->jumlah_stok_keluar, $operation);
     }
 
     private function processTransaction($request, $operation, $userId, $old_transaksi = null)
     {
         $barangId = $request->barang_id;
         $selectedSatuanId = $request->satuan;
-        $jumlahStokMasuk = $request->jumlah_stok_masuk;
+        $jumlahStokKeluar = $request->jumlah_stok_keluar;
         $selectedGudang = $request->selected_gudang;
 
-        $jumlahMasukSatuanDasar = KonversiSatuan::convertToSatuanDasar($barangId, $selectedSatuanId, $jumlahStokMasuk);
+        $jumlahKeluarSatuanDasar = KonversiSatuan::convertToSatuanDasar($barangId, $selectedSatuanId, $jumlahStokKeluar);
 
-        StokBarang::updateStok($barangId, $selectedGudang, $jumlahMasukSatuanDasar, $operation);
+        StokBarang::updateStok($barangId, $selectedGudang, $jumlahKeluarSatuanDasar, $operation);
 
         if ($old_transaksi) {
             $old_transaksi->update([
                 'user_update_id' => $userId,
                 'kode_gudang' => $selectedGudang,
                 'barang_id' => $barangId,
-                'jumlah_stok_masuk' => $jumlahMasukSatuanDasar,
+                'jumlah_stok_keluar' => $jumlahKeluarSatuanDasar,
                 'keterangan' => $request->keterangan,
             ]);
         } else {
-            TransaksiBarangMasuk::create([
+            TransaksiBarangKeluar::create([
                 'user_buat_id' => $userId,
                 'kode_gudang' => $selectedGudang,
                 'barang_id' => $barangId,
-                'jumlah_stok_masuk' => $jumlahMasukSatuanDasar,
+                'jumlah_stok_keluar' => $jumlahKeluarSatuanDasar,
                 'keterangan' => $request->keterangan,
             ]);
         }
@@ -163,11 +161,11 @@ class BarangMasukController extends Controller
         if (in_array($e->getMessage(), $customErrors)) {
             $custom_message = $custom_message . $e->getMessage();
         }
-        Log::error('Error in BarangMasukController: ' . $e->getMessage(), [
+        Log::error('Error in BarangKeluarController: ' . $e->getMessage(), [
             'request_data' => $request->all(),
             'exception_trace' => $e->getTraceAsString(),
         ]);
-        return redirect()->route('barangmasuk.index')->withErrors($custom_message);
+        return redirect()->route('barangkeluar.index')->withErrors($custom_message);
     }
     private function buildQueryParams($request)
     {

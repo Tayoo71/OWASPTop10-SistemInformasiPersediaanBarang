@@ -27,12 +27,10 @@ class JenisController extends Controller
                 'deleteJenis' => $request->has('delete') ? Jenis::select('id', 'nama_jenis')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            Log::error('(JenisController.php) function[index] Error: ' . $e->getMessage(), [
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
-            return redirect('/')->withErrors('Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis.');
         }
     }
+
     public function store(StoreJenisRequest $request)
     {
         DB::beginTransaction();
@@ -46,16 +44,11 @@ class JenisController extends Controller
                 'search' => $request->input('search'),
             ])->with('success', 'Data Jenis berhasil ditambahkan.');
         } catch (\Exception $e) {
-            Log::error('(JenisController.php) function[store] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftarjenis.index', [
-                'search' => $request->all(),
-            ])->withErrors('Terjadi kesalahan saat menambah data Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Jenis.');
         }
     }
+
     public function update(StoreJenisRequest $request, $id)
     {
         DB::beginTransaction();
@@ -70,16 +63,11 @@ class JenisController extends Controller
                 'search' => $request->input('search'),
             ])->with('success', 'Data Jenis berhasil diubah.');
         } catch (\Exception $e) {
-            Log::error('(JenisController.php) function[update] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftarjenis.index', [
-                'search' => $request->all(),
-            ])->withErrors('Terjadi kesalahan saat mengubah data Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Jenis.');
         }
     }
+
     public function destroy(Request $request, $id)
     {
         DB::beginTransaction();
@@ -90,14 +78,22 @@ class JenisController extends Controller
                 'search' => $request->input('search'),
             ])->with('success', 'Data Jenis berhasil dihapus.');
         } catch (\Exception $e) {
-            Log::error('(JenisController.php) function[destroy] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftarjenis.index', [
-                'search' => $request->input('search'),
-            ])->withErrors('Terjadi kesalahan saat menghapus data Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Jenis.');
         }
+    }
+
+    /**
+     * Helper function to handle exceptions and log the error.
+     */
+    private function handleException(\Exception $e, Request $request, $customMessage)
+    {
+        Log::error('Error in JenisController: ' . $e->getMessage(), [
+            'request_data' => $request->all(),
+            'exception_trace' => $e->getTraceAsString(),
+        ]);
+        return redirect()->route('daftarjenis.index', [
+            'search' => $request->input('search'),
+        ])->withErrors($customMessage);
     }
 }

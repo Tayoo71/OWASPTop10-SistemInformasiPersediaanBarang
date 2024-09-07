@@ -2,10 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JenisController;
+use App\Http\Controllers\MerekController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\GudangController;
-use App\Http\Controllers\MerekController;
 use App\Http\Controllers\BarangMasukController;
+use App\Http\Controllers\BarangKeluarController;
 
 Route::get('/', function () {
     return view('home', [
@@ -24,14 +25,9 @@ Route::get('/kartustok', function () {
         'title' => 'Kartu Stok',
     ]);
 });
+Route::get('/barang/search', [BarangController::class, 'search']);
 Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::get('/barangmasuk/search', [BarangController::class, 'search']);
-
-Route::get('/barangkeluar', function () {
-    return view('barangkeluar', [
-        'title' => 'Barang Keluar',
-    ]);
-});
+Route::resource('barangkeluar', BarangKeluarController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::get('/stokopname', function () {
     return view('stokopname', [
         'title' => 'Stok Opname',

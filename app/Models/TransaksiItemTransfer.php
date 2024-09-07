@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransaksiItemTransfer extends Model
 {
-    protected $fillable = ['gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah', 'keterangan', 'user_buat_id'];
+    protected $fillable = ['gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah', 'keterangan', 'user_update_id', 'user_buat_id'];
 
     public function gudangAsal()
     {

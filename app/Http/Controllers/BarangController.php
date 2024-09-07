@@ -44,17 +44,13 @@ class BarangController extends Controller
                 'title' => 'Daftar Barang',
                 'barangs' => $barangs,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
-                'jenises' =>  Jenis::select('id', 'nama_jenis')->get(),
-                'mereks' =>  Merek::select('id', 'nama_merek')->get(),
+                'jenises' => Jenis::select('id', 'nama_jenis')->get(),
+                'mereks' => Merek::select('id', 'nama_merek')->get(),
                 'editBarang' => $request->has('edit') ? Barang::with(['konversiSatuans'])->find($request->edit) : null,
                 'deleteBarang' => $request->has('delete') ? Barang::select('id', 'nama_item')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            Log::error('(BarangController.php) function[index] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
-            return redirect('/')->withErrors('Terjadi kesalahan saat memuat data Barang pada halaman Daftar Barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang.');
         }
     }
 
@@ -62,14 +58,7 @@ class BarangController extends Controller
     {
         DB::beginTransaction();
         try {
-            $barang = Barang::create([
-                'nama_item' => $request->nama_item,
-                'jenis_id' => $request->jenis,
-                'merek_id' => $request->merek,
-                'rak' => $request->rak,
-                'keterangan' => $request->keterangan,
-                'stok_minimum' => $$request->stok_minimum ?? 0,
-            ]);
+            $barang = Barang::create($this->getBarangData($request));
 
             foreach ($request->konversiSatuan as $konversi) {
                 $barang->konversiSatuans()->create([
@@ -80,35 +69,21 @@ class BarangController extends Controller
                 ]);
             }
             DB::commit();
-            return redirect()->route('daftarbarang.index', [
-                'search' => $request->input('search'),
-                'gudang' => $request->input('gudang'),
-            ])->with('success', 'Data Barang berhasil ditambahkan.');
+            return redirect()->route('daftarbarang.index', $this->buildQueryParams($request))
+                ->with('success', 'Data Barang berhasil ditambahkan.');
         } catch (\Exception $e) {
-            Log::error('(BarangController.php) function[store] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftarbarang.index', [
-                'search' => $request->input('search'),
-                'gudang' => $request->input('gudang'),
-            ])->withErrors('Terjadi kesalahan saat menambah data Barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data barang.');
         }
     }
+
     public function update(StoreBarangRequest $request, $kode_item)
     {
         DB::beginTransaction();
         try {
             $barang = Barang::where('id', $kode_item)->lockForUpdate()->firstOrFail();
-            $barang->update([
-                'nama_item' => $request->nama_item,
-                'jenis_id' => $request->jenis,
-                'merek_id' => $request->merek,
-                'rak' => $request->rak,
-                'keterangan' => $request->keterangan,
-                'stok_minimum' => $request->stok_minimum ?? 0,
-            ]);
+            $barang->update($this->getBarangData($request));
+
             foreach ($request->konversiSatuan as $konversi) {
                 $barang->konversiSatuans()
                     ->where('id', $konversi['id'])
@@ -119,53 +94,76 @@ class BarangController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('daftarbarang.index', [
-                'search' => $request->input('search'),
-                'gudang' => $request->input('gudang'),
-            ])->with('success', 'Data Barang berhasil diubah.');
+            return redirect()->route('daftarbarang.index', $this->buildQueryParams($request))
+                ->with('success', 'Data Barang berhasil diubah.');
         } catch (\Exception $e) {
-            Log::error('(BarangController.php) function[update] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftarbarang.index', [
-                'search' => $request->input('search'),
-                'gudang' => $request->input('gudang'),
-            ])->withErrors('Terjadi kesalahan saat mengubah data Barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data barang.');
         }
     }
+
     public function destroy(Request $request, $kode_item)
     {
         DB::beginTransaction();
         try {
             Barang::findOrFail($kode_item)->delete();
             DB::commit();
-            return redirect()->route('daftarbarang.index', [
-                'search' => $request->input('search'),
-                'gudang' => $request->input('gudang'),
-            ])->with('success', 'Data Barang berhasil dihapus.');
+            return redirect()->route('daftarbarang.index', $this->buildQueryParams($request))
+                ->with('success', 'Data Barang berhasil dihapus.');
         } catch (\Exception $e) {
-            Log::error('(BarangController.php) function[destroy] Error: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'exception_trace' => $e->getTraceAsString(),
-            ]);
             DB::rollBack();
-            return redirect()->route('daftarbarang.index')->withErrors('Terjadi kesalahan saat menghapus data Barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data barang.');
         }
     }
+
     public function search(Request $request)
     {
         $search = $request->input('search');
 
-        // Query to find barang and load konversi_satuans
         $barangs = Barang::with('konversiSatuans:id,barang_id,satuan,jumlah')
             ->where('nama_item', 'LIKE', "%{$search}%")
-            ->select('id', 'nama_item')  // Select only necessary columns
+            ->select('id', 'nama_item')
             ->limit(5)
             ->get();
 
-        // Return the data as JSON for use in Alpine.js
         return response()->json($barangs);
+    }
+
+    /**
+     * Helper function to build query parameters for redirects.
+     */
+    private function buildQueryParams(Request $request)
+    {
+        return [
+            'search' => $request->input('search'),
+            'gudang' => $request->input('gudang'),
+        ];
+    }
+
+    /**
+     * Helper function to handle exceptions and log the error.
+     */
+    private function handleException(\Exception $e, $request, $customMessage)
+    {
+        Log::error('Error in BarangController: ' . $e->getMessage(), [
+            'request_data' => $request->all(),
+            'exception_trace' => $e->getTraceAsString(),
+        ]);
+        return redirect()->route('daftarbarang.index')->withErrors($customMessage);
+    }
+
+    /**
+     * Helper function to extract barang data from the request.
+     */
+    private function getBarangData(StoreBarangRequest $request)
+    {
+        return [
+            'nama_item' => $request->nama_item,
+            'jenis_id' => $request->jenis,
+            'merek_id' => $request->merek,
+            'rak' => $request->rak,
+            'keterangan' => $request->keterangan,
+            'stok_minimum' => $request->stok_minimum ?? 0,
+        ];
     }
 }
