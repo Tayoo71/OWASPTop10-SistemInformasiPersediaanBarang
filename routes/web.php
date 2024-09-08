@@ -7,12 +7,13 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
+use App\Http\Controllers\StokMinimumController;
 
 Route::get('/', function () {
     return view('home', [
         'title' => 'Halaman Utama'
     ]);
-});
+})->name('home_page');
 Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftargudang', GudangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftarjenis', JenisController::class)->parameters([
@@ -20,6 +21,7 @@ Route::resource('daftarjenis', JenisController::class)->parameters([
     'daftarjenis' => 'daftarjenis'
 ])->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftarmerek', MerekController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::resource('stokminimum', StokMinimumController::class)->only(['index']);
 Route::get('/kartustok', function () {
     return view('kartustok', [
         'title' => 'Kartu Stok',

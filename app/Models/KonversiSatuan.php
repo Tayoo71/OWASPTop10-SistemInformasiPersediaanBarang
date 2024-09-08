@@ -15,15 +15,15 @@ class KonversiSatuan extends Model
     public static function getFormattedConvertedStok($barang, $jumlahStok)
     {
         $konversiSatuans = $barang->konversiSatuans->sortByDesc('jumlah');
-
         $stokDisplay = [];
-
         foreach ($konversiSatuans as $konversi) {
             $stokTerkonversi = $jumlahStok / $konversi->jumlah;
-
+            $isLast = $konversi->is($konversiSatuans->last());
             if ($stokTerkonversi >= 1) {
                 $decimal = is_float($stokTerkonversi) ? 2 : 0;
                 $stokDisplay[] = number_format($stokTerkonversi, $decimal, ',', '.') . ' ' . $konversi->satuan;
+            } elseif ($isLast) {
+                $stokDisplay[] = $stokTerkonversi . ' ' . $konversi->satuan;
             }
         }
 

@@ -60,16 +60,7 @@
     </form>
 
     <!-- Wrapper untuk Tabel dan Button Tambah -->
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
-        <!-- Tambah Barang Button -->
-        <div class="flex justify-between items-center mb-4">
-            <!-- Modal Trigger -->
-            <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                Tambah Barang
-            </button>
-        </div>
-
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-6">
         <!-- Tabel -->
         <table class="w-full text-sm text-center text-gray-500">
             <thead class="text-xs text-gray-700 bg-gray-50 sticky top-0 shadow-md">
@@ -77,13 +68,11 @@
                     <th scope="col" class="px-6 py-3 bg-gray-50">KODE ITEM</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">NAMA BARANG</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">STOK</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">STOK MINIMUM</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">JENIS</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">MEREK</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">HARGA POKOK</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">HARGA JUAL</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">RAK</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">KETERANGAN</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
                 </tr>
             </thead>
             <tbody>
@@ -92,29 +81,16 @@
                         <td class="px-6 py-4 align-middle">{{ $barang['id'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['nama_item'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['stok'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $barang['stok_minimum'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['jenis'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['merek'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['harga_pokok'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['harga_jual'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['rak'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['keterangan'] }}</td>
-                        <td class="px-6 py-4 align-middle">
-                            <div class="flex justify-center items-center">
-                                <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['edit' => $barang['id']])) }}"
-                                    class="font-medium text-yellow-300 hover:underline">
-                                    Ubah
-                                </a>
-                                <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['delete' => $barang['id']])) }}"
-                                    class="font-medium text-red-600 hover:underline ml-3">
-                                    Hapus
-                                </a>
-                            </div>
-                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data barang tidak ditemukan.
-                        </td>
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data Informasi Stok Miniumum
+                            tidak ditemukan.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -125,19 +101,4 @@
     <div class="py-4 px-4 mt-4">
         {{ $barangs->links() }}
     </div>
-
-    {{-- Modal Tambah Barang --}}
-    <x-tambah-barang-modal :jenises="$jenises" :mereks="$mereks" />
-
-    @if ($editBarang && !$errors->any() && !session('error'))
-        {{-- Modal Ubah Barang --}}
-        <x-ubah-barang-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" />
-    @elseif ($deleteBarang && !$errors->any() && !session('error'))
-        {{-- Modal Hapus Barang --}}
-        <x-modal-delete :action="route(
-            'daftarbarang.destroy',
-            ['daftarbarang' => $deleteBarang->id] + request()->only('search', 'gudang'),
-        )"
-            message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus barang dengan Nama Item "{{ $deleteBarang->nama_item }}"?' />
-    @endif
 </x-layout>

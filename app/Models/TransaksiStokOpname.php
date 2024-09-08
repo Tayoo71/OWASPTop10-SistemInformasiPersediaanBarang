@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransaksiStokOpname extends Model
 {
-    const CREATED_AT = 'tanggal_transaksi';
-    const UPDATED_AT = null;
     protected $fillable = [
         'kode_gudang',
         'barang_id',
@@ -15,6 +13,7 @@ class TransaksiStokOpname extends Model
         'stok_fisik',
         'keterangan',
         'user_buat_id',
+        'user_update_id'
     ];
 
     public function gudang()

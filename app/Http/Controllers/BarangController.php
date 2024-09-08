@@ -50,7 +50,7 @@ class BarangController extends Controller
                 'deleteBarang' => $request->has('delete') ? Barang::select('id', 'nama_item')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang.', 'home_page');
         }
     }
 
@@ -143,13 +143,13 @@ class BarangController extends Controller
     /**
      * Helper function to handle exceptions and log the error.
      */
-    private function handleException(\Exception $e, $request, $customMessage)
+    private function handleException(\Exception $e, $request, $customMessage, $redirect = 'daftarbarang.index')
     {
         Log::error('Error in BarangController: ' . $e->getMessage(), [
             'request_data' => $request->all(),
             'exception_trace' => $e->getTraceAsString(),
         ]);
-        return redirect()->route('daftarbarang.index')->withErrors($customMessage);
+        return redirect()->route($redirect)->withErrors($customMessage);
     }
 
     /**

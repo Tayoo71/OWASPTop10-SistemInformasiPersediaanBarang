@@ -120,7 +120,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($transaksies as $transaksi)
+                @forelse ($transaksies as $transaksi)
                     <tr class="odd:bg-white even:bg-gray-50 border-b">
                         <td class="px-6 py-4 align-middle">{{ $transaksi['id'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['created_at'] }}</td>
@@ -144,7 +144,13 @@
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data Transaksi Barang Keluar
+                            tidak ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

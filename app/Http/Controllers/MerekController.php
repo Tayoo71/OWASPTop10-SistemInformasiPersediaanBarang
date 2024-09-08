@@ -27,7 +27,7 @@ class MerekController extends Controller
                 'deleteMerek' => $request->has('delete') ? Merek::select('id', 'nama_merek')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Merek pada halaman Daftar Merek.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Merek pada halaman Daftar Merek.', 'home_page');
         }
     }
 
@@ -86,13 +86,13 @@ class MerekController extends Controller
     /**
      * Helper function to handle exceptions and log the error.
      */
-    private function handleException(\Exception $e, Request $request, $customMessage)
+    private function handleException(\Exception $e, Request $request, $customMessage, $redirect = 'daftarmerek.index')
     {
         Log::error('Error in MerekController: ' . $e->getMessage(), [
             'request_data' => $request->all(),
             'exception_trace' => $e->getTraceAsString(),
         ]);
-        return redirect()->route('daftarmerek.index', [
+        return redirect()->route($redirect, [
             'search' => $request->input('search'),
         ])->withErrors($customMessage);
     }

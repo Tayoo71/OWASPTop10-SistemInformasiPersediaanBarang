@@ -27,7 +27,7 @@ class JenisController extends Controller
                 'deleteJenis' => $request->has('delete') ? Jenis::select('id', 'nama_jenis')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis.', 'home_page');
         }
     }
 
@@ -86,13 +86,13 @@ class JenisController extends Controller
     /**
      * Helper function to handle exceptions and log the error.
      */
-    private function handleException(\Exception $e, Request $request, $customMessage)
+    private function handleException(\Exception $e, Request $request, $customMessage, $redirect = 'daftarjenis.index')
     {
         Log::error('Error in JenisController: ' . $e->getMessage(), [
             'request_data' => $request->all(),
             'exception_trace' => $e->getTraceAsString(),
         ]);
-        return redirect()->route('daftarjenis.index', [
+        return redirect()->route($redirect, [
             'search' => $request->input('search'),
         ])->withErrors($customMessage);
     }

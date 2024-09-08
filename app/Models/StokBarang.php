@@ -20,7 +20,16 @@ class StokBarang extends Model
     {
         return $this->belongsTo(Gudang::class, 'kode_gudang', 'kode_gudang');
     }
+    public static function getCurrentStock($barangId, $kodeGudang = null)
+    {
+        $query = self::where('barang_id', $barangId);
 
+        if (!is_null($kodeGudang)) {
+            $query->where('kode_gudang', $kodeGudang);
+        }
+
+        return $query->sum('stok');
+    }
     public static function updateStok($barangId, $kodeGudang, $jumlah, $proses)
     {
         $stokBarang = DB::table('stok_barangs')

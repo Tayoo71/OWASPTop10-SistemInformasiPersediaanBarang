@@ -11,7 +11,7 @@
                             class="rounded-md {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 text-sm font-medium">Home</a>
                         <div class="relative">
                             <button @click="isMasterDataOpen = !isMasterDataOpen"
-                                class="rounded-md px-3 py-2 text-sm font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek']) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                class="rounded-md px-3 py-2 text-sm font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
                                 Master Data
                             </button>
                             <div x-show="isMasterDataOpen" @click.away="isMasterDataOpen = false"
@@ -38,6 +38,9 @@
                                 <a href="/daftarmerek"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarmerek') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
                                     Merek</a>
+                                <a href="/stokminimum"
+                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokminimum') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Informasi
+                                    Stok Minimum</a>
                             </div>
                         </div>
 
@@ -130,7 +133,7 @@
             <a href="/"
                 class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Home</a>
             <p
-                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
+                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
                 Master Data</p>
             <a href="/daftarbarang"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarbarang') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
@@ -147,6 +150,9 @@
             <a href="/daftarmerek"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarmerek') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
                 Merek</a>
+            <a href="/stokminimum"
+                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokminimum') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Informasi
+                Stok Minimum</a>
             <p
                 class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['barangmasuk', 'barangkeluar', 'stokopname', 'itemtransfer']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
                 Transaksi</p>

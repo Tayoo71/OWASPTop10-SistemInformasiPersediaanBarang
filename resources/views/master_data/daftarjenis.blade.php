@@ -45,7 +45,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($jenises as $jenis)
+                @forelse ($jenises as $jenis)
                     <tr class="odd:bg-white even:bg-gray-50 border-b">
                         <td class="px-6 py-4 align-middle">{{ $jenis['id'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $jenis['nama_jenis'] }}</td>
@@ -65,7 +65,12 @@
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data Jenis tidak ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

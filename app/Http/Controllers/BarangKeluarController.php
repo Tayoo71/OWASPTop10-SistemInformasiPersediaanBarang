@@ -64,7 +64,7 @@ class BarangKeluarController extends Controller
                     : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Keluar pada halaman Barang Keluar.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Keluar pada halaman Barang Keluar.', 'home_page');
         }
     }
     public function store(StoreBarangKeluarRequest $request)
@@ -151,7 +151,7 @@ class BarangKeluarController extends Controller
             ]);
         }
     }
-    private function handleException(\Exception $e, $request, $custom_message)
+    private function handleException(\Exception $e, $request, $custom_message, $redirect = 'barangkeluar.index')
     {
         $customErrors = [
             'Stok tidak mencukupi untuk dikurangi.',
@@ -165,7 +165,7 @@ class BarangKeluarController extends Controller
             'request_data' => $request->all(),
             'exception_trace' => $e->getTraceAsString(),
         ]);
-        return redirect()->route('barangkeluar.index')->withErrors($custom_message);
+        return redirect()->route($redirect)->withErrors($custom_message);
     }
     private function buildQueryParams($request)
     {

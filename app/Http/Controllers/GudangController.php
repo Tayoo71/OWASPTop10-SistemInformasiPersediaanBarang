@@ -27,7 +27,7 @@ class GudangController extends Controller
                 'deleteGudang' => $request->has('delete') ? Gudang::select('kode_gudang', 'nama_gudang')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Gudang pada halaman Daftar Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Gudang pada halaman Daftar Gudang.', 'home_page');
         }
     }
 
@@ -88,13 +88,13 @@ class GudangController extends Controller
     /**
      * Helper function to handle exceptions and log the error.
      */
-    private function handleException(\Exception $e, Request $request, $customMessage)
+    private function handleException(\Exception $e, Request $request, $customMessage, $redirect = 'daftargudang.index')
     {
         Log::error('Error in GudangController: ' . $e->getMessage(), [
             'request_data' => $request->all(),
             'exception_trace' => $e->getTraceAsString(),
         ]);
-        return redirect()->route('daftargudang.index', [
+        return redirect()->route($redirect, [
             'search' => $request->input('search'),
         ])->withErrors($customMessage);
     }

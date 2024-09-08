@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('transaksi_stok_opnames', function (Blueprint $table) {
             $table->id();
             $table->string('user_buat_id');
+            $table->string('user_update_id')->nullable();
             $table->string('kode_gudang');
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->integer('stok_buku');
             $table->integer('stok_fisik');
             $table->text('keterangan')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
 
             $table->foreign('user_buat_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('user_update_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('restrict');
             $table->foreign('kode_gudang')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');
         });
     }

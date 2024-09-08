@@ -45,7 +45,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($gudangs as $gudang)
+                @forelse ($gudangs as $gudang)
                     <tr class="odd:bg-white even:bg-gray-50 border-b">
                         <td class="px-6 py-4 align-middle">{{ $gudang['kode_gudang'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $gudang['nama_gudang'] }}</td>
@@ -65,7 +65,12 @@
                             </div>
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data Gudang tidak ditemukan.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

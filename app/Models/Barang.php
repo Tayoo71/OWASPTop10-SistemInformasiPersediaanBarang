@@ -60,12 +60,9 @@ class Barang extends Model
                 });
         });
     }
-
     public function getFormattedStokAndPrices($gudang = null)
     {
-        $totalStok = $this->stokBarangs
-            ->when($gudang, fn($query) => $query->where('kode_gudang', $gudang))
-            ->sum('stok');
+        $totalStok = StokBarang::getCurrentStock($this->id, $gudang);
         $stokDisplay = KonversiSatuan::getFormattedConvertedStok($this, $totalStok);
 
         $hargaPokokDisplay = [];

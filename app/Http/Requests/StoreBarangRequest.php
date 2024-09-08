@@ -50,6 +50,19 @@ class StoreBarangRequest extends FormRequest
 
         return $rules;
     }
+    protected function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            $konversiSatuan = $this->input('konversiSatuan', []);
+
+            // Check if at least one 'jumlah' value equals 1
+            $hasOneInJumlah = collect($konversiSatuan)->pluck('jumlah')->contains(1);
+
+            if (!$hasOneInJumlah && !$this->isMethod('put')) {
+                $validator->errors()->add('konversiSatuan', 'Setidaknya satu dari Jumlah dalam Konversi Satuan harus memiliki nilai 1');
+            }
+        });
+    }
     public function messages()
     {
         return [
