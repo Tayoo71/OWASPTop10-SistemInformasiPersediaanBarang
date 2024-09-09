@@ -8,6 +8,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
+use App\Http\Controllers\ItemTransferController;
 use App\Http\Controllers\StokMinimumController;
 use App\Http\Controllers\StokOpnameController;
 
@@ -31,12 +32,8 @@ Route::get('/kartustok', function () {
 });
 Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('barangkeluar', BarangKeluarController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::resource('stokopname', StokOpnameController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::get('/itemtransfer', function () {
-    return view('itemtransfer', [
-        'title' => 'Item Transfer',
-    ]);
-});
+Route::resource('stokopname', StokOpnameController::class)->only(['index', 'store', 'destroy']);
+Route::resource('itemtransfer', ItemTransferController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::get('/laporan', function () {
     return view('laporan', [
         'title' => 'Laporan Daftar Barang',

@@ -138,7 +138,7 @@ class StokOpnameController extends Controller
         if (in_array($e->getMessage(), $customErrors)) {
             $custom_message = $custom_message . $e->getMessage();
         }
-        Log::error('Error in BarangMasukController: ' . $e->getMessage(), [
+        Log::error('Error in StokOpnameController: ' . $e->getMessage(), [
             'request_data' => $request->all(),
             'exception_trace' => $e->getTraceAsString(),
         ]);

@@ -20,7 +20,7 @@ class TransaksiItemTransferSeeder extends Seeder
                 'gudang_asal' => 'SH',
                 'gudang_tujuan' => 'TK',
                 'barang_id' => 1,
-                'jumlah' => 2,
+                'jumlah_stok_transfer' => 2,
                 'keterangan' => 'Barang dipindahkan oleh: Yanto',
                 'created_at' => '2024-07-30 08:20:47',
                 'updated_at' => '2024-08-17 08:20:47'
@@ -31,7 +31,7 @@ class TransaksiItemTransferSeeder extends Seeder
                 'gudang_asal' => 'TK',
                 'gudang_tujuan' => 'SH',
                 'barang_id' => 2,
-                'jumlah' => 6,
+                'jumlah_stok_transfer' => 6,
                 'keterangan' => 'Barang dipindahkan oleh: Budi. Karena tidak ada lagi ruang pada Toko',
                 'created_at' => '2024-07-30 08:20:47',
                 'updated_at' => '2024-08-20 08:16:43'
