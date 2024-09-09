@@ -27,7 +27,7 @@ class JenisController extends Controller
                 'deleteJenis' => $request->has('delete') ? Jenis::select('id', 'nama_jenis')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis.', 'home_page');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis. ', 'home_page');
         }
     }
 
@@ -45,7 +45,7 @@ class JenisController extends Controller
             ])->with('success', 'Data Jenis berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Jenis. ');
         }
     }
 
@@ -64,7 +64,7 @@ class JenisController extends Controller
             ])->with('success', 'Data Jenis berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Jenis. ');
         }
     }
 
@@ -79,7 +79,7 @@ class JenisController extends Controller
             ])->with('success', 'Data Jenis berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Jenis.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Jenis. ');
         }
     }
 

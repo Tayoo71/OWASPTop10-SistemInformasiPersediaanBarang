@@ -27,7 +27,7 @@ class MerekController extends Controller
                 'deleteMerek' => $request->has('delete') ? Merek::select('id', 'nama_merek')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Merek pada halaman Daftar Merek.', 'home_page');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Merek pada halaman Daftar Merek. ', 'home_page');
         }
     }
 
@@ -45,7 +45,7 @@ class MerekController extends Controller
             ])->with('success', 'Data Merek berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Merek.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Merek. ');
         }
     }
 
@@ -64,7 +64,7 @@ class MerekController extends Controller
             ])->with('success', 'Data Merek berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Merek.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Merek. ');
         }
     }
 
@@ -79,7 +79,7 @@ class MerekController extends Controller
             ])->with('success', 'Data Merek berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Merek.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Merek. ');
         }
     }
 

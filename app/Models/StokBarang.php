@@ -58,7 +58,6 @@ class StokBarang extends Model
             } else {
                 throw new \Exception('Proses tidak valid.');
             }
-
             // Update stok dengan Query Builder dikarenakan Composite Key Not Supported using ORM
             DB::table('stok_barangs')
                 ->where('barang_id', $barangId)

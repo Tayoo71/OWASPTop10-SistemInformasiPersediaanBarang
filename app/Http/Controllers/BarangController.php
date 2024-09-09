@@ -50,7 +50,7 @@ class BarangController extends Controller
                 'deleteBarang' => $request->has('delete') ? Barang::select('id', 'nama_item')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang.', 'home_page');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang. ', 'home_page');
         }
     }
 
@@ -73,7 +73,7 @@ class BarangController extends Controller
                 ->with('success', 'Data Barang berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data barang. ');
         }
     }
 
@@ -98,7 +98,7 @@ class BarangController extends Controller
                 ->with('success', 'Data Barang berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data barang. ');
         }
     }
 
@@ -112,21 +112,8 @@ class BarangController extends Controller
                 ->with('success', 'Data Barang berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data barang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data barang. ');
         }
-    }
-
-    public function search(Request $request)
-    {
-        $search = $request->input('search');
-
-        $barangs = Barang::with('konversiSatuans:id,barang_id,satuan,jumlah')
-            ->where('nama_item', 'LIKE', "%{$search}%")
-            ->select('id', 'nama_item')
-            ->limit(5)
-            ->get();
-
-        return response()->json($barangs);
     }
 
     /**

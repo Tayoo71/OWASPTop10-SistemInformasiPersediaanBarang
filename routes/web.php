@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\APIController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JenisController;
 use App\Http\Controllers\MerekController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\GudangController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\StokMinimumController;
+use App\Http\Controllers\StokOpnameController;
 
 Route::get('/', function () {
     return view('home', [
@@ -27,14 +29,9 @@ Route::get('/kartustok', function () {
         'title' => 'Kartu Stok',
     ]);
 });
-Route::get('/barang/search', [BarangController::class, 'search']);
 Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('barangkeluar', BarangKeluarController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::get('/stokopname', function () {
-    return view('stokopname', [
-        'title' => 'Stok Opname',
-    ]);
-});
+Route::resource('stokopname', StokOpnameController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::get('/itemtransfer', function () {
     return view('itemtransfer', [
         'title' => 'Item Transfer',
@@ -45,3 +42,7 @@ Route::get('/laporan', function () {
         'title' => 'Laporan Daftar Barang',
     ]);
 });
+
+
+// API Route
+Route::get('/barang/search', [APIController::class, 'search']);

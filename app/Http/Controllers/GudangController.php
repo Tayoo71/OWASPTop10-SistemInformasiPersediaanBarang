@@ -27,7 +27,7 @@ class GudangController extends Controller
                 'deleteGudang' => $request->has('delete') ? Gudang::select('kode_gudang', 'nama_gudang')->find($request->delete) : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Gudang pada halaman Daftar Gudang.', 'home_page');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Gudang pada halaman Daftar Gudang. ', 'home_page');
         }
     }
 
@@ -46,7 +46,7 @@ class GudangController extends Controller
             ])->with('success', 'Data Gudang berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Gudang. ');
         }
     }
 
@@ -66,7 +66,7 @@ class GudangController extends Controller
             ])->with('success', 'Data Gudang berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Gudang. ');
         }
     }
 
@@ -81,7 +81,7 @@ class GudangController extends Controller
             ])->with('success', 'Data Gudang berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Gudang.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Gudang. ');
         }
     }
 

@@ -1,6 +1,6 @@
-<x-modal-create title="Tambah Transaksi Barang Masuk">
+<x-modal-create title="Tambah Stok Opname">
     <form method="POST"
-        action="{{ route('barangmasuk.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
+        action="{{ route('stokopname.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
         class="p-4 md:p-5">
         @csrf
         <div x-data="barangSearch()" class="relative">
@@ -36,15 +36,15 @@
             </div>
             <input type="hidden" name="barang_id" x-model="selectedBarang.id" />
             <div class="mb-4" x-show="selectedBarang.id !== '' && konversiSatuan.length > 0 && selectedGudang !== ''">
-                <label for="stokBarang" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
-                    Barang Saat Ini</label>
-                <input type="text" name="stokBarang" id="stokBarang" x-model="stokBarang"
+                <label for="stok_buku" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
+                    Buku</label>
+                <input type="text" name="stok_buku" id="stok_buku" x-model="stokBuku"
                     class="bg-gray-200 border border-gray-400 text-gray-900 cursor-not-allowed text-sm rounded-lg w-full p-2.5"
-                    placeholder="Loading..." disabled>
+                    placeholder="Stok Buku" disabled>
             </div>
-            <div class="mb-4" x-show="konversiSatuan.length > 0 && selectedGudang !== '' && selectedBarang.id !== ''">
+            <div class="mb-4" x-show="konversiSatuan.length > 0 && selectedGudang !== ''">
                 <label for="satuan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih Satuan
-                    Stok</label>
+                    Stok Fisik</label>
                 <select name="satuan" id="satuan" x-model="selectedKonversiSatuan"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5" required>
                     <option value="">Pilih Satuan</option>
@@ -54,13 +54,12 @@
                 </select>
             </div>
             <div class="mb-4" x-show="selectedBarang.id !== '' && konversiSatuan.length > 0 && selectedGudang !== ''">
-                <label for="jumlah_stok_masuk"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah
-                    Stok Masuk</label>
-                <input type="number" name="jumlah_stok_masuk" id="jumlah_stok_masuk" min="1" step = "1"
-                    x-model="jumlahStokMasuk"
+                <label for="stok_fisik" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
+                    Fisik</label>
+                <input type="number" name="stok_fisik" id="stok_fisik" min="0" step = "1"
+                    x-model="stokFisik"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
-                    placeholder="Masukkan jumlah stok masuk" required>
+                    placeholder="Masukkan jumlah Stok Fisik" required>
             </div>
         </div>
         <div class="grid gap-4 mb-4">
@@ -75,7 +74,7 @@
         <div class="flex justify-center">
             <button type="submit"
                 class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                Tambah Transaksi
+                Tambah Stok Opname
             </button>
         </div>
     </form>
@@ -87,9 +86,9 @@
                 barangList: [],
                 konversiSatuan: [],
                 selectedBarang: {},
-                stokBarang: '',
+                stokBuku: '',
                 selectedKonversiSatuan: '',
-                jumlahStokMasuk: '',
+                stokFisik: '',
 
                 searchBarang() {
                     if (this.selectedBarang && this.selectedBarang.id) {
@@ -113,14 +112,13 @@
                     this.search = barang.nama_item;
                     this.konversiSatuan = barang.konversi_satuans;
                     this.barangList = [];
-                    this.stokBarang = this.selectedBarang.stok;
-                    this.jumlahStokMasuk = '';
+                    this.stokBuku = this.selectedBarang.stok;
                 },
 
                 updateStok() {
                     this.fetchAPI(this.search, this.selectedGudang)
                         .then(data => {
-                            this.stokBarang = data[0].stok;
+                            this.stokBuku = data[0].stok;
                         })
                         .catch(error => {
                             console.error('Error fetching data:', error);
@@ -137,10 +135,11 @@
                     this.konversiSatuan = [];
                     this.barangList = [];
                     this.stokBarang = '';
-                    this.jumlahStokMasuk = '';
                     this.selectedKonversiSatuan = '';
+                    this.stokFisik = '';
                 }
             }
         }
     </script>
+
 </x-modal-create>

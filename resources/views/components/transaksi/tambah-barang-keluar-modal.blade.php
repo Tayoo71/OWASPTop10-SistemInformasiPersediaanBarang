@@ -3,20 +3,23 @@
         action="{{ route('barangkeluar.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
         class="p-4 md:p-5">
         @csrf
-        <div class="mb-4">
-            <label for ="selected_gudang"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gudang</label>
-            <select name="selected_gudang" id="selected_gudang"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5" required>
-                <option value="">Pilih Gudang</option>
-                @foreach ($gudangs as $gudang)
-                    <option value="{{ $gudang->kode_gudang }}">{{ $gudang->kode_gudang }} - {{ $gudang->nama_gudang }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
         <div x-data="barangSearch()" class="relative">
             <div class="mb-4">
+                <label for ="selected_gudang"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gudang</label>
+                <select name="selected_gudang" id="selected_gudang" x-model="selectedGudang"
+                    @change="search !== '' ? updateStok() : null"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5" required>
+                    <option value="">Pilih Gudang</option>
+                    @foreach ($gudangs as $gudang)
+                        <option value="{{ $gudang->kode_gudang }}">
+                            {{ $gudang->kode_gudang }} -
+                            {{ $gudang->nama_gudang }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="mb-4" x-show="selectedGudang !== ''">
                 <label for="barang"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Barang</label>
                 <input type="text" id="barang" x-model="search" @input.debounce.500ms="searchBarang"
@@ -32,7 +35,14 @@
                 </div>
             </div>
             <input type="hidden" name="barang_id" x-model="selectedBarang.id" />
-            <div class="mb-4" x-show="konversiSatuan.length > 0">
+            <div class="mb-4" x-show="selectedBarang.id !== '' && konversiSatuan.length > 0 && selectedGudang !== ''">
+                <label for="stokBarang" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
+                    Barang Saat Ini</label>
+                <input type="text" name="stokBarang" id="stokBarang" x-model="stokBarang"
+                    class="bg-gray-200 border border-gray-400 text-gray-900 cursor-not-allowed text-sm rounded-lg w-full p-2.5"
+                    placeholder="Loading..." disabled>
+            </div>
+            <div class="mb-4" x-show="konversiSatuan.length > 0 && selectedGudang !== '' && selectedBarang.id !== ''">
                 <label for="satuan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih Satuan
                     Stok</label>
                 <select name="satuan" id="satuan" x-model="selectedKonversiSatuan"
@@ -43,11 +53,12 @@
                     </template>
                 </select>
             </div>
-            <div class="mb-4" x-show="selectedBarang.id !== '' && konversiSatuan.length > 0">
+            <div class="mb-4" x-show="selectedBarang.id !== '' && konversiSatuan.length > 0 && selectedGudang !== ''">
                 <label for="jumlah_stok_keluar"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah
                     Stok Keluar</label>
                 <input type="number" name="jumlah_stok_keluar" id="jumlah_stok_keluar" min="1" step = "1"
+                    x-model="jumlahStokKeluar"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
                     placeholder="Masukkan jumlah stok keluar" required>
             </div>
@@ -64,7 +75,7 @@
         <div class="flex justify-center">
             <button type="submit"
                 class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                Tambah Barang
+                Tambah Transaksi
             </button>
         </div>
     </form>
@@ -72,17 +83,25 @@
         function barangSearch() {
             return {
                 search: '',
+                selectedGudang: '',
                 barangList: [],
                 konversiSatuan: [],
                 selectedBarang: {},
+                stokBarang: '',
                 selectedKonversiSatuan: '',
+                jumlahStokKeluar: '',
 
                 searchBarang() {
+                    if (this.selectedBarang && this.selectedBarang.id) {
+                        this.resetVariables();
+                    }
                     if (this.search.length > 2) {
-                        fetch(`/barang/search?search=${this.search}`)
-                            .then(response => response.json())
+                        this.fetchAPI(this.search, this.selectedGudang)
                             .then(data => {
                                 this.barangList = data;
+                            })
+                            .catch(error => {
+                                console.error('Error fetching data:', error);
                             });
                     } else {
                         this.barangList = [];
@@ -94,6 +113,32 @@
                     this.search = barang.nama_item;
                     this.konversiSatuan = barang.konversi_satuans;
                     this.barangList = [];
+                    this.stokBarang = this.selectedBarang.stok;
+                    this.jumlahStokKeluar = '';
+                },
+
+                updateStok() {
+                    this.fetchAPI(this.search, this.selectedGudang)
+                        .then(data => {
+                            this.stokBarang = data[0].stok;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
+                },
+
+                fetchAPI(search, gudang) {
+                    return fetch(`/barang/search?search=${search}&gudang=${gudang}`)
+                        .then(response => response.json());
+                },
+
+                resetVariables() {
+                    this.selectedBarang = {};
+                    this.konversiSatuan = [];
+                    this.barangList = [];
+                    this.stokBarang = '';
+                    this.jumlahStokKeluar = '';
+                    this.selectedKonversiSatuan = '';
                 }
             }
         }

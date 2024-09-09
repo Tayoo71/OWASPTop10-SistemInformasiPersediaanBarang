@@ -28,8 +28,8 @@ class BarangMasukController extends Controller
                 $convertedStok = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->jumlah_stok_masuk);
                 return [
                     'id' => $transaksi->id,
-                    'created_at' => $transaksi->created_at->format('d/m/Y'),
-                    'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y'),
+                    'created_at' => $transaksi->created_at->format('d/m/Y H:i:s'),
+                    'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y H:i:s'),
                     'kode_gudang' => $transaksi->kode_gudang,
                     'nama_item' => $transaksi->barang->nama_item,
                     'jumlah_stok_masuk' => $convertedStok,
@@ -64,7 +64,7 @@ class BarangMasukController extends Controller
                     : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Masuk pada halaman Barang Masuk.', 'home_page');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Masuk pada halaman Barang Masuk. ', 'home_page');
         }
     }
 
@@ -78,7 +78,7 @@ class BarangMasukController extends Controller
                 ->with('success', 'Transaksi Barang Masuk berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Transaksi Barang Masuk.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Transaksi Barang Masuk. ');
         }
     }
 
@@ -89,7 +89,7 @@ class BarangMasukController extends Controller
             $old_transaksi = TransaksiBarangMasuk::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
 
             // Revert old transaction stock before updating
-            $this->processStock($old_transaksi, 'delete_masuk');
+            $this->revertStok($old_transaksi, 'delete_masuk');
 
             // Process new transaction data
             $this->processTransaction($request, 'masuk', 'antony', $old_transaksi);
@@ -99,7 +99,7 @@ class BarangMasukController extends Controller
                 ->with('success', 'Transaksi Barang Masuk berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah Transaksi Barang Masuk.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah Transaksi Barang Masuk. ');
         }
     }
 
@@ -108,18 +108,18 @@ class BarangMasukController extends Controller
         DB::beginTransaction();
         try {
             $transaksi = TransaksiBarangMasuk::findOrFail($id);
-            $this->processStock($transaksi, 'delete_masuk');
+            $this->revertStok($transaksi, 'delete_masuk');
             $transaksi->delete();
             DB::commit();
             return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
                 ->with('success', 'Transaksi Barang Masuk berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus Transaksi Barang Masuk.');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus Transaksi Barang Masuk. ');
         }
     }
 
-    private function processStock($transaksi, $operation)
+    private function revertStok($transaksi, $operation)
     {
         StokBarang::updateStok($transaksi->barang_id, $transaksi->kode_gudang, $transaksi->jumlah_stok_masuk, $operation);
     }

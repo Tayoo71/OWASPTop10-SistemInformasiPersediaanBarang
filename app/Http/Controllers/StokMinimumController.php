@@ -24,8 +24,18 @@ class StokMinimumController extends Controller
                 ->withQueryString();
 
             // Filter barang yang stoknya di bawah atau sama dengan stok minimum
-            $filteredBarangs = $barangs->filter(function ($barang) {
-                $totalStok = $barang->stokBarangs->sum('stok');
+            $filteredBarangs = $barangs->filter(function ($barang) use ($filters) {
+                // Check if the 'gudang' filter is provided
+                if (!empty($filters['gudang'])) {
+                    // Filter stokBarangs based on the provided 'kode_gudang' in the filters
+                    $totalStok = $barang->stokBarangs
+                        ->where('kode_gudang', $filters['gudang'])
+                        ->sum('stok');
+                } else {
+                    // If no 'gudang' is specified, sum all stokBarangs
+                    $totalStok = $barang->stokBarangs->sum('stok');
+                }
+
                 return $totalStok <= $barang->stok_minimum;
             });
 
@@ -61,7 +71,7 @@ class StokMinimumController extends Controller
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data stok minimum.', 'home_page');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data stok minimum. ', 'home_page');
         }
     }
     private function handleException(\Exception $e, $request, $customMessage, $redirect = 'stokminimum.index')
