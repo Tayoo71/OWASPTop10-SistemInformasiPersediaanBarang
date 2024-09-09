@@ -137,10 +137,6 @@
                         <td class="px-6 py-4 align-middle">{{ $transaksi['user_update_id'] }}</td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
-                                <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['edit' => $transaksi['id']])) }}"
-                                    class="font-medium text-yellow-300 hover:underline">
-                                    Ubah
-                                </a>
                                 <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
                                     class="font-medium text-red-600 hover:underline ml-3">
                                     Hapus
@@ -166,15 +162,12 @@
 
     {{-- Modal Tambah Transaksi --}}
     <x-tambah-opname-modal :gudangs="$gudangs" />
-    {{-- @if ($editTransaksi && !$errors->any() && !session('error')) --}}
-    {{-- Modal Ubah Transaksi --}}
-    {{-- <x-ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" /> --}}
-    {{-- @elseif ($deleteTransaksi && !$errors->any() && !session('error')) --}}
-    {{-- Modal Hapus Transaksi --}}
-    {{-- <x-modal-delete :action="route(
+    @if ($deleteTransaksi && !$errors->any() && !session('error'))
+        {{-- Modal Hapus Transaksi --}}
+        <x-modal-delete :action="route(
             'stokopname.destroy',
             ['stokopname' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
         )"
-            message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus Stok Opname dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' /> --}}
-    {{-- @endif --}}
+            message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus Stok Opname dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' />
+    @endif
 </x-layout>

@@ -158,7 +158,7 @@ class BarangMasukController extends Controller
         $customErrors = [
             'Stok tidak mencukupi untuk dikurangi.',
             'Proses tidak valid.',
-            'Stok tidak ada, tidak dapat mengurangi stok.'
+            'Stok tidak mencukupi, tidak dapat mengurangi stok.'
         ];
         if (in_array($e->getMessage(), $customErrors)) {
             $custom_message = $custom_message . $e->getMessage();

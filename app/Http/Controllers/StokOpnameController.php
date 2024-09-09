@@ -44,23 +44,10 @@ class StokOpnameController extends Controller
                 ];
             });
 
-            $editTransaksi = null;
-            $editTransaksiSatuan = null;
-            // if ($request->has('edit')) {
-            //     $editTransaksi = TransaksiStokOpname::select('id', 'kode_gudang', 'barang_id', 'jumlah_stok_masuk', 'keterangan')
-            //         ->with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
-            //         ->find($request->edit);
-            //     if ($editTransaksi) {
-            //         $editTransaksiSatuan = KonversiSatuan::getSatuanToEdit($editTransaksi->barang, $editTransaksi->jumlah_stok_masuk);
-            //     }
-            // }
-
             return view('transaksi/stokopname', [
                 'title' => 'Stok Opname',
                 'transaksies' => $transaksies,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
-                'editTransaksi' => $editTransaksi,
-                'editTransaksiSatuan' => $editTransaksiSatuan,
                 'deleteTransaksi' => $request->has('delete') ?
                     TransaksiStokOpname::with(['barang:id,nama_item'])
                     ->where('id', $request->delete)
@@ -85,9 +72,20 @@ class StokOpnameController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Data Stok Opname. ');
         }
     }
-    private function revertStok($transaksi, $operation)
+    public function destroy(Request $request, $id)
     {
-        StokBarang::updateStok($transaksi->barang_id, $transaksi->kode_gudang, $transaksi->stok_fisik, $operation);
+        DB::beginTransaction();
+        try {
+            $transaksi = TransaksiStokOpname::findOrFail($id);
+            StokBarang::updateStok($transaksi->barang_id, $transaksi->kode_gudang, $transaksi->stok_fisik, 'delete_opname', $transaksi->stok_buku);
+            $transaksi->delete();
+            DB::commit();
+            return redirect()->route('stokopname.index', $this->buildQueryParams($request))
+                ->with('success', 'Data Stok Opname berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus Data Stok Opname. ');
+        }
     }
     private function processTransaction($request, $operation, $userId, $old_transaksi = null)
     {
@@ -135,7 +133,7 @@ class StokOpnameController extends Controller
         $customErrors = [
             'Stok tidak mencukupi untuk dikurangi.',
             'Proses tidak valid.',
-            'Stok tidak ada, tidak dapat mengurangi stok.'
+            'Stok tidak mencukupi, tidak dapat mengurangi stok.'
         ];
         if (in_array($e->getMessage(), $customErrors)) {
             $custom_message = $custom_message . $e->getMessage();

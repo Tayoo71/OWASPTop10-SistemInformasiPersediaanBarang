@@ -30,34 +30,42 @@ class StokBarang extends Model
 
         return $query->sum('stok');
     }
-    public static function updateStok($barangId, $kodeGudang, $jumlah, $proses)
+    public static function updateStok($barangId, $kodeGudang, $stokFisik, $proses, $stokBuku = null)
     {
+        // Ambil stok barang dari database dengan locking untuk mencegah race conditions
         $stokBarang = DB::table('stok_barangs')
             ->where('barang_id', $barangId)
             ->where('kode_gudang', $kodeGudang)
-            ->lockForUpdate() // Mengunci record stok barang untuk mencegah race conditions
+            ->lockForUpdate()
             ->first();
 
         if ($stokBarang) {
             if ($proses == 'masuk') {
-                $newStok = $stokBarang->stok + $jumlah;
+                // Tambahkan stok saat proses 'masuk'
+                $newStok = $stokBarang->stok + $stokFisik;
             } elseif ($proses == 'keluar') {
-                if ($stokBarang->stok < $jumlah) {
+                // Kurangi stok saat proses 'keluar', periksa ketersediaan stok
+                if ($stokBarang->stok < $stokFisik) {
                     throw new \Exception('Stok tidak mencukupi untuk dikurangi.');
                 }
-                $newStok = $stokBarang->stok - $jumlah;
+                $newStok = $stokBarang->stok - $stokFisik;
             } elseif ($proses == 'opname') {
-                $newStok = $jumlah;
+                // Perbarui stok saat opname dilakukan dengan stok fisik
+                $newStok = $stokFisik;
             } elseif ($proses == 'delete_masuk') {
-                if ($stokBarang->stok < $jumlah) {
-                    throw new \Exception('Stok tidak mencukupi untuk dikurangi.');
-                }
-                $newStok = $stokBarang->stok - $jumlah;
+                // Kurangi stok saat transaksi 'masuk' dihapus
+                $newStok = $stokBarang->stok - $stokFisik;
             } elseif ($proses == 'delete_keluar') {
-                $newStok = $stokBarang->stok + $jumlah;
+                // Tambahkan stok saat transaksi 'keluar' dihapus
+                $newStok = $stokBarang->stok + $stokFisik;
+            } elseif ($proses == 'delete_opname' && $stokBuku !== null) {
+                // Kembalikan stok ke kondisi sebelum opname jika opname dihapus
+                // Stok Sebelum Opname = Stok Saat Ini - (Stok Fisik - Stok Sebelum Opname)
+                $newStok = $stokBarang->stok - ($stokFisik - $stokBuku);
             } else {
                 throw new \Exception('Proses tidak valid.');
             }
+
             // Update stok dengan Query Builder dikarenakan Composite Key Not Supported using ORM
             DB::table('stok_barangs')
                 ->where('barang_id', $barangId)
@@ -67,16 +75,17 @@ class StokBarang extends Model
                     'updated_at' => now(),
                 ]);
         } else {
+            // Jika stok tidak ditemukan, hanya buat data baru untuk proses 'masuk' atau 'opname'
             if (in_array($proses, ['masuk', 'opname'])) {
                 DB::table('stok_barangs')->insert([
                     'barang_id' => $barangId,
                     'kode_gudang' => $kodeGudang,
-                    'stok' => $jumlah,
+                    'stok' => $stokFisik,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
             } else {
-                throw new \Exception('Stok tidak ada, tidak dapat mengurangi stok.');
+                throw new \Exception('Stok tidak mencukupi, tidak dapat mengurangi stok.');
             }
         }
     }
