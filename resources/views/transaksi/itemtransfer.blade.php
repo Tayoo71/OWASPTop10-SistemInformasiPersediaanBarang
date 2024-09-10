@@ -164,15 +164,15 @@
 
     {{-- Modal Tambah Transaksi --}}
     <x-tambah-item-transfer-modal :gudangs="$gudangs" />
-    {{-- @if ($editTransaksi && !$errors->any() && !session('error')) --}}
-    {{-- Modal Ubah Transaksi --}}
-    {{-- <x-ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" /> --}}
-    {{-- @elseif ($deleteTransaksi && !$errors->any() && !session('error')) --}}
-    {{-- Modal Hapus Transaksi --}}
-    {{-- <x-modal-delete :action="route(
-            'barangmasuk.destroy',
-            ['barangmasuk' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
+    @if ($editTransaksi && !$errors->any() && !session('error'))
+        {{-- Modal Ubah Transaksi --}}
+        <x-ubah-item-transfer-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />
+    @elseif ($deleteTransaksi && !$errors->any() && !session('error'))
+        {{-- Modal Hapus Transaksi --}}
+        <x-modal-delete :action="route(
+            'itemtransfer.destroy',
+            ['itemtransfer' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
         )"
-            message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus transaksi barang masuk dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' /> --}}
-    {{-- @endif --}}
+            message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus transaksi item transfer dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' />
+    @endif
 </x-layout>

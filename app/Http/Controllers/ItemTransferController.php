@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gudang;
+use App\Models\StokBarang;
 use Illuminate\Http\Request;
 use App\Models\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
@@ -41,14 +42,14 @@ class ItemTransferController extends Controller
 
             $editTransaksi = null;
             $editTransaksiSatuan = null;
-            // if ($request->has('edit')) {
-            //     $editTransaksi = TransaksiBarangMasuk::select('id', 'kode_gudang', 'barang_id', 'jumlah_stok_masuk', 'keterangan')
-            //         ->with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
-            //         ->find($request->edit);
-            //     if ($editTransaksi) {
-            //         $editTransaksiSatuan = KonversiSatuan::getSatuanToEdit($editTransaksi->barang, $editTransaksi->jumlah_stok_masuk);
-            //     }
-            // }
+            if ($request->has('edit')) {
+                $editTransaksi = TransaksiItemTransfer::select('id', 'gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah_stok_transfer', 'keterangan')
+                    ->with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
+                    ->find($request->edit);
+                if ($editTransaksi) {
+                    $editTransaksiSatuan = KonversiSatuan::getSatuanToEdit($editTransaksi->barang, $editTransaksi->jumlah_stok_transfer);
+                }
+            }
 
             return view('transaksi/itemtransfer', [
                 'title' => 'Item Transfer',
@@ -71,16 +72,99 @@ class ItemTransferController extends Controller
     {
         DB::beginTransaction();
         try {
-            $this->processTransaction($request, 'masuk', 'admin');
+            $this->processTransaction($request, 'tambah_item_transfer', 'admin');
             DB::commit();
-            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
-                ->with('success', 'Transaksi Barang Masuk berhasil ditambahkan.');
+            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request))
+                ->with('success', 'Transaksi Item Transfer berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Transaksi Barang Masuk. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Transaksi Item Transfer. ');
         }
     }
+    public function update(StoreItemTransferRequest $request, $idTransaksi)
+    {
+        DB::beginTransaction();
+        try {
+            $old_transaksi = TransaksiItemTransfer::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
+            $this->processTransaction($request, 'update_item_transfer', 'antony', $old_transaksi);
+            DB::commit();
+            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request))
+                ->with('success', 'Transaksi Item Transfer berhasil diubah.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah Transaksi Item Transfer. ');
+        }
+    }
+    public function destroy(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $transaksi = TransaksiItemTransfer::findOrFail($id);
+            $this->processTransaction($transaksi, 'delete_item_transfer');
+            $transaksi->delete();
+            DB::commit();
+            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request))
+                ->with('success', 'Transaksi Item Transfer berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus Transaksi Item Transfer. ');
+        }
+    }
+    private function processTransaction($request, $operation, $userId = '', $old_transaksi = null)
+    {
+        $barangId = $request->barang_id;
+        $selectedSatuanId = $operation === 'delete_item_transfer' ? null : $request->satuan;
+        $jumlahStokTransfer = $request->jumlah_stok_transfer;
+        $selectedGudangAsal = $operation === 'delete_item_transfer' ? $request->gudang_asal : $request->selected_gudang_asal;
+        $selectedGudangTujuan = $operation === 'delete_item_transfer' ? $request->gudang_tujuan : $request->selected_gudang_tujuan;
+        $jumlahTransferSatuanDasar = $operation === 'delete_item_transfer' ? null : KonversiSatuan::convertToSatuanDasar($barangId, $selectedSatuanId, $jumlahStokTransfer);
 
+        if ($operation === 'tambah_item_transfer') {
+            // Tambah Stok pada Transaksi Baru
+            $this->operationStok($barangId, $selectedGudangAsal, $selectedGudangTujuan, $jumlahTransferSatuanDasar, 'tambah_item');
+
+            TransaksiItemTransfer::create([
+                'user_buat_id' => $userId,
+                'gudang_asal' => $selectedGudangAsal,
+                'gudang_tujuan' => $selectedGudangTujuan,
+                'barang_id' => $barangId,
+                'jumlah_stok_transfer' => $jumlahTransferSatuanDasar,
+                'keterangan' => $request->keterangan,
+            ]);
+        } elseif ($operation === 'update_item_transfer') {
+            // Kembalikan Stok pada Transaksi Lama
+            $this->operationStok($old_transaksi->barang_id, $old_transaksi->gudang_asal, $old_transaksi->gudang_tujuan, $old_transaksi->jumlah_stok_transfer, 'delete_item');
+
+            // Tambah Stok pada Transaksi Baru
+            $this->operationStok($barangId, $selectedGudangAsal, $selectedGudangTujuan, $jumlahTransferSatuanDasar, 'tambah_item');
+
+            // Update Tabel Transaksi
+            $old_transaksi->update([
+                'user_update_id' => $userId,
+                'gudang_asal' => $selectedGudangAsal,
+                'gudang_tujuan' => $selectedGudangTujuan,
+                'barang_id' => $barangId,
+                'jumlah_stok_transfer' => $jumlahTransferSatuanDasar,
+                'keterangan' => $request->keterangan,
+            ]);
+        } else if ($operation === 'delete_item_transfer') {
+            $this->operationStok($barangId, $selectedGudangAsal, $selectedGudangTujuan, $jumlahStokTransfer, 'delete_item');
+        };
+    }
+    private function operationStok($barangId, $selectedGudangAsal, $selectedGudangTujuan, $jumlahTransferSatuanDasar, $operation)
+    {
+        if ($operation === 'tambah_item') {
+            // Hapus Stok pada gudang asal
+            StokBarang::updateStok($barangId, $selectedGudangAsal, $jumlahTransferSatuanDasar, 'keluar');
+            // Tambah Stok pada gudang tujuan
+            StokBarang::updateStok($barangId, $selectedGudangTujuan, $jumlahTransferSatuanDasar, 'masuk');
+        } else if ($operation === 'delete_item') {
+            // Hapus Stok pada gudang asal
+            StokBarang::updateStok($barangId, $selectedGudangAsal, $jumlahTransferSatuanDasar, 'delete_keluar');
+            // Hapus Stok pada gudang tujuan
+            StokBarang::updateStok($barangId, $selectedGudangTujuan, $jumlahTransferSatuanDasar, 'delete_masuk');
+        }
+    }
     private function handleException(\Exception $e, $request, $custom_message, $redirect = 'itemtransfer.index')
     {
         $customErrors = [

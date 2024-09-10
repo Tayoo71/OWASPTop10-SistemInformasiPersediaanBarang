@@ -22,12 +22,12 @@ class StoreItemTransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'gudang_asal' => [
+            'selected_gudang_asal' => [
                 'required',
                 'string',
                 'exists:gudangs,kode_gudang',
             ],
-            'gudang_tujuan' => [
+            'selected_gudang_tujuan' => [
                 'required',
                 'string',
                 'exists:gudangs,kode_gudang',

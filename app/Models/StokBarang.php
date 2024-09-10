@@ -85,7 +85,7 @@ class StokBarang extends Model
                     'updated_at' => now(),
                 ]);
             } else {
-                throw new \Exception('Stok tidak mencukupi, tidak dapat mengurangi stok.');
+                throw new \Exception('Proses tidak valid.');
             }
         }
     }
