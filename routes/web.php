@@ -9,6 +9,7 @@ use App\Http\Controllers\GudangController;
 use App\Http\Controllers\BarangMasukController;
 use App\Http\Controllers\BarangKeluarController;
 use App\Http\Controllers\ItemTransferController;
+use App\Http\Controllers\KartuStokController;
 use App\Http\Controllers\StokMinimumController;
 use App\Http\Controllers\StokOpnameController;
 
@@ -17,6 +18,8 @@ Route::get('/', function () {
         'title' => 'Halaman Utama'
     ]);
 })->name('home_page');
+
+// Master Data
 Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftargudang', GudangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftarjenis', JenisController::class)->parameters([
@@ -25,15 +28,15 @@ Route::resource('daftarjenis', JenisController::class)->parameters([
 ])->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftarmerek', MerekController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('stokminimum', StokMinimumController::class)->only(['index']);
-Route::get('/kartustok', function () {
-    return view('kartustok', [
-        'title' => 'Kartu Stok',
-    ]);
-});
+Route::resource('kartustok', KartuStokController::class)->only(['index']);
+
+// Transaksi
 Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('barangkeluar', BarangKeluarController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('stokopname', StokOpnameController::class)->only(['index', 'store', 'destroy']);
 Route::resource('itemtransfer', ItemTransferController::class)->only(['index', 'store', 'update', 'destroy']);
+
+// Laporan Daftar Barang
 Route::get('/laporan', function () {
     return view('laporan', [
         'title' => 'Laporan Daftar Barang',

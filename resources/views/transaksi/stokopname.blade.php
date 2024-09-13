@@ -17,7 +17,7 @@
                     </div>
                     <input id="datepicker-range-start" name="start" type="text"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                        placeholder="Pilih tanggal mulai" value="{{ request('start') }}">
+                        placeholder="Pilih Tanggal Mulai" value="{{ request('start') }}">
                 </div>
                 <span class="mx-3 text-gray-500">Sampai</span>
                 <div class="relative">
@@ -30,7 +30,7 @@
                     </div>
                     <input id="datepicker-range-end" name="end" type="text"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                        placeholder="Pilih tanggal akhir" value="{{ request('end') }}">
+                        placeholder="Pilih Tanggal Akhir" value="{{ request('end') }}">
                 </div>
             </div>
         </div>

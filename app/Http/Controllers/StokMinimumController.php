@@ -66,7 +66,7 @@ class StokMinimumController extends Controller
             });
 
             return view('master_data/stokminimum', [
-                'title' => 'Daftar Barang Stok Minimum',
+                'title' => 'Informasi Stok Minimum',
                 'barangs' => $paginatedBarangs,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
             ]);
