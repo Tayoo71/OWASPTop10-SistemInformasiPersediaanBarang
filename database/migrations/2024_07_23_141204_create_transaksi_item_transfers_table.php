@@ -14,16 +14,18 @@ return new class extends Migration
         Schema::create('transaksi_item_transfers', function (Blueprint $table) {
             $table->id();
             $table->string('user_buat_id');
+            $table->string('user_update_id')->nullable();
             $table->string('gudang_asal');
             $table->string('gudang_tujuan');
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
-            $table->integer('jumlah');
+            $table->bigInteger('jumlah_stok_transfer');
             $table->text('keterangan')->nullable();
-            $table->timestamp('tanggal_transaksi');
+            $table->timestamps();
 
-            $table->foreign('user_buat_id')->references('id')->on('users')->onDelete('restrict');
-            $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onDelete('cascade');
-            $table->foreign('gudang_tujuan')->references('kode_gudang')->on('gudangs')->onDelete('cascade');
+            $table->foreign('user_buat_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('user_update_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('gudang_tujuan')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

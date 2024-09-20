@@ -16,19 +16,23 @@ class TransaksiBarangKeluarSeeder extends Seeder
         DB::table('transaksi_barang_keluars')->insert([
             [
                 'user_buat_id' => 'admin',
+                'user_update_id' => 'admin',
                 'kode_gudang' => 'SH',
                 'barang_id' => 1,
                 'jumlah_stok_keluar' => 5,
                 'keterangan' => 'Barang dipindahkan oleh: Budi',
-                'tanggal_transaksi' => '2024-07-30 08:16:43'
+                'created_at' => '2024-07-30 08:16:43',
+                'updated_at' => '2024-08-20 08:16:43'
             ],
             [
                 'user_buat_id' => 'admin',
+                'user_update_id' => 'admin',
                 'kode_gudang' => 'TK',
                 'barang_id' => 2,
                 'jumlah_stok_keluar' => 6,
                 'keterangan' => 'Barang Terjual di toko',
-                'tanggal_transaksi' => '2024-07-30 08:16:43'
+                'created_at' => '2024-07-30 08:16:43',
+                'updated_at' => '2024-08-20 08:16:43'
             ],
         ]);
     }

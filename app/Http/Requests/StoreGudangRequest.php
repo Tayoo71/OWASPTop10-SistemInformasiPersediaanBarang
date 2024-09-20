@@ -29,18 +29,13 @@ class StoreGudangRequest extends FormRequest
     public function messages(): array
     {
         return [
-            // Pesan untuk 'kode_gudang'
             'kode_gudang.required' => 'Kode gudang wajib diisi.',
             'kode_gudang.string' => 'Kode gudang harus berupa teks.',
             'kode_gudang.max' => 'Kode gudang tidak boleh lebih dari 255 karakter.',
             'kode_gudang.unique' => 'Kode gudang sudah digunakan, pilih kode gudang yang lain.',
-
-            // Pesan untuk 'nama_gudang'
             'nama_gudang.required' => 'Nama gudang wajib diisi.',
             'nama_gudang.string' => 'Nama gudang harus berupa teks.',
             'nama_gudang.max' => 'Nama gudang tidak boleh lebih dari 255 karakter.',
-
-            // Pesan untuk 'keterangan'
             'keterangan.string' => 'Keterangan harus berupa teks.',
             'keterangan.max' => 'Keterangan tidak boleh lebih dari 1000 karakter.',
         ];

@@ -15,6 +15,6 @@ class UbahGudangModal extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ubah-gudang-modal');
+        return view('components.master_data.ubah-gudang-modal');
     }
 }

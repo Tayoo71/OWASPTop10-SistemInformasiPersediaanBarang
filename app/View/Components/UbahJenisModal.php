@@ -15,6 +15,6 @@ class UbahJenisModal extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.ubah-jenis-modal');
+        return view('components.master_data.ubah-jenis-modal');
     }
 }

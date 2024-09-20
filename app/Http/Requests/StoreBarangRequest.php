@@ -50,57 +50,49 @@ class StoreBarangRequest extends FormRequest
 
         return $rules;
     }
+    protected function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+            $konversiSatuan = $this->input('konversiSatuan', []);
+
+            // Check if at least one 'jumlah' value equals 1
+            $hasOneInJumlah = collect($konversiSatuan)->pluck('jumlah')->contains(1);
+
+            if (!$hasOneInJumlah && !$this->isMethod('put')) {
+                $validator->errors()->add('konversiSatuan', 'Setidaknya satu dari Jumlah dalam Konversi Satuan harus memiliki nilai 1');
+            }
+        });
+    }
     public function messages()
     {
         return [
-            // Pesan untuk 'jenis'
             'jenis.exists' => 'Jenis yang dipilih tidak valid.',
-
-            // Pesan untuk 'merek'
             'merek.exists' => 'Merek yang dipilih tidak valid.',
-
-            // Pesan untuk 'rak'
             'rak.string' => 'Rak harus berupa teks.',
             'rak.max' => 'Rak tidak boleh lebih dari 255 karakter.',
-
-            // Pesan untuk 'keterangan'
             'keterangan.string' => 'Keterangan harus berupa teks.',
             'keterangan.max' => 'Keterangan tidak boleh lebih dari 1000 karakter.',
-
-            // Pesan untuk 'stok_minimum'
             'stok_minimum.integer' => 'Stok minimum harus berupa angka.',
             'stok_minimum.min' => 'Stok minimum tidak boleh kurang dari 0.',
-
-            // Pesan untuk 'konversiSatuan'
             'konversiSatuan.required' => 'Konversi satuan wajib diisi.',
             'konversiSatuan.array' => 'Konversi satuan harus berupa array.',
             'konversiSatuan.min' => 'Setidaknya satu konversi satuan harus diisi.',
-
-            // Pesan untuk 'konversiSatuan.*.harga_pokok'
             'konversiSatuan.*.harga_pokok.numeric' => 'Harga pokok harus berupa angka.',
             'konversiSatuan.*.harga_pokok.min' => 'Harga pokok tidak boleh kurang dari 0.',
-
-            // Pesan untuk 'konversiSatuan.*.harga_jual'
             'konversiSatuan.*.harga_jual.numeric' => 'Harga jual harus berupa angka.',
             'konversiSatuan.*.harga_jual.min' => 'Harga jual tidak boleh kurang dari 0.',
-
-            // Pesan untuk 'nama_item'
             'nama_item.required' => 'Nama item wajib diisi.',
             'nama_item.string' => 'Nama item harus berupa teks.',
             'nama_item.max' => 'Nama item tidak boleh lebih dari 255 karakter.',
             'nama_item.unique' => 'Nama item sudah digunakan, pilih nama item yang lain.',
-
-            // Pesan tambahan untuk aturan update
             'konversiSatuan.*.satuan.required' => 'Nama satuan wajib diisi.',
             'konversiSatuan.*.satuan.string' => 'Nama satuan harus berupa teks.',
             'konversiSatuan.*.satuan.max' => 'Nama satuan tidak boleh lebih dari 255 karakter.',
             'konversiSatuan.*.satuan.distinct' => 'Nama satuan harus unik.',
-
             'konversiSatuan.*.jumlah.required' => 'Jumlah satuan wajib diisi.',
             'konversiSatuan.*.jumlah.integer' => 'Jumlah satuan harus berupa angka.',
             'konversiSatuan.*.jumlah.min' => 'Jumlah satuan tidak boleh kurang dari 1.',
             'konversiSatuan.*.jumlah.distinct' => 'Jumlah satuan harus unik.',
-
             'konversiSatuan.*.id' => 'ID konversi satuan tidak valid.',
         ];
     }

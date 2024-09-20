@@ -16,6 +16,6 @@ class TambahBarangModal extends Component
 
     public function render()
     {
-        return view('components.tambah-barang-modal');
+        return view('components.master_data.tambah-barang-modal');
     }
 }

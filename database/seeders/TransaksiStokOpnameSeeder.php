@@ -21,7 +21,8 @@ class TransaksiStokOpnameSeeder extends Seeder
                 'stok_buku' => 0,
                 'stok_fisik' => 20,
                 'keterangan' => 'Hanya Contoh. Dilakukan pengecekkan oleh Pegawai A',
-                'tanggal_transaksi' => '2024-07-30 08:24:21'
+                'created_at' => '2024-07-30 08:24:21',
+                'updated_at' => '2024-07-30 08:24:21'
             ],
             [
                 'user_buat_id' => 'admin',
@@ -30,7 +31,8 @@ class TransaksiStokOpnameSeeder extends Seeder
                 'stok_buku' => 10,
                 'stok_fisik' => 6,
                 'keterangan' => 'Hanya Contoh. Dilakukan pengecekkan oleh Pemilik Toko',
-                'tanggal_transaksi' => '2024-07-30 08:24:21'
+                'created_at' => '2024-07-30 08:24:21',
+                'updated_at' => '2024-07-30 08:24:22'
             ],
         ]);
     }
