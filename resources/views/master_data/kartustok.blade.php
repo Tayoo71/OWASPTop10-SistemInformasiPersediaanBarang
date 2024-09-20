@@ -98,40 +98,38 @@
         <table class="w-full text-sm text-center text-gray-500">
             <thead class="text-xs text-gray-700 bg-gray-50 sticky top-0 shadow-md">
                 <tr>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">KODE ITEM</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">NAMA BARANG</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">STOK</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">STOK MINIMUM</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">JENIS</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">MEREK</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">RAK</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">NOMOR TRANSAKSI</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">GUDANG</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">TANGGAL TRANSAKSI</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">TIPE TRANSAKSI</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">JUMLAH</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">SALDO STOK</th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">KETERANGAN</th>
                 </tr>
             </thead>
             <tbody>
-                {{-- @forelse ($barangs as $barang)
+                @forelse ($kartuStok as $data)
                     <tr class="odd:bg-white even:bg-gray-50 border-b">
-                        <td class="px-6 py-4 align-middle">{{ $barang['id'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['nama_item'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['stok'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['stok_minimum'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['jenis'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['merek'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['rak'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['keterangan'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $data['nomor_transaksi'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $data['gudang'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $data['tanggal'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $data['tipe_transaksi'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $data['jumlah'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $data['saldo_stok'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $data['keterangan'] }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data Informasi Stok Miniumum
-                            tidak ditemukan.</td>
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Silahkan mengisi kolom
+                            pencarian untuk melihat Data Kartu Stok.</td>
                     </tr>
-                @endforelse --}}
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
     {{-- <div class="py-4 px-4 mt-4">
-        {{ $barangs->links() }}
+        {{ $kartuStok->links() }}
     </div> --}}
 </x-layout>
