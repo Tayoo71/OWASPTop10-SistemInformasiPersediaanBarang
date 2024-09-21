@@ -35,7 +35,7 @@ class BarangController extends Controller
                 ->withQueryString();
 
             $barangs->getCollection()->transform(function ($barang) use ($filters) {
-                $formattedData = $barang->getFormattedStokAndPrices($filters['gudang'] ?? null);
+                $formattedData = $barang->getFormattedStokAndPrices();
                 return [
                     'id' => $barang->id,
                     'nama_item' => $barang->nama_item,

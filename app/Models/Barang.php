@@ -59,8 +59,8 @@ class Barang extends Model
             ->groupBy('stok_barangs.barang_id')]); // Mengelompokkan stok berdasarkan barang_id
 
         // Sorting
-        $sortBy = $filters['sort_by'];
-        $direction = $filters['direction'];
+        $sortBy = $filters['sort_by'] ?? 'nama_item';
+        $direction = $filters['direction'] ?? 'asc';
 
         // Sorting menggunakan subquery
         if ($sortBy === "jenis") {
