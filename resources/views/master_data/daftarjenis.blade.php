@@ -38,9 +38,87 @@
         <table class="w-full text-sm text-center text-gray-500">
             <thead class="text-xs text-gray-700 bg-gray-50 sticky top-0 shadow-md">
                 <tr>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">KODE JENIS</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">NAMA JENIS</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">KETERANGAN</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('daftarjenis.index', array_merge(request()->query(), ['sort_by' => 'id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            KODE JENIS
+                            @if (request('sort_by') === 'id')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('daftarjenis.index', array_merge(request()->query(), ['sort_by' => 'nama_jenis', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            NAMA JENIS
+                            @if (request('sort_by') === 'nama_jenis')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('daftarjenis.index', array_merge(request()->query(), ['sort_by' => 'keterangan', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            KETERANGAN
+                            @if (request('sort_by') === 'keterangan')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
                 </tr>
             </thead>
