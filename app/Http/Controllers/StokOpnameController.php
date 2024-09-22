@@ -17,18 +17,31 @@ class StokOpnameController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['search', 'gudang', 'start', 'end']);
+            $validatedData = $request->validate([
+                'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,stok_buku,stok_fisik,selisih,keterangan,user_buat_id,user_update_id',
+                'direction' => 'nullable|in:asc,desc',
+                'gudang' => 'nullable|exists:gudangs,kode_gudang',
+                'search' => 'nullable|string|max:255',
+                'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
+                'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
+            ]);
+
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
+            $filters['gudang'] = $validatedData['gudang'] ?? null;
+            $filters['search'] = $validatedData['search'] ?? null;
+            $filters['start'] = $validatedData['start'] ?? null;
+            $filters['end'] = $validatedData['end'] ?? null;
 
             $transaksies = TransaksiStokOpname::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
                 ->search($filters)
-                ->orderBy('created_at', 'desc')
                 ->paginate(20)
                 ->withQueryString();
 
             $transaksies->getCollection()->transform(function ($transaksi) {
                 $convertedStokBuku = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->stok_buku);
                 $convertedStokFisik = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->stok_fisik);
-                $convertedSelisih = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, ($transaksi->stok_fisik - $transaksi->stok_buku));
+                $convertedSelisih = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->selisih);
                 return [
                     'id' => $transaksi->id,
                     'created_at' => $transaksi->created_at->format('d/m/Y H:i:s'),
@@ -40,7 +53,6 @@ class StokOpnameController extends Controller
                     'selisih' => $convertedSelisih,
                     'keterangan' => $transaksi->keterangan ?? '-',
                     'user_buat_id' => $transaksi->user_buat_id,
-                    'user_update_id' => $transaksi->user_update_id ?? '-'
                 ];
             });
 

@@ -12,8 +12,12 @@ class APIController extends Controller
     // Fetch API For Searching Barang - AJAX
     public function search(Request $request)
     {
-        $search = $request->input('search');
-        $gudang = $request->input('gudang');
+        $validatedData = $request->validate([
+            'gudang' => 'nullable|exists:gudangs,kode_gudang',
+            'search' => 'nullable|string|max:255',
+        ]);
+        $search = $validatedData['search'] ?? null;
+        $gudang = $validatedData['gudang'] ?? null;
 
         $barangs = Barang::with([
             'konversiSatuans:id,barang_id,satuan,jumlah',
