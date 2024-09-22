@@ -17,16 +17,17 @@ class KartuStokController extends Controller
     public function index(Request $request)
     {
         try {
-            // Ambil input dari request
-            $barangId = $request->query('barang_id');
-            $gudang = $request->query('gudang');
-            $start = Carbon::parse($request->query('start'))->startOfDay();
-            $end = Carbon::parse($request->query('end'))->endOfDay();
+            $validatedData = $request->validate([
+                'barang_id' => 'required|exists:barangs,id',
+                'gudang' => 'required|exists:gudangs,kode_gudang',
+                'start' => 'required|date_format:d/m/Y|before_or_equal:end',
+                'end' => 'required|date_format:d/m/Y|after_or_equal:start',
+            ]);
 
-            $barangId = 7;
-            $gudang = 'all';
-            $start = Carbon::parse('2024-01-01')->startOfDay();
-            $end = Carbon::parse('2024-09-30')->endOfDay();
+            $barangId = $validatedData['barang_id'];
+            $gudang = $validatedData['gudang'];
+            $start = Carbon::parse($validatedData['start'])->startOfDay();
+            $end = Carbon::parse($validatedData['end'])->endOfDay();
 
             // Cek apakah semua parameter sudah terisi
             if (!$barangId || !$gudang || !$start || !$end) {

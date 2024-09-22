@@ -107,17 +107,276 @@
         <table class="w-full text-sm text-center text-gray-500">
             <thead class="text-xs text-gray-700 bg-gray-50 sticky top-0 shadow-md">
                 <tr>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">NOMOR TRANSAKSI</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">TANGGAL BUAT</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">TANGGAL UBAH</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">GUDANG</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">NAMA BARANG</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">STOK BUKU</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">STOK FISIK</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">SELISIH</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">KETERANGAN</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">USER BUAT</th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">USER UPDATE</th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            NOMOR TRANSAKSI
+                            @if (request('sort_by') === 'id')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'created_at', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            TANGGAL BUAT
+                            @if (request('sort_by') === 'created_at')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'updated_at', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            TANGGAL UBAH
+                            @if (request('sort_by') === 'updated_at')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'kode_gudang', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            GUDANG
+                            @if (request('sort_by') === 'kode_gudang')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'nama_item', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            NAMA BARANG
+                            @if (request('sort_by') === 'nama_item')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'stok_buku', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            STOK BUKU
+                            @if (request('sort_by') === 'stok_buku')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'stok_fisik', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            STOK FISIK
+                            @if (request('sort_by') === 'stok_fisik')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'selisih', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            SELISIH
+                            @if (request('sort_by') === 'selisih')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'keterangan', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            KETERANGAN
+                            @if (request('sort_by') === 'keterangan')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'user_buat_id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            USER BUAT
+                            @if (request('sort_by') === 'user_buat_id')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
                 </tr>
             </thead>
@@ -134,7 +393,6 @@
                         <td class="px-6 py-4 align-middle">{{ $transaksi['selisih'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['keterangan'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['user_buat_id'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $transaksi['user_update_id'] }}</td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"

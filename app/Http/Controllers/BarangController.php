@@ -16,16 +16,26 @@ class BarangController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['search', 'gudang']);
+            $validatedData = $request->validate([
+                'sort_by' => 'nullable|in:id,nama_item,stok,jenis,merek,harga_pokok,harga_jual,keterangan,rak',
+                'direction' => 'nullable|in:asc,desc',
+                'gudang' => 'nullable|exists:gudangs,kode_gudang',
+                'search' => 'nullable|string|max:255',
+            ]);
 
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_item';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
+            $filters['gudang'] = $validatedData['gudang'] ?? null;
+            $filters['search'] = $validatedData['search'] ?? null;
+
+            // Query Barang dengan scopeSearch
             $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
                 ->search($filters)
-                ->orderBy('nama_item', 'asc')
                 ->paginate(20)
                 ->withQueryString();
 
             $barangs->getCollection()->transform(function ($barang) use ($filters) {
-                $formattedData = $barang->getFormattedStokAndPrices($filters['gudang'] ?? null);
+                $formattedData = $barang->getFormattedStokAndPrices();
                 return [
                     'id' => $barang->id,
                     'nama_item' => $barang->nama_item,

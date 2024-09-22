@@ -15,11 +15,20 @@ class StokMinimumController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['search', 'gudang']);
+            $validatedData = $request->validate([
+                'sort_by' => 'nullable|in:id,nama_item,stok,jenis,merek,stok_minimum,keterangan,rak',
+                'direction' => 'nullable|in:asc,desc',
+                'gudang' => 'nullable|exists:gudangs,kode_gudang',
+                'search' => 'nullable|string|max:255',
+            ]);
 
-            $barangs = Barang::with(['jenis', 'merek', 'stokBarangs'])
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_item';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
+            $filters['gudang'] = $validatedData['gudang'] ?? null;
+            $filters['search'] = $validatedData['search'] ?? null;
+
+            $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
                 ->search($filters)
-                ->orderBy('nama_item', 'asc')
                 ->paginate(20)
                 ->withQueryString();
 
@@ -51,7 +60,7 @@ class StokMinimumController extends Controller
             );
 
             $paginatedBarangs->getCollection()->transform(function ($barang) use ($filters) {
-                $formattedStokData = $barang->getFormattedStokAndPrices($filters['gudang'] ?? null);
+                $formattedStokData = $barang->getFormattedStokAndPrices();
                 $formattedStokMinimumData = KonversiSatuan::getFormattedConvertedStok($barang, $barang->stok_minimum);
                 return [
                     'id' => $barang->id,

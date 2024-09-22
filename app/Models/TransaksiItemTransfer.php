@@ -75,5 +75,22 @@ class TransaksiItemTransfer extends Model
                 });
             });
         });
+
+        // Sorting
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $direction = $filters['direction'] ?? 'desc';
+
+        // Sorting menggunakan subquery
+        if ($sortBy === "nama_item") {
+            $query->addSelect(['nama_item' => Barang::select('nama_item')
+                ->whereColumn('barangs.id', 'transaksi_item_transfers.barang_id')
+                ->limit(1)])
+                ->orderBy('nama_item', $direction);
+        } else if ($sortBy === "updated_at") {
+            $query->orderByRaw("CASE WHEN updated_at != created_at THEN 1 ELSE 0 END $direction")
+                ->orderBy('updated_at', $direction);
+        } else {
+            $query->orderBy($sortBy, $direction);
+        }
     }
 }

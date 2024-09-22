@@ -13,10 +13,18 @@ class MerekController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['search']);
+            $validatedData = $request->validate([
+                'sort_by' => 'nullable|in:id,nama_merek,keterangan',
+                'direction' => 'nullable|in:asc,desc',
+                'search' => 'nullable|string|max:255',
+            ]);
+
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_merek';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
+            $filters['search'] = $validatedData['search'] ?? null;
 
             $mereks = Merek::search($filters)
-                ->orderBy('nama_merek', 'asc')
+                ->orderBy($filters['sort_by'], $filters['direction'])
                 ->paginate(20)
                 ->withQueryString();
 

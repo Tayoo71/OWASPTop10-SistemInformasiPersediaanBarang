@@ -16,11 +16,24 @@ class BarangMasukController extends Controller
     public function index(Request $request)
     {
         try {
-            $filters = $request->only(['search', 'gudang', 'start', 'end']);
+            $validatedData = $request->validate([
+                'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,jumlah_stok_masuk,keterangan,user_buat_id,user_update_id',
+                'direction' => 'nullable|in:asc,desc',
+                'gudang' => 'nullable|exists:gudangs,kode_gudang',
+                'search' => 'nullable|string|max:255',
+                'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
+                'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
+            ]);
+
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
+            $filters['gudang'] = $validatedData['gudang'] ?? null;
+            $filters['search'] = $validatedData['search'] ?? null;
+            $filters['start'] = $validatedData['start'] ?? null;
+            $filters['end'] = $validatedData['end'] ?? null;
 
             $transaksies = TransaksiBarangMasuk::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
                 ->search($filters)
-                ->orderBy('created_at', 'desc')
                 ->paginate(20)
                 ->withQueryString();
 
