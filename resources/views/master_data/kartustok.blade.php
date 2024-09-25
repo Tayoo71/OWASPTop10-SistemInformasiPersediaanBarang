@@ -17,7 +17,7 @@
                     </div>
                     <input id="datepicker-range-start" name="start" type="text"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                        placeholder="Pilih Tanggal Mulai" value="{{ request('start') }}">
+                        required placeholder="Pilih Tanggal Mulai" value="{{ request('start') }}">
                 </div>
                 <span class="mx-3 text-gray-500">Sampai</span>
                 <div class="relative">
@@ -30,7 +30,7 @@
                     </div>
                     <input id="datepicker-range-end" name="end" type="text"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                        placeholder="Pilih Tanggal Akhir" value="{{ request('end') }}">
+                        required placeholder="Pilih Tanggal Akhir" value="{{ request('end') }}">
                 </div>
             </div>
         </div>
@@ -75,18 +75,38 @@
                 </div>
 
                 <!-- Search Bar -->
-                <div class="relative w-full flex">
-                    <input type="search" id="search-dropdown" name="search"
-                        class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-r-none border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Cari Stok Opname" value="{{ request('search') }}" />
-                    <button type="submit"
-                        class="p-2.5 text-sm font-medium text-white bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-0 transition-none flex-shrink-0">
-                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
-                        <span class="sr-only">Search</span>
-                    </button>
+                <div class="relative w-full" x-data="searchBarangFunction()" x-init="updateVariable()">
+                    <div class="flex">
+                        <div class="relative flex-grow">
+                            <input type="search" id="search-dropdown"
+                                class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-none border-l-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                                x-model="searchBarang" @input.debounce.500ms="searchBarangAPI"
+                                :placeholder="selectedBarang !== '' ? 'Loading...' : 'Cari Barang...'"
+                                placeholder="Cari Barang..." required />
+
+                            <!-- Dropdown -->
+                            <div x-show="searchBarangList.length > 0"
+                                class="absolute z-50 bg-white border border-gray-300 rounded-lg mt-1 w-full max-h-48 overflow-y-auto">
+                                <template x-for="barang in searchBarangList" :key="barang.id">
+                                    <div @click="selectBarang(barang)"
+                                        class="px-4 py-2 cursor-pointer hover:bg-gray-100">
+                                        <span x-text="barang.nama_item"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="p-2.5 text-sm font-medium text-white bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-0 transition-none flex-shrink-0">
+                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                            </svg>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="search" x-model="selectedBarang" />
                 </div>
             </div>
         </div>
@@ -127,9 +147,48 @@
             </tbody>
         </table>
     </div>
+    <script>
+        function searchBarangFunction() {
+            return {
+                searchBarang: '',
+                selectedBarang: '{{ request('search') }}',
+                searchBarangList: [],
 
-    <!-- Pagination -->
-    {{-- <div class="py-4 px-4 mt-4">
-        {{ $kartuStok->links() }}
-    </div> --}}
+                searchBarangAPI() {
+                    this.selectedBarang = '';
+                    if (this.searchBarang.length > 0) {
+                        this.fetchAPI(this.searchBarang, 'search')
+                            .then(data => {
+                                this.searchBarangList = data;
+                            })
+                            .catch(error => {
+                                console.error('Error fetching data:', error);
+                            });
+                    } else {
+                        this.searchBarangList = [];
+                    }
+                },
+                updateVariable() {
+                    if (this.selectedBarang != '') {
+                        this.fetchAPI(this.selectedBarang, 'update')
+                            .then(data => {
+                                this.searchBarang = data[0].nama_item
+                            })
+                            .catch(error => {
+                                console.error('Error fetching data:', error);
+                            });
+                    }
+                },
+                selectBarang(barang) {
+                    this.selectedBarang = barang.id;
+                    this.searchBarang = barang.nama_item;
+                    this.searchBarangList = [];
+                },
+                fetchAPI(search, mode) {
+                    return fetch(`/barang/search/barang?search=${search}&mode=${mode}`)
+                        .then(response => response.json());
+                },
+            }
+        }
+    </script>
 </x-layout>

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreBarangRequest;
+use Illuminate\Support\Facades\Validator;
 
 class BarangController extends Controller
 {
@@ -21,6 +22,8 @@ class BarangController extends Controller
                 'direction' => 'nullable|in:asc,desc',
                 'gudang' => 'nullable|exists:gudangs,kode_gudang',
                 'search' => 'nullable|string|max:255',
+                'edit' => 'nullable|exists:barangs,id',
+                'delete' => 'nullable|exists:barangs,id',
             ]);
 
             $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_item';
@@ -56,8 +59,8 @@ class BarangController extends Controller
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
                 'jenises' => Jenis::select('id', 'nama_jenis')->get(),
                 'mereks' => Merek::select('id', 'nama_merek')->get(),
-                'editBarang' => $request->has('edit') ? Barang::with(['konversiSatuans'])->find($request->edit) : null,
-                'deleteBarang' => $request->has('delete') ? Barang::select('id', 'nama_item')->find($request->delete) : null,
+                'editBarang' => !empty($validatedData['edit']) ? Barang::with(['konversiSatuans'])->find($validatedData['edit']) : null,
+                'deleteBarang' => !empty($validatedData['delete']) ? Barang::select('id', 'nama_item')->find($validatedData['delete']) : null,
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang. ', 'home_page');

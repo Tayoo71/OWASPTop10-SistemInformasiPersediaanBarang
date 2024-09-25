@@ -46,3 +46,4 @@ Route::get('/laporan', function () {
 
 // API Route
 Route::get('/barang/search', [APIController::class, 'search']);
+Route::get('/barang/search/barang', [APIController::class, 'searchBarang']);
