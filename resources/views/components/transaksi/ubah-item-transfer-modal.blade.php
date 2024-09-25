@@ -81,7 +81,7 @@
                 <input type="number" name="jumlah_stok_transfer" id="jumlah_stok_transfer" min="1"
                     step="1" x-model="ubahJumlahStokTransfer" @input.debounce.500ms="updateStok()"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
-                    placeholder="Masukkan jumlah stok transfer" required>
+                    placeholder="Masukkan Jumlah Stok Transfer" required>
             </div>
             <div class="grid gap-4 mb-4">
                 <div class="col-span-2">
@@ -89,7 +89,7 @@
                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Keterangan</label>
                     <textarea id="keterangan" name="keterangan" rows="3" x-model="ubahKeterangan"
                         class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                        placeholder="Masukkan keterangan"></textarea>
+                        placeholder="Masukkan Keterangan"></textarea>
                 </div>
             </div>
         </div>
@@ -118,7 +118,7 @@
                     if (this.ubahSelectedBarang && this.ubahSelectedBarang) {
                         this.ubahResetVariables();
                     }
-                    if (this.ubahSearch.length > 2) {
+                    if (this.ubahSearch.length > 0) {
                         this.fetchAPI(this.ubahSearch, this.ubahSelectedGudangAsal)
                             .then(data => {
                                 this.ubahBarangList = data;

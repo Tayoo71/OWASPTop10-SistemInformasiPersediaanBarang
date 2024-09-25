@@ -59,7 +59,7 @@
                 <input type="number" name="stok_fisik" id="stok_fisik" min="0" step = "1"
                     x-model="stokFisik"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
-                    placeholder="Masukkan jumlah Stok Fisik" required>
+                    placeholder="Masukkan Jumlah Stok Fisik" required>
             </div>
         </div>
         <div class="grid gap-4 mb-4">
@@ -68,7 +68,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Keterangan</label>
                 <textarea id="keterangan" name="keterangan" rows="3"
                     class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="Masukkan keterangan"></textarea>
+                    placeholder="Masukkan Keterangan"></textarea>
             </div>
         </div>
         <div class="flex justify-center">
@@ -94,7 +94,7 @@
                     if (this.selectedBarang && this.selectedBarang.id) {
                         this.resetVariables();
                     }
-                    if (this.search.length > 2) {
+                    if (this.search.length > 0) {
                         this.fetchAPI(this.search, this.selectedGudang)
                             .then(data => {
                                 this.barangList = data;

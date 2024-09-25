@@ -27,6 +27,7 @@ class APIController extends Controller
                 }
             }
         ])->where('nama_item', 'LIKE', "%{$search}%")
+            ->orWhere('id', $search)
             ->select('id', 'nama_item')
             ->limit(5)
             ->get();
@@ -43,6 +44,41 @@ class APIController extends Controller
                         'satuan' => $konversi->satuan
                     ];
                 })
+            ];
+        });
+
+        return response()->json($barangs);
+    }
+    public function searchBarang(Request $request)
+    {
+        $validatedData = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'mode' => 'required|in:search,update',
+        ]);
+        $search = $validatedData['search'] ?? null;
+        $mode = $validatedData['mode'];
+
+        if ($mode === 'search') {
+            $barangs = Barang::where('nama_item', 'LIKE', "%{$search}%")
+                ->select('id', 'nama_item')
+                ->limit(5)
+                ->get();
+        } else {
+            if (is_numeric($search)) {
+                $barangs = Barang::where('id', $search)
+                    ->select('id', 'nama_item')
+                    ->limit(1)
+                    ->get();
+            } else {
+                // Jika search bukan angka, kosongkan hasil
+                $barangs = collect();
+            }
+        }
+
+        $barangs->transform(function ($barang) {
+            return [
+                'id' => $barang->id,
+                'nama_item' => $barang->nama_item,
             ];
         });
 
