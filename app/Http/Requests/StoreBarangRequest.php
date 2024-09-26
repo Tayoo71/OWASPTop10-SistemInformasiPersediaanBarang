@@ -28,6 +28,7 @@ class StoreBarangRequest extends FormRequest
             'rak' => 'nullable|string|max:255',
             'keterangan' => 'nullable|string|max:1000',
             'stok_minimum' => 'nullable|integer|min:0',
+            'status' => 'nullable|string|in:Aktif,Tidak Aktif',
             'konversiSatuan' => 'required|array|min:1',
             'konversiSatuan.*.harga_pokok' => 'nullable|numeric|min:0',
             'konversiSatuan.*.harga_jual' => 'nullable|numeric|min:0',

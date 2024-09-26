@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('user_buat_id');
             $table->string('user_update_id')->nullable();
             $table->string('kode_gudang');
-            $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
+            $table->foreignId('barang_id')->constrained('barangs')->onDelete('restrict');
             $table->bigInteger('jumlah_stok_keluar');
             $table->text('keterangan')->nullable();
             $table->timestamps();

@@ -71,7 +71,7 @@ class KartuStokController extends Controller
                 ->merge(TransaksiItemTransfer::where('barang_id', $barangId)->whereBetween('updated_at', [$start, $end])->get())
                 ->sortByDesc('updated_at');
         } else {
-            $saldoAkhir = StokBarang::where('barang_id', $barangId)->where('kode_gudang', $gudang)->value('stok');
+            $saldoAkhir = StokBarang::where('barang_id', $barangId)->where('kode_gudang', $gudang)->sum('stok');
             $transaksiDalamPeriode = collect()
                 ->merge(TransaksiBarangMasuk::where('barang_id', $barangId)->where('kode_gudang', $gudang)->whereBetween('updated_at', [$start, $end])->get())
                 ->merge(TransaksiBarangKeluar::where('barang_id', $barangId)->where('kode_gudang', $gudang)->whereBetween('updated_at', [$start, $end])->get())
