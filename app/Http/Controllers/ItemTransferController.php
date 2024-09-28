@@ -23,6 +23,8 @@ class ItemTransferController extends Controller
                 'search' => 'nullable|string|max:255',
                 'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
                 'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
+                'edit' => 'nullable|exists:transaksi_item_transfers,id',
+                'delete' => 'nullable|exists:transaksi_item_transfers,id',
             ]);
 
             $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
@@ -49,16 +51,20 @@ class ItemTransferController extends Controller
                     'jumlah_stok_transfer' => $convertedStok,
                     'keterangan' => $transaksi->keterangan ?? '-',
                     'user_buat_id' => $transaksi->user_buat_id,
-                    'user_update_id' => $transaksi->user_update_id ?? '-'
+                    'user_update_id' => $transaksi->user_update_id ?? '-',
+                    'statusBarang' => $transaksi->barang->status === "Aktif" ? true : false
                 ];
             });
 
             $editTransaksi = null;
             $editTransaksiSatuan = null;
-            if ($request->has('edit')) {
+            if (!empty($validatedData['edit'])) {
                 $editTransaksi = TransaksiItemTransfer::select('id', 'gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah_stok_transfer', 'keterangan')
+                    ->whereHas('barang', function ($query) {
+                        $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
+                    })
                     ->with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
-                    ->find($request->edit);
+                    ->find($validatedData['edit']);
                 if ($editTransaksi) {
                     $editTransaksiSatuan = KonversiSatuan::getSatuanToEdit($editTransaksi->barang, $editTransaksi->jumlah_stok_transfer);
                 }
@@ -70,15 +76,17 @@ class ItemTransferController extends Controller
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
                 'editTransaksi' => $editTransaksi,
                 'editTransaksiSatuan' => $editTransaksiSatuan,
-                'deleteTransaksi' => $request->has('delete') ?
-                    TransaksiItemTransfer::with(['barang:id,nama_item'])
-                    ->where('id', $request->delete)
+                'deleteTransaksi' => !empty($validatedData['delete']) ?
+                    TransaksiItemTransfer::where('id', $validatedData['delete'])
+                    ->whereHas('barang', function ($query) {
+                        $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
+                    })
                     ->select('id', 'barang_id')
                     ->first()
                     : null,
             ]);
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Masuk pada halaman Barang Masuk. ', 'home_page');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Item Transfer pada halaman Item Transfer. ', 'home_page');
         }
     }
     public function store(StoreItemTransferRequest $request)
@@ -183,7 +191,8 @@ class ItemTransferController extends Controller
         $customErrors = [
             'Stok tidak mencukupi untuk dikurangi.',
             'Proses tidak valid.',
-            'Stok tidak mencukupi, tidak dapat mengurangi stok.'
+            'Stok tidak mencukupi, tidak dapat mengurangi stok.',
+            'Barang dengan status "Tidak Aktif" tidak dapat diproses. '
         ];
         if (in_array($e->getMessage(), $customErrors)) {
             $custom_message = $custom_message . $e->getMessage();

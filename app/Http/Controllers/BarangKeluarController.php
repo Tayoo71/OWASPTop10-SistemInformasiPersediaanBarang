@@ -23,6 +23,8 @@ class BarangKeluarController extends Controller
                 'search' => 'nullable|string|max:255',
                 'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
                 'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
+                'edit' => 'nullable|exists:transaksi_barang_keluars,id',
+                'delete' => 'nullable|exists:transaksi_barang_keluars,id',
             ]);
 
             $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
@@ -48,16 +50,20 @@ class BarangKeluarController extends Controller
                     'jumlah_stok_keluar' => $convertedStok,
                     'keterangan' => $transaksi->keterangan ?? '-',
                     'user_buat_id' => $transaksi->user_buat_id,
-                    'user_update_id' => $transaksi->user_update_id ?? '-'
+                    'user_update_id' => $transaksi->user_update_id ?? '-',
+                    'statusBarang' => $transaksi->barang->status === "Aktif" ? true : false
                 ];
             });
 
             $editTransaksi = null;
             $editTransaksiSatuan = null;
-            if ($request->has('edit')) {
+            if (!empty($validatedData['edit'])) {
                 $editTransaksi = TransaksiBarangKeluar::select('id', 'kode_gudang', 'barang_id', 'jumlah_stok_keluar', 'keterangan')
+                    ->whereHas('barang', function ($query) {
+                        $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
+                    })
                     ->with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
-                    ->find($request->edit);
+                    ->find($validatedData['edit']);
                 if ($editTransaksi) {
                     $editTransaksiSatuan = KonversiSatuan::getSatuanToEdit($editTransaksi->barang, $editTransaksi->jumlah_stok_keluar);
                 }
@@ -69,9 +75,11 @@ class BarangKeluarController extends Controller
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
                 'editTransaksi' => $editTransaksi,
                 'editTransaksiSatuan' => $editTransaksiSatuan,
-                'deleteTransaksi' => $request->has('delete') ?
-                    TransaksiBarangKeluar::with(['barang:id,nama_item'])
-                    ->where('id', $request->delete)
+                'deleteTransaksi' => !empty($validatedData['delete']) ?
+                    TransaksiBarangKeluar::where('id', $validatedData['delete'])
+                    ->whereHas('barang', function ($query) {
+                        $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
+                    })
                     ->select('id', 'jumlah_stok_keluar', 'barang_id')
                     ->first()
                     : null,
@@ -169,7 +177,8 @@ class BarangKeluarController extends Controller
         $customErrors = [
             'Stok tidak mencukupi untuk dikurangi.',
             'Proses tidak valid.',
-            'Stok tidak mencukupi, tidak dapat mengurangi stok.'
+            'Stok tidak mencukupi, tidak dapat mengurangi stok.',
+            'Barang dengan status "Tidak Aktif" tidak dapat diproses. '
         ];
         if (in_array($e->getMessage(), $customErrors)) {
             $custom_message = $custom_message . $e->getMessage();

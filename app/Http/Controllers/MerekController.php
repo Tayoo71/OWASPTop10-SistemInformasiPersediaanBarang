@@ -17,6 +17,8 @@ class MerekController extends Controller
                 'sort_by' => 'nullable|in:id,nama_merek,keterangan',
                 'direction' => 'nullable|in:asc,desc',
                 'search' => 'nullable|string|max:255',
+                'edit' => 'nullable|exists:mereks,id',
+                'delete' => 'nullable|exists:mereks,id',
             ]);
 
             $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_merek';
@@ -31,8 +33,8 @@ class MerekController extends Controller
             return view('master_data/daftarmerek', [
                 'title' => 'Daftar Merek',
                 'mereks' => $mereks,
-                'editMerek' => $request->has('edit') ? Merek::find($request->edit) : null,
-                'deleteMerek' => $request->has('delete') ? Merek::select('id', 'nama_merek')->find($request->delete) : null,
+                'editMerek' => $validatedData['edit'] ? Merek::find($validatedData['edit']) : null,
+                'deleteMerek' => $validatedData['delete'] ? Merek::select('id', 'nama_merek')->find($validatedData['delete']) : null,
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Merek pada halaman Daftar Merek. ', 'home_page');

@@ -317,6 +317,33 @@
                             @endif
                         </a>
                     </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">
+                        <a href="{{ route('daftarbarang.index', array_merge(request()->query(), ['sort_by' => 'status', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                            class="flex justify-center items-center">
+                            STATUS
+                            @if (request('sort_by') === 'status')
+                                @if (request('direction') === 'asc')
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 9l4-4 4 4" />
+                                    </svg>
+                                @else
+                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 15l-4 4-4-4" />
+                                    </svg>
+                                @endif
+                            @else
+                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+                                </svg>
+                            @endif
+                        </a>
+                    </th>
                     <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
                 </tr>
             </thead>
@@ -332,16 +359,19 @@
                         <td class="px-6 py-4 align-middle">{{ $barang['harga_jual'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['rak'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['keterangan'] }}</td>
+                        <td class="px-6 py-4 align-middle">{{ $barang['status'] }}</td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['edit' => $barang['id']])) }}"
                                     class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
-                                <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['delete' => $barang['id']])) }}"
-                                    class="font-medium text-red-600 hover:underline ml-3">
-                                    Hapus
-                                </a>
+                                @if ($barang['statusTransaksi'] === false)
+                                    <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['delete' => $barang['id']])) }}"
+                                        class="font-medium text-red-600 hover:underline ml-3">
+                                        Hapus
+                                    </a>
+                                @endif
                             </div>
                         </td>
                     </tr>

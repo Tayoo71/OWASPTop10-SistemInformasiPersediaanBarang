@@ -136,10 +136,12 @@
                                     class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
-                                <a href="{{ route('daftargudang.index', array_merge(request()->only(['search']), ['delete' => $gudang['kode_gudang']])) }}"
-                                    class="font-medium text-red-600 hover:underline ml-3">
-                                    Hapus
-                                </a>
+                                @if ($gudang['statusTransaksi'] === false)
+                                    <a href="{{ route('daftargudang.index', array_merge(request()->only(['search']), ['delete' => $gudang['kode_gudang']])) }}"
+                                        class="font-medium text-red-600 hover:underline ml-3">
+                                        Hapus
+                                    </a>
+                                @endif
                             </div>
                         </td>
                     </tr>

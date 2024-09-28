@@ -29,6 +29,7 @@ class StokMinimumController extends Controller
 
             $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
                 ->search($filters)
+                ->where('status', 'Aktif')
                 ->paginate(20)
                 ->withQueryString();
 
@@ -59,7 +60,7 @@ class StokMinimumController extends Controller
                 ['path' => $request->url(), 'query' => $request->query()]
             );
 
-            $paginatedBarangs->getCollection()->transform(function ($barang) use ($filters) {
+            $paginatedBarangs->getCollection()->transform(function ($barang) {
                 $formattedStokData = $barang->getFormattedStokAndPrices();
                 $formattedStokMinimumData = KonversiSatuan::getFormattedConvertedStok($barang, $barang->stok_minimum);
                 return [

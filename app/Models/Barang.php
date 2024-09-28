@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Barang extends Model
 {
@@ -13,6 +14,7 @@ class Barang extends Model
         'jenis_id',
         'merek_id',
         'stok_minimum',
+        'status'
     ];
     public $timestamps = false;
     public function jenis()
@@ -33,6 +35,22 @@ class Barang extends Model
     public function konversiSatuans()
     {
         return $this->hasMany(KonversiSatuan::class);
+    }
+    public function transaksiBarangMasuks()
+    {
+        return $this->hasMany(TransaksiBarangMasuk::class, 'barang_id');
+    }
+    public function transaksiBarangKeluars()
+    {
+        return $this->hasMany(TransaksiBarangKeluar::class, 'barang_id');
+    }
+    public function transaksiStokOpnames()
+    {
+        return $this->hasMany(TransaksiStokOpname::class, 'barang_id');
+    }
+    public function transaksiItemTransfers()
+    {
+        return $this->hasMany(TransaksiItemTransfer::class, 'barang_id');
     }
     public function scopeSearch($query, array $filters)
     {
@@ -59,11 +77,14 @@ class Barang extends Model
             ->groupBy('stok_barangs.barang_id')]); // Mengelompokkan stok berdasarkan barang_id
 
         // Sorting
-        $sortBy = $filters['sort_by'] ?? 'nama_item';
-        $direction = $filters['direction'] ?? 'asc';
+        $sortBy = $filters['sort_by'];
+        $direction = $filters['direction'];
 
         // Sorting menggunakan subquery
-        if ($sortBy === "jenis") {
+        if ($sortBy === null || $direction === null) {
+            // Default SORT
+            $query->orderBy('status', 'asc')->orderBy('nama_item', 'asc');
+        } else if ($sortBy === "jenis") {
             $query->addSelect(['nama_jenis' => Jenis::select('nama_jenis')
                 ->whereColumn('jenises.id', 'barangs.jenis_id')
                 ->limit(1)])
@@ -84,15 +105,17 @@ class Barang extends Model
         } else if ($sortBy === "harga_pokok") {
             $query->addSelect(['harga_pokok' => KonversiSatuan::select('harga_pokok')
                 ->whereColumn('konversi_satuans.barang_id', 'barangs.id')
-                ->orderBy('harga_pokok', 'asc')  // Mengambil harga_pokok terendah
+                ->orderBy('jumlah', 'desc')  // Mengambil satuan tertinggi
                 ->limit(1)])
                 ->orderBy('harga_pokok', $direction);
         } else if ($sortBy === "harga_jual") {
             $query->addSelect(['harga_jual' => KonversiSatuan::select('harga_jual')
                 ->whereColumn('konversi_satuans.barang_id', 'barangs.id')
-                ->orderBy('harga_jual', 'asc')  // Mengambil harga_jual terendah
+                ->orderBy('jumlah', 'desc')  // Mengambil satuan tertinggi
                 ->limit(1)])
                 ->orderBy('harga_jual', $direction);
+        } else if ($sortBy === "status") {
+            $query->orderBy('status', $filters['direction'] ?? 'asc');
         } else {
             $query->orderBy($sortBy, $direction);
         }

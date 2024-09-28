@@ -24,6 +24,7 @@ class StokOpnameController extends Controller
                 'search' => 'nullable|string|max:255',
                 'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
                 'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
+                'delete' => 'nullable|exists:transaksi_stok_opnames,id',
             ]);
 
             $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
@@ -53,6 +54,7 @@ class StokOpnameController extends Controller
                     'selisih' => $convertedSelisih,
                     'keterangan' => $transaksi->keterangan ?? '-',
                     'user_buat_id' => $transaksi->user_buat_id,
+                    'statusBarang' => $transaksi->barang->status === "Aktif" ? true : false
                 ];
             });
 
@@ -60,9 +62,11 @@ class StokOpnameController extends Controller
                 'title' => 'Stok Opname',
                 'transaksies' => $transaksies,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
-                'deleteTransaksi' => $request->has('delete') ?
-                    TransaksiStokOpname::with(['barang:id,nama_item'])
-                    ->where('id', $request->delete)
+                'deleteTransaksi' => !empty($validatedData['delete']) ?
+                    TransaksiStokOpname::where('id', $validatedData['delete'])
+                    ->whereHas('barang', function ($query) {
+                        $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
+                    })
                     ->select('id', 'barang_id')
                     ->first()
                     : null,
@@ -145,7 +149,8 @@ class StokOpnameController extends Controller
         $customErrors = [
             'Stok tidak mencukupi untuk dikurangi.',
             'Proses tidak valid.',
-            'Stok tidak mencukupi, tidak dapat mengurangi stok.'
+            'Stok tidak mencukupi, tidak dapat mengurangi stok.',
+            'Barang dengan status "Tidak Aktif" tidak dapat diproses. '
         ];
         if (in_array($e->getMessage(), $customErrors)) {
             $custom_message = $custom_message . $e->getMessage();

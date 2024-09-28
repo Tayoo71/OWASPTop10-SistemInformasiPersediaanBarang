@@ -5,17 +5,26 @@ namespace App\Http\Controllers\API;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 use App\Models\KonversiSatuan;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class APIController extends Controller
 {
     // Fetch API For Searching Barang - AJAX
     public function search(Request $request)
     {
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'gudang' => 'nullable|exists:gudangs,kode_gudang',
             'search' => 'nullable|string|max:255',
         ]);
+
+        // If validation fails, log the validation errors and return a 404 error page
+        if ($validator->fails()) {
+            $this->logValidationErrors($validator, $request);
+        }
+
+        $validatedData = $validator->validated();
         $search = $validatedData['search'] ?? null;
         $gudang = $validatedData['gudang'] ?? null;
 
@@ -26,11 +35,16 @@ class APIController extends Controller
                     $query->where('kode_gudang', $gudang);
                 }
             }
-        ])->where('nama_item', 'LIKE', "%{$search}%")
-            ->orWhere('id', $search)
+        ])
+            ->where('status', 'Aktif')  // Ensures only records with status 'Aktif' are retrieved
+            ->where(function ($query) use ($search) {
+                $query->where('nama_item', 'LIKE', "%{$search}%")
+                    ->orWhere('id', $search);
+            })
             ->select('id', 'nama_item')
             ->limit(5)
             ->get();
+
 
         $barangs->transform(function ($barang) {
             $convertedStok = KonversiSatuan::getFormattedConvertedStok($barang, $barang->stokBarangs->sum('stok'));
@@ -51,10 +65,17 @@ class APIController extends Controller
     }
     public function searchBarang(Request $request)
     {
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'search' => 'nullable|string|max:255',
             'mode' => 'required|in:search,update',
         ]);
+
+        // If validation fails, log the validation errors and return a 404 error page
+        if ($validator->fails()) {
+            $this->logValidationErrors($validator, $request);
+        }
+
+        $validatedData = $validator->validated();
         $search = $validatedData['search'] ?? null;
         $mode = $validatedData['mode'];
 
@@ -83,5 +104,17 @@ class APIController extends Controller
         });
 
         return response()->json($barangs);
+    }
+
+    private function logValidationErrors($validator, $request)
+    {
+        // Log validation errors
+        Log::error('Validation failed in APIController', [
+            'request_data' => $request->all(),
+            'validation_errors' => $validator->errors(),
+        ]);
+
+        // Abort and return a 404 page
+        abort(404);
     }
 }

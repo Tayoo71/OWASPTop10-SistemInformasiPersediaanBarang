@@ -395,10 +395,16 @@
                         <td class="px-6 py-4 align-middle">{{ $transaksi['user_buat_id'] }}</td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
-                                <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
-                                    class="font-medium text-red-600 hover:underline ml-3">
-                                    Hapus
-                                </a>
+                                @if ($transaksi['statusBarang'] === true)
+                                    <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
+                                        class="font-medium text-red-600 hover:underline ml-3">
+                                        Hapus
+                                    </a>
+                                @else
+                                    <span class="font-medium text-gray-500">
+                                        Status Barang Tidak Aktif
+                                    </span>
+                                @endif
                             </div>
                         </td>
                     </tr>
