@@ -17,6 +17,8 @@ class JenisController extends Controller
                 'sort_by' => 'nullable|in:id,nama_jenis,keterangan',
                 'direction' => 'nullable|in:asc,desc',
                 'search' => 'nullable|string|max:255',
+                'edit' => 'nullable|exists:jenises,id',
+                'delete' => 'nullable|exists:jenises,id',
             ]);
 
             $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_jenis';
@@ -31,8 +33,8 @@ class JenisController extends Controller
             return view('master_data/daftarjenis', [
                 'title' => 'Daftar Jenis',
                 'jenises' => $jenises,
-                'editJenis' => $request->has('edit') ? Jenis::find($request->edit) : null,
-                'deleteJenis' => $request->has('delete') ? Jenis::select('id', 'nama_jenis')->find($request->delete) : null,
+                'editJenis' => $validatedData['edit'] ? Jenis::find($validatedData['edit']) : null,
+                'deleteJenis' => $validatedData['delete'] ? Jenis::select('id', 'nama_jenis')->find($validatedData['delete']) : null,
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis. ', 'home_page');

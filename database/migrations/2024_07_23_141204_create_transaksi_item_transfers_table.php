@@ -24,8 +24,8 @@ return new class extends Migration
 
             $table->foreign('user_buat_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('restrict');
             $table->foreign('user_update_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('restrict');
-            $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('gudang_tujuan')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('gudang_asal')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('gudang_tujuan')->references('kode_gudang')->on('gudangs')->onUpdate('cascade')->onDelete('restrict');
         });
     }
 

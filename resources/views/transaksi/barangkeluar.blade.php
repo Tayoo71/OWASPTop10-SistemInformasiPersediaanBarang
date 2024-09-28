@@ -367,14 +367,20 @@
                         <td class="px-6 py-4 align-middle">{{ $transaksi['user_update_id'] }}</td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
-                                <a href="{{ route('barangkeluar.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['edit' => $transaksi['id']])) }}"
-                                    class="font-medium text-yellow-300 hover:underline">
-                                    Ubah
-                                </a>
-                                <a href="{{ route('barangkeluar.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
-                                    class="font-medium text-red-600 hover:underline ml-3">
-                                    Hapus
-                                </a>
+                                @if ($transaksi['statusBarang'] === true)
+                                    <a href="{{ route('barangkeluar.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['edit' => $transaksi['id']])) }}"
+                                        class="font-medium text-yellow-300 hover:underline">
+                                        Ubah
+                                    </a>
+                                    <a href="{{ route('barangkeluar.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
+                                        class="font-medium text-red-600 hover:underline ml-3">
+                                        Hapus
+                                    </a>
+                                @else
+                                    <span class="font-medium text-gray-500">
+                                        Status Barang Tidak Aktif
+                                    </span>
+                                @endif
                             </div>
                         </td>
                     </tr>

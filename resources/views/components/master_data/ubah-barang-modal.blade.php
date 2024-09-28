@@ -79,13 +79,18 @@
             </div>
 
             <div class="col-span-2">
-                <label for="status" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status
+                <label for="status" class="block text-sm font-medium text-gray-900 dark:text-white">Status
                     Barang</label>
+                <p class="mb-3 text-xs text-red-600 dark:text-red-400">
+                    Barang yang berstatus "Tidak Aktif" tidak dapat digunakan dalam fitur Transaksi, Informasi Stok
+                    Minimum, serta tidak akan terdaftar dalam Laporan Daftar Barang.
+                </p>
                 <select name="status" id="status"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
                     <option value="">Pilih Status Barang</option>
-                    <option value="Aktif" {{ $barang->deleted_at === null ? 'selected' : '' }}>Aktif</option>
-                    <option value="Tidak Aktif" {{ $barang->deleted_at !== null ? 'selected' : '' }}>Tidak Aktif
+                    <option value="Aktif" {{ $barang->status === 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                    <option value="Tidak Aktif" {{ $barang->status === 'Tidak Aktif' ? 'selected' : '' }}>Tidak
+                        Aktif
                     </option>
                 </select>
             </div>

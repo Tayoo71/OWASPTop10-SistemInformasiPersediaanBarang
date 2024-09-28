@@ -24,9 +24,13 @@ class TransaksiItemTransfer extends Model
         return $this->belongsTo(Barang::class);
     }
 
-    public function user()
+    public function userBuat()
     {
         return $this->belongsTo(User::class, 'user_buat_id', 'id');
+    }
+    public function userUpdate()
+    {
+        return $this->belongsTo(User::class, 'user_update_id', 'id');
     }
     public function scopeSearch($query, array $filters)
     {

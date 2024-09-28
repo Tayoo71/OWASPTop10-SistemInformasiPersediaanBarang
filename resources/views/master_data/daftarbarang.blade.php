@@ -366,7 +366,7 @@
                                     class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
-                                @if ($barang['status'] === 'Aktif' && $barang['statusTransaksi'] === false)
+                                @if ($barang['statusTransaksi'] === false)
                                     <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['delete' => $barang['id']])) }}"
                                         class="font-medium text-red-600 hover:underline ml-3">
                                         Hapus

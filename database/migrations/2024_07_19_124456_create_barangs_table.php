@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('jenis_id')->nullable()->constrained('jenises')->nullOnDelete();
             $table->foreignId('merek_id')->nullable()->constrained('mereks')->nullOnDelete();
             $table->integer('stok_minimum');
-            $table->softDeletes();
+            $table->enum('status', ['Aktif', 'Tidak Aktif'])->default('Aktif');
         });
     }
 

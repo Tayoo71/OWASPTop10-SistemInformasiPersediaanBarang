@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Barang extends Model
 {
-    use SoftDeletes;
     protected $fillable = [
         'nama_item',
         'keterangan',
@@ -15,6 +14,7 @@ class Barang extends Model
         'jenis_id',
         'merek_id',
         'stok_minimum',
+        'status'
     ];
     public $timestamps = false;
     public function jenis()
@@ -54,9 +54,6 @@ class Barang extends Model
     }
     public function scopeSearch($query, array $filters)
     {
-        // Menggunakan withTrashed untuk menyertakan barang yang di-soft delete
-        $query->withTrashed();
-
         $query->when($filters['search'] ?? false, function ($query, $search) {
             return $query->where('id', 'like', '%' . $search . '%')
                 ->orWhere('nama_item', 'like', '%' . $search . '%')
@@ -86,7 +83,7 @@ class Barang extends Model
         // Sorting menggunakan subquery
         if ($sortBy === null || $direction === null) {
             // Default SORT
-            $query->orderBy('deleted_at', 'asc')->orderBy('nama_item', 'asc');
+            $query->orderBy('status', 'asc')->orderBy('nama_item', 'asc');
         } else if ($sortBy === "jenis") {
             $query->addSelect(['nama_jenis' => Jenis::select('nama_jenis')
                 ->whereColumn('jenises.id', 'barangs.jenis_id')
@@ -118,7 +115,7 @@ class Barang extends Model
                 ->limit(1)])
                 ->orderBy('harga_jual', $direction);
         } else if ($sortBy === "status") {
-            $query->orderBy('deleted_at', $filters['direction'] ?? 'asc');  // Barang yang aktif dulu (NULL deleted_at)
+            $query->orderBy('status', $filters['direction'] ?? 'asc');
         } else {
             $query->orderBy($sortBy, $direction);
         }
