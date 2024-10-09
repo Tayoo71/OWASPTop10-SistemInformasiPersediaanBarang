@@ -5,7 +5,29 @@
 
 version: 2
 updates:
-  - package-ecosystem: "composer"
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    labels:
+      - "dependencies"
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "npm"
+      - "dependencies"
+
+  # Maintain dependencies for Composer
+  - package-ecosystem: "composer"
+    directory: "/"
+    registries:
+      - spark
+    schedule:
+      interval: "daily"
+    labels:
+      - "php"
+      - "dependencies"
