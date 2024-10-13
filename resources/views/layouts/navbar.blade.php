@@ -72,10 +72,6 @@
                                     Transfer</a>
                             </div>
                         </div>
-
-                        <a href="/laporan"
-                            class="rounded-md {{ request()->is('laporan') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 text-sm font-medium">Laporan
-                            Daftar Barang</a>
                     </div>
                 </div>
             </div>
@@ -168,9 +164,6 @@
             <a href="/itemtransfer"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('itemtransfer') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Item
                 Transfer</a>
-            <a href="/laporan"
-                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is('laporan') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Laporan
-                Daftar Barang</a>
         </div>
         <div class="border-t border-gray-700 pb-3 pt-4">
             <div class="flex items-center px-5">
