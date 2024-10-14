@@ -18,6 +18,9 @@ class GudangController extends Controller
     {
         try {
             $filters = $this->getValidatedFilters($request);
+            if (is_null($filters['format'])) {
+                throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
+            }
 
             $headers = ["Kode Gudang", "Nama Gudang", "Keterangan"];
             $datas = Gudang::search($filters)
@@ -31,9 +34,10 @@ class GudangController extends Controller
             } else if ($filters['format'] === "pdf") {
                 $pdf = Pdf::loadview('layouts.exports.export_gudang', [
                     'headers' => $headers,
-                    'datas' => $datas
+                    'datas' => $datas,
+                    'date' => date('d-F-Y H:i:s T')
                 ]);
-                return $pdf->download($fileName . '.pdf');
+                return $pdf->stream($fileName . '.pdf');
             } else if ($filters['format'] === "csv") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }

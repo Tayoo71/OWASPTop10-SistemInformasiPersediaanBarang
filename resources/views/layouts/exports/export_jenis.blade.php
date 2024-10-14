@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Gudang</title>
+    <title>Daftar Jenis</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,17 +50,14 @@
         /* Membuat tabel lebih proporsional */
         td:nth-child(1) {
             width: 20%;
-            /* Lebar kolom untuk Kode Gudang */
         }
 
         td:nth-child(2) {
             width: 30%;
-            /* Lebar kolom untuk Nama Gudang */
         }
 
         td:nth-child(3) {
             width: 50%;
-            /* Lebar kolom untuk Keterangan */
         }
 
         .date {
@@ -73,7 +70,7 @@
 </head>
 
 <body>
-    <h1>Daftar Gudang</h1>
+    <h1>Daftar Jenis</h1>
     <div class="date">
         Terakhir Update: {{ $date }}
     </div>
@@ -88,8 +85,8 @@
         <tbody>
             @foreach ($datas as $data)
                 <tr>
-                    <td>{{ $data['kode_gudang'] }}</td>
-                    <td>{{ $data['nama_gudang'] }}</td>
+                    <td>{{ $data['id'] }}</td>
+                    <td>{{ $data['nama_jenis'] }}</td>
                     <td>{{ $data['keterangan'] }}</td>
                 </tr>
             @endforeach
