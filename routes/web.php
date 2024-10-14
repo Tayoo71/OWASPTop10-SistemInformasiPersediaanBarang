@@ -22,6 +22,7 @@ Route::get('/', function () {
 // Master Data
 Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftargudang', GudangController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::post('daftargudang/export', [GudangController::class, 'export'])->name('daftargudang.export');;
 Route::resource('daftarjenis', JenisController::class)->parameters([
     // Menghindari Pemangkasan Plural 's'
     'daftarjenis' => 'daftarjenis'
