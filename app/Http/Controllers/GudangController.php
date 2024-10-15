@@ -32,7 +32,7 @@ class GudangController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.exports.export_gudang', [
+                $pdf = Pdf::loadview('layouts.pdf_exports.export_gudang', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'date' => date('d-F-Y H:i:s T')

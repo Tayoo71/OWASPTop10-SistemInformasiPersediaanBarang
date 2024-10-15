@@ -29,6 +29,7 @@ Route::resource('daftarjenis', JenisController::class)->parameters([
 ])->only(['index', 'store', 'update', 'destroy']);
 Route::post('daftarjenis/export', [JenisController::class, 'export'])->name('daftarjenis.export');;
 Route::resource('daftarmerek', MerekController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::post('daftarmerek/export', [MerekController::class, 'export'])->name('daftarmerek.export');;
 Route::resource('stokminimum', StokMinimumController::class)->only(['index']);
 Route::resource('kartustok', KartuStokController::class)->only(['index']);
 
