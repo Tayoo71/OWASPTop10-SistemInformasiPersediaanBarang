@@ -43,8 +43,8 @@ class ItemTransferController extends Controller
                 $convertedStok = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->jumlah_stok_transfer);
                 return [
                     'id' => $transaksi->id,
-                    'created_at' => $transaksi->created_at->format('d/m/Y H:i:s'),
-                    'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y H:i:s'),
+                    'created_at' => $transaksi->created_at->format('d/m/Y H:i:s T'),
+                    'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y H:i:s T'),
                     'gudang_asal' => $transaksi->gudang_asal,
                     'gudang_tujuan' => $transaksi->gudang_tujuan,
                     'nama_item' => $transaksi->barang->nama_item,

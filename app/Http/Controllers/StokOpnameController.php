@@ -45,8 +45,8 @@ class StokOpnameController extends Controller
                 $convertedSelisih = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->selisih);
                 return [
                     'id' => $transaksi->id,
-                    'created_at' => $transaksi->created_at->format('d/m/Y H:i:s'),
-                    'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y H:i:s'),
+                    'created_at' => $transaksi->created_at->format('d/m/Y H:i:s T'),
+                    'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y H:i:s T'),
                     'kode_gudang' => $transaksi->kode_gudang,
                     'nama_item' => $transaksi->barang->nama_item,
                     'stok_buku' => $convertedStokBuku,
