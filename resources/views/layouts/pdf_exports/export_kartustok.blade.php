@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informasi Stok Minimum</title>
+    <title>Kartu Stok</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,19 +48,17 @@
         /* Mengatur proporsi kolom */
         td:nth-child(1) {
             width: 10%;
+            /* Nomor Transaksi lebih kecil */
         }
 
-        td:nth-child(2) {
-            width: 40%;
-        }
-
+        td:nth-child(2),
         td:nth-child(3),
         td:nth-child(4),
         td:nth-child(5),
         td:nth-child(6),
-        td:nth-child(7),
-        td:nth-child(8) {
-            width: 12.5%;
+        td:nth-child(7) {
+            width: auto;
+            /* Kolom lainnya proporsional */
         }
 
         .date {
@@ -70,30 +68,28 @@
             margin-bottom: 5px;
         }
 
-        /* Gaya untuk informasi gudang */
-        .gudang {
+        .barang {
             text-align: left;
             color: #000;
-            /* Mengubah warna teks menjadi hitam */
             margin-bottom: 10px;
         }
     </style>
 </head>
 
 <body>
-    <h1>Informasi Stok Minimum</h1>
+    <h1>Kartu Stok</h1>
 
     <!-- Tanggal terakhir update -->
     <div class="date">
         Terakhir Update: {{ $date }}
     </div>
 
-    <!-- Informasi Gudang -->
-    <div class="gudang">
-        Gudang: {{ $gudang }}
+    <!-- Informasi Barang -->
+    <div class="barang">
+        Barang: {{ $barang }}
     </div>
 
-    <!-- Tabel Stok Minimum -->
+    <!-- Tabel Kartu Stok -->
     <table>
         <thead>
             <tr>
@@ -105,13 +101,12 @@
         <tbody>
             @foreach ($datas as $data)
                 <tr>
-                    <td>{{ $data['id'] }}</td>
-                    <td>{{ $data['nama_item'] }}</td>
-                    <td>{{ $data['stok'] }}</td>
-                    <td>{{ $data['stok_minimum'] }}</td>
-                    <td>{{ $data['jenis'] }}</td>
-                    <td>{{ $data['merek'] }}</td>
-                    <td>{{ $data['rak'] }}</td>
+                    <td>{{ $data['nomor_transaksi'] }}</td>
+                    <td>{{ $data['gudang'] }}</td>
+                    <td>{{ $data['tanggal'] }}</td>
+                    <td>{{ $data['tipe_transaksi'] }}</td>
+                    <td>{{ $data['jumlah'] }}</td>
+                    <td>{{ $data['saldo_stok'] }}</td>
                     <td>{{ $data['keterangan'] }}</td>
                 </tr>
             @endforeach

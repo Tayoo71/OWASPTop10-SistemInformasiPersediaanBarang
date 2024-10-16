@@ -33,6 +33,7 @@ Route::post('daftarmerek/export', [MerekController::class, 'export'])->name('daf
 Route::resource('stokminimum', StokMinimumController::class)->only(['index']);
 Route::post('stokminimum/export', [StokMinimumController::class, 'export'])->name('stokminimum.export');
 Route::resource('kartustok', KartuStokController::class)->only(['index']);
+Route::post('kartustok/export', [KartuStokController::class, 'export'])->name('kartustok.export');
 
 // Transaksi
 Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);

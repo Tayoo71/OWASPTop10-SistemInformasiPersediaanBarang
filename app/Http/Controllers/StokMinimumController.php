@@ -44,6 +44,8 @@ class StokMinimumController extends Controller
                     'keterangan' => $barang->keterangan ?? '-',
                 ];
             });
+            $gudang = is_null($filters['gudang']) ? "Semua Gudang" :
+                $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
             $fileName = 'Informasi Stok Minimum ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
@@ -52,6 +54,7 @@ class StokMinimumController extends Controller
                 $pdf = Pdf::loadview('layouts.pdf_exports.export_stokminimum', [
                     'headers' => $headers,
                     'datas' => $datas,
+                    'gudang' => $gudang,
                     'date' => date('d-F-Y H:i:s T')
                 ]);
                 return $pdf->stream($fileName . '.pdf');

@@ -3,34 +3,59 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Barang;
 use App\Models\Gudang;
 use App\Models\StokBarang;
+use App\Exports\ExcelExport;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\TransaksiStokOpname;
 use Illuminate\Support\Facades\Log;
 use App\Models\TransaksiBarangMasuk;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\TransaksiBarangKeluar;
 use App\Models\TransaksiItemTransfer;
+use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class KartuStokController extends Controller
 {
+    public function export(Request $request)
+    {
+        try {
+            $filters = $this->getValidatedFilters($request);
+            if (is_null($filters['format'])) {
+                throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
+            }
+
+            $headers = ["Nomor Transaksi", "Gudang", "Tanggal Transaksi", "Tipe Transaksi", "Jumlah", "Saldo Stok", "Keterangan"];
+            $datas = $this->getDataKartuStok($filters['search'], $filters['gudang'], $filters['start'], $filters['end']);
+            $barang = $filters['search'] . ' - ' . Barang::where('id', $filters['search'])->value('nama_item');
+
+            $fileName = 'Kartu Stok (' . $filters['search'] . ') ' . date('d-m-Y His');
+            if ($filters['format'] === "xlsx") {
+                return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
+            } else if ($filters['format'] === "pdf") {
+                $pdf = Pdf::loadview('layouts.pdf_exports.export_kartustok', [
+                    'headers' => $headers,
+                    'datas' => $datas,
+                    'barang' => $barang,
+                    'date' => date('d-F-Y H:i:s T')
+                ]);
+                return $pdf->stream($fileName . '.pdf');
+            } else if ($filters['format'] === "csv") {
+                return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
+            }
+        } catch (\Exception $e) {
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Daftar Gudang. ');
+        }
+    }
     public function index(Request $request)
     {
         try {
             // Validate request data
-            $validatedData = $request->validate([
-                'search' => 'nullable|exists:barangs,id',
-                'gudang' => 'nullable|exists:gudangs,kode_gudang',
-                'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
-                'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
-            ]);
+            $filters = $this->getValidatedFilters($request);
 
-            $barangId = $validatedData['search'] ?? null;
-            $gudang = $validatedData['gudang'] ?? 'all';
-            $start = !empty($validatedData['start']) ? Carbon::createFromFormat('d/m/Y', $validatedData['start'])->startOfDay() : null;
-            $end = !empty($validatedData['end']) ? Carbon::createFromFormat('d/m/Y', $validatedData['end'])->endOfDay() : null;
-
-            if (!$barangId || !$start || !$end) {
+            if (!$filters['search'] || !$filters['start'] || !$filters['end']) {
                 return view('master_data/kartustok', [
                     'title' => 'Kartu Stok',
                     'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
@@ -38,14 +63,7 @@ class KartuStokController extends Controller
                 ]);
             }
 
-            // Get saldo akhir and transactions
-            list($saldoAkhir, $transaksiDalamPeriode) = $this->getSaldoAndTransactions($barangId, $gudang, $start, $end);
-
-            // Calculate saldo awal
-            $saldoAwal = $this->calculateSaldoAwal($saldoAkhir, $transaksiDalamPeriode, $gudang);
-
-            // Generate Kartu Stok
-            $kartuStok = $this->generateKartuStok($saldoAwal, $gudang, $start, $end, $transaksiDalamPeriode);
+            $kartuStok = $this->getDataKartuStok($filters['search'], $filters['gudang'], $filters['start'], $filters['end']);
 
             return view('master_data/kartustok', [
                 'title' => 'Kartu Stok',
@@ -55,6 +73,35 @@ class KartuStokController extends Controller
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Kartu Stok.', 'home_page');
         }
+    }
+    private function getDataKartuStok($barangId, $gudang, $start, $end)
+    {
+        // Get saldo akhir and transactions
+        list($saldoAkhir, $transaksiDalamPeriode) = $this->getSaldoAndTransactions($barangId, $gudang, $start, $end);
+
+        // Calculate saldo awal
+        $saldoAwal = $this->calculateSaldoAwal($saldoAkhir, $transaksiDalamPeriode, $gudang);
+
+        // Generate Kartu Stok
+        return $this->generateKartuStok($saldoAwal, $gudang, $start, $end, $transaksiDalamPeriode);
+    }
+    private function getValidatedFilters(Request $request)
+    {
+        $validatedData = $request->validate([
+            'search' => 'nullable|exists:barangs,id',
+            'gudang' => 'nullable|exists:gudangs,kode_gudang',
+            'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
+            'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
+            'format' => 'nullable|in:pdf,xlsx,csv',
+        ]);
+
+        return [
+            'search' => $validatedData['search'] ?? null,
+            'gudang' => $validatedData['gudang'] ?? 'all',
+            'start' => !empty($validatedData['start']) ? Carbon::createFromFormat('d/m/Y', $validatedData['start'])->startOfDay() : null,
+            'end' => !empty($validatedData['end']) ? Carbon::createFromFormat('d/m/Y', $validatedData['end'])->endOfDay() : null,
+            'format' => $validatedData['format'] ?? null,
+        ];
     }
 
     /**

@@ -79,68 +79,70 @@
             </button>
         </div>
     </form>
-    <script>
-        function barangSearch() {
-            return {
-                search: '',
-                selectedGudang: '',
-                barangList: [],
-                konversiSatuan: [],
-                selectedBarang: {},
-                stokBarang: '',
-                selectedKonversiSatuan: '',
-                jumlahStokMasuk: '',
+    @push('scripts')
+        <script>
+            function barangSearch() {
+                return {
+                    search: '',
+                    selectedGudang: '',
+                    barangList: [],
+                    konversiSatuan: [],
+                    selectedBarang: {},
+                    stokBarang: '',
+                    selectedKonversiSatuan: '',
+                    jumlahStokMasuk: '',
 
-                searchBarang() {
-                    if (this.selectedBarang && this.selectedBarang.id) {
-                        this.resetVariables();
-                    }
-                    if (this.search.length > 0) {
+                    searchBarang() {
+                        if (this.selectedBarang && this.selectedBarang.id) {
+                            this.resetVariables();
+                        }
+                        if (this.search.length > 0) {
+                            this.fetchAPI(this.search, this.selectedGudang)
+                                .then(data => {
+                                    this.barangList = data;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching data:', error);
+                                });
+                        } else {
+                            this.barangList = [];
+                        }
+                    },
+
+                    selectBarang(barang) {
+                        this.selectedBarang = barang;
+                        this.search = barang.nama_item;
+                        this.konversiSatuan = barang.konversi_satuans;
+                        this.barangList = [];
+                        this.stokBarang = this.selectedBarang.stok;
+                        this.jumlahStokMasuk = '';
+                    },
+
+                    updateStok() {
                         this.fetchAPI(this.search, this.selectedGudang)
                             .then(data => {
-                                this.barangList = data;
+                                this.stokBarang = data[0].stok;
                             })
                             .catch(error => {
                                 console.error('Error fetching data:', error);
                             });
-                    } else {
+                    },
+
+                    fetchAPI(search, gudang) {
+                        return fetch(`/barang/search?search=${search}&gudang=${gudang}`)
+                            .then(response => response.json());
+                    },
+
+                    resetVariables() {
+                        this.selectedBarang = {};
+                        this.konversiSatuan = [];
                         this.barangList = [];
+                        this.stokBarang = '';
+                        this.jumlahStokMasuk = '';
+                        this.selectedKonversiSatuan = '';
                     }
-                },
-
-                selectBarang(barang) {
-                    this.selectedBarang = barang;
-                    this.search = barang.nama_item;
-                    this.konversiSatuan = barang.konversi_satuans;
-                    this.barangList = [];
-                    this.stokBarang = this.selectedBarang.stok;
-                    this.jumlahStokMasuk = '';
-                },
-
-                updateStok() {
-                    this.fetchAPI(this.search, this.selectedGudang)
-                        .then(data => {
-                            this.stokBarang = data[0].stok;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching data:', error);
-                        });
-                },
-
-                fetchAPI(search, gudang) {
-                    return fetch(`/barang/search?search=${search}&gudang=${gudang}`)
-                        .then(response => response.json());
-                },
-
-                resetVariables() {
-                    this.selectedBarang = {};
-                    this.konversiSatuan = [];
-                    this.barangList = [];
-                    this.stokBarang = '';
-                    this.jumlahStokMasuk = '';
-                    this.selectedKonversiSatuan = '';
                 }
             }
-        }
-    </script>
+        </script>
+    @endpush
 </x-modal-create>
