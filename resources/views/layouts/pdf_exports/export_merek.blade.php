@@ -32,7 +32,8 @@
         th,
         td {
             padding: 8px;
-            vertical-align: top;
+            text-align: center;
+            vertical-align: middle;
         }
 
         th {

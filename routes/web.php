@@ -22,15 +22,16 @@ Route::get('/', function () {
 // Master Data
 Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::resource('daftargudang', GudangController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::post('daftargudang/export', [GudangController::class, 'export'])->name('daftargudang.export');;
+Route::post('daftargudang/export', [GudangController::class, 'export'])->name('daftargudang.export');
 Route::resource('daftarjenis', JenisController::class)->parameters([
     // Menghindari Pemangkasan Plural 's'
     'daftarjenis' => 'daftarjenis'
 ])->only(['index', 'store', 'update', 'destroy']);
-Route::post('daftarjenis/export', [JenisController::class, 'export'])->name('daftarjenis.export');;
+Route::post('daftarjenis/export', [JenisController::class, 'export'])->name('daftarjenis.export');
 Route::resource('daftarmerek', MerekController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::post('daftarmerek/export', [MerekController::class, 'export'])->name('daftarmerek.export');;
+Route::post('daftarmerek/export', [MerekController::class, 'export'])->name('daftarmerek.export');
 Route::resource('stokminimum', StokMinimumController::class)->only(['index']);
+Route::post('stokminimum/export', [StokMinimumController::class, 'export'])->name('stokminimum.export');
 Route::resource('kartustok', KartuStokController::class)->only(['index']);
 
 // Transaksi

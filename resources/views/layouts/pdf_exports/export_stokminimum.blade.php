@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Jenis</title>
+    <title>Informasi Stok Minimum</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,32 +33,39 @@
         td {
             padding: 8px;
             text-align: center;
+            /* Rata tengah secara horizontal */
             vertical-align: middle;
+            /* Rata tengah secara vertikal */
         }
 
         th {
             background-color: #f2f2f2;
             font-weight: bold;
-            text-align: center;
-            /* Menambahkan text-align untuk header */
         }
 
-        /* Untuk memastikan kolom Keterangan bisa membungkus teks yang panjang */
         td {
             word-wrap: break-word;
         }
 
-        /* Membuat tabel lebih proporsional */
+        /* Mengatur proporsi kolom */
         td:nth-child(1) {
-            width: 20%;
+            width: 10%;
+            /* id lebih kecil */
         }
 
         td:nth-child(2) {
-            width: 30%;
+            width: 40%;
+            /* nama barang lebih besar */
         }
 
-        td:nth-child(3) {
-            width: 50%;
+        td:nth-child(3),
+        td:nth-child(4),
+        td:nth-child(5),
+        td:nth-child(6),
+        td:nth-child(7),
+        td:nth-child(8) {
+            width: 12.5%;
+            /* Kolom lainnya proporsional */
         }
 
         .date {
@@ -71,7 +78,7 @@
 </head>
 
 <body>
-    <h1>Daftar Jenis</h1>
+    <h1>Informasi Stok Minimum</h1>
     <div class="date">
         Terakhir Update: {{ $date }}
     </div>
@@ -87,7 +94,12 @@
             @foreach ($datas as $data)
                 <tr>
                     <td>{{ $data['id'] }}</td>
-                    <td>{{ $data['nama_jenis'] }}</td>
+                    <td>{{ $data['nama_item'] }}</td>
+                    <td>{{ $data['stok'] }}</td>
+                    <td>{{ $data['stok_minimum'] }}</td>
+                    <td>{{ $data['jenis'] }}</td>
+                    <td>{{ $data['merek'] }}</td>
+                    <td>{{ $data['rak'] }}</td>
                     <td>{{ $data['keterangan'] }}</td>
                 </tr>
             @endforeach

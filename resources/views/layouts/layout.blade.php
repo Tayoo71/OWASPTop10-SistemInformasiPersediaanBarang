@@ -8,6 +8,7 @@
     <meta name="robots" content="noindex,nofollow,noarchive">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/css/inter.css', 'resources/js/app.js'])
+    <link rel="icon" href="{{ asset('images/logo/logo_perusahaan.svg') }}">
     <title>{{ $title }} - Aplikasi Persediaan Toko X</title>
 </head>
 

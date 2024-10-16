@@ -1,6 +1,6 @@
-<x-modal-export title="Cetak & Konversi Daftar Jenis">
+<x-modal-export title="Cetak & Konversi Informasi Stok Minimum">
     <form method="POST" target="_blank"
-        action="{{ route('daftarjenis.export') }}?{{ http_build_query(request()->only(['search', 'sort_by', 'direction'])) }}"
+        action="{{ route('stokminimum.export') }}?{{ http_build_query(request()->only(['search', 'sort_by', 'direction', 'gudang'])) }}"
         class="p-4 md:p-5"">
         @csrf
         <div class="grid gap-4 mb-4">
