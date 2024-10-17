@@ -68,7 +68,8 @@
             margin-bottom: 5px;
         }
 
-        .barang {
+        .barang,
+        .filter-info {
             text-align: left;
             color: #000;
             margin-bottom: 10px;
@@ -82,6 +83,16 @@
     <!-- Tanggal terakhir update -->
     <div class="date">
         Terakhir Update: {{ $date }}
+    </div>
+
+    <!-- Informasi Filter -->
+    <div class="filter-info">
+        Filter:
+        <ul>
+            <li>Range Tanggal: {{ $start }} - {{ $end }}</li>
+            <li>Gudang: {{ $gudang }}</li>
+            <li>Pencarian: {{ $search }}</li>
+        </ul>
     </div>
 
     <!-- Informasi Barang -->

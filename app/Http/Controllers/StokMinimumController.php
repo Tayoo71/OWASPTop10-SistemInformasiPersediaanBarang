@@ -55,14 +55,15 @@ class StokMinimumController extends Controller
                     'headers' => $headers,
                     'datas' => $datas,
                     'gudang' => $gudang,
-                    'date' => date('d-F-Y H:i:s T')
+                    'date' => date('d-F-Y H:i:s T'),
+                    'search' => $filters['search'] ?? 'Tidak Ada'
                 ]);
                 return $pdf->stream($fileName . '.pdf');
             } else if ($filters['format'] === "csv") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Daftar Gudang. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Informasi Stok Minimum. ');
         }
     }
     public function index(Request $request)

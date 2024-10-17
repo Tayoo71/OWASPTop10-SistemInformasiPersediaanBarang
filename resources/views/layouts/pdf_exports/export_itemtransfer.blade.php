@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informasi Stok Minimum</title>
+    <title>Item Transfer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 14px;
+            font-size: 12px;
+            /* Mengurangi ukuran font agar lebih pas di A4 */
             margin: 20px;
         }
 
@@ -31,7 +32,8 @@
 
         th,
         td {
-            padding: 8px;
+            padding: 6px;
+            /* Mengurangi padding untuk lebih banyak ruang */
             text-align: center;
             vertical-align: middle;
         }
@@ -47,20 +49,41 @@
 
         /* Mengatur proporsi kolom */
         td:nth-child(1) {
+            width: 7%;
+            /* Lebih kecil untuk Nomor Transaksi */
+        }
+
+        td:nth-child(2),
+        td:nth-child(3) {
+            width: 15%;
+            /* Lebar sedang untuk Tanggal Buat dan Ubah */
+        }
+
+        td:nth-child(4) {
             width: 10%;
+            /* Gudang lebih kecil */
         }
 
-        td:nth-child(2) {
-            width: 40%;
+        td:nth-child(5) {
+            width: 25%;
+            /* Lebar normal untuk Nama Barang */
         }
 
-        td:nth-child(3),
-        td:nth-child(4),
-        td:nth-child(5),
-        td:nth-child(6),
-        td:nth-child(7),
-        td:nth-child(8) {
-            width: 12.5%;
+        td:nth-child(6) {
+            width: 10%;
+            /* Lebar sedang untuk Jumlah Stok Keluar */
+        }
+
+        td:nth-child(7) {
+            width: 20%;
+            /* Lebih besar untuk Keterangan */
+        }
+
+        td:nth-child(8),
+        td:nth-child(9),
+        td:nth-child(10) {
+            width: 7%;
+            /* Lebih kecil untuk User Buat, User Ubah, dan Status Barang */
         }
 
         .date {
@@ -79,22 +102,24 @@
 </head>
 
 <body>
-    <h1>Informasi Stok Minimum</h1>
+    <h1>Item Transfer</h1>
 
     <!-- Tanggal terakhir update -->
     <div class="date">
         Terakhir Update: {{ $date }}
     </div>
 
+    <!-- Informasi Filter -->
     <div class="filter-info">
         Filter:
         <ul>
+            <li>Range Tanggal: {{ $start }} - {{ $end }}</li>
             <li>Gudang: {{ $gudang }}</li>
             <li>Pencarian: {{ $search }}</li>
         </ul>
     </div>
 
-    <!-- Tabel Stok Minimum -->
+    <!-- Tabel Barang keluar -->
     <table>
         <thead>
             <tr>
@@ -107,13 +132,16 @@
             @foreach ($datas as $data)
                 <tr>
                     <td>{{ $data['id'] }}</td>
+                    <td>{{ $data['created_at'] }}</td>
+                    <td>{{ $data['updated_at'] }}</td>
+                    <td>{{ $data['gudang_asal'] }}</td>
+                    <td>{{ $data['gudang_tujuan'] }}</td>
                     <td>{{ $data['nama_item'] }}</td>
-                    <td>{{ $data['stok'] }}</td>
-                    <td>{{ $data['stok_minimum'] }}</td>
-                    <td>{{ $data['jenis'] }}</td>
-                    <td>{{ $data['merek'] }}</td>
-                    <td>{{ $data['rak'] }}</td>
+                    <td>{{ $data['jumlah_stok_transfer'] }}</td>
                     <td>{{ $data['keterangan'] }}</td>
+                    <td>{{ $data['user_buat_id'] }}</td>
+                    <td>{{ $data['user_update_id'] }}</td>
+                    <td>{{ $data['statusBarang'] }}</td>
                 </tr>
             @endforeach
         </tbody>

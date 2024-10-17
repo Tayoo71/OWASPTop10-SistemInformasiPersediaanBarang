@@ -30,6 +30,8 @@ class KartuStokController extends Controller
             $headers = ["Nomor Transaksi", "Gudang", "Tanggal Transaksi", "Tipe Transaksi", "Jumlah", "Saldo Stok", "Keterangan"];
             $datas = $this->getDataKartuStok($filters['search'], $filters['gudang'], $filters['start'], $filters['end']);
             $barang = $filters['search'] . ' - ' . Barang::where('id', $filters['search'])->value('nama_item');
+            $gudang = $filters['gudang'] === 'all' ? "Semua Gudang" :
+                $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
             $fileName = 'Kartu Stok (' . $filters['search'] . ') ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
@@ -39,14 +41,18 @@ class KartuStokController extends Controller
                     'headers' => $headers,
                     'datas' => $datas,
                     'barang' => $barang,
-                    'date' => date('d-F-Y H:i:s T')
+                    'date' => date('d-F-Y H:i:s T'),
+                    'start' => is_null($filters['start']) ? "-" : $filters['start']->format('d/m/Y'),
+                    'end' => is_null($filters['end']) ? "-" : $filters['end']->format('d/m/Y'),
+                    'gudang' => $gudang,
+                    'search' => $filters['search'] ?? 'Tidak Ada'
                 ]);
                 return $pdf->stream($fileName . '.pdf');
             } else if ($filters['format'] === "csv") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Daftar Gudang. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Kartu Stok. ');
         }
     }
     public function index(Request $request)

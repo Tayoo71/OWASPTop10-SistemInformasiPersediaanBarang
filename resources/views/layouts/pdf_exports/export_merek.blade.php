@@ -67,6 +67,12 @@
             color: #555;
             margin-bottom: 10px;
         }
+
+        .filter-info {
+            text-align: left;
+            color: #000;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
@@ -74,6 +80,13 @@
     <h1>Daftar Merek</h1>
     <div class="date">
         Terakhir Update: {{ $date }}
+    </div>
+    <!-- Informasi Filter -->
+    <div class="filter-info">
+        Filter:
+        <ul>
+            <li>Pencarian: {{ $search }}</li>
+        </ul>
     </div>
     <table>
         <thead>

@@ -99,6 +99,17 @@
             class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
             Tambah Transaksi Item Transfer
         </button>
+        @if ($transaksies->isNotEmpty())
+            <button data-modal-target="export-modal" data-modal-toggle="export-modal"
+                class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center">
+                <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 18v4h12v-4M8 18h8" />
+                </svg>
+                Cetak & Konversi
+            </button>
+        @endif
     </div>
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
@@ -429,6 +440,10 @@
 
     {{-- Modal Tambah Transaksi --}}
     <x-tambah-item-transfer-modal :gudangs="$gudangs" />
+    @if ($transaksies->isNotEmpty())
+        {{-- Modal Export --}}
+        <x-export-item-transfer-modal />
+    @endif
     @if ($editTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Ubah Transaksi --}}
         <x-ubah-item-transfer-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />

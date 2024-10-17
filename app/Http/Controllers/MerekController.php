@@ -35,14 +35,15 @@ class MerekController extends Controller
                 $pdf = Pdf::loadview('layouts.pdf_exports.export_merek', [
                     'headers' => $headers,
                     'datas' => $datas,
-                    'date' => date('d-F-Y H:i:s T')
+                    'date' => date('d-F-Y H:i:s T'),
+                    'search' => $filters['search'] ?? 'Tidak Ada'
                 ]);
                 return $pdf->stream($fileName . '.pdf');
             } else if ($filters['format'] === "csv") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Daftar Gudang. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Daftar Merek. ');
         }
     }
     public function index(Request $request)

@@ -35,7 +35,8 @@ class GudangController extends Controller
                 $pdf = Pdf::loadview('layouts.pdf_exports.export_gudang', [
                     'headers' => $headers,
                     'datas' => $datas,
-                    'date' => date('d-F-Y H:i:s T')
+                    'date' => date('d-F-Y H:i:s T'),
+                    'search' => $filters['search'] ?? 'Tidak Ada'
                 ]);
                 return $pdf->stream($fileName . '.pdf');
             } else if ($filters['format'] === "csv") {

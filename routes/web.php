@@ -37,17 +37,13 @@ Route::post('kartustok/export', [KartuStokController::class, 'export'])->name('k
 
 // Transaksi
 Route::resource('barangmasuk', BarangMasukController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::post('barangmasuk/export', [BarangMasukController::class, 'export'])->name('barangmasuk.export');
 Route::resource('barangkeluar', BarangKeluarController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::post('barangkeluar/export', [BarangKeluarController::class, 'export'])->name('barangkeluar.export');
 Route::resource('stokopname', StokOpnameController::class)->only(['index', 'store', 'destroy']);
+Route::post('stokopname/export', [StokOpnameController::class, 'export'])->name('stokopname.export');
 Route::resource('itemtransfer', ItemTransferController::class)->only(['index', 'store', 'update', 'destroy']);
-
-// Laporan Daftar Barang
-Route::get('/laporan', function () {
-    return view('laporan', [
-        'title' => 'Laporan Daftar Barang',
-    ]);
-});
-
+Route::post('itemtransfer/export', [ItemTransferController::class, 'export'])->name('itemtransfer.export');
 
 // API Route
 Route::get('/barang/search', [APIController::class, 'search']);

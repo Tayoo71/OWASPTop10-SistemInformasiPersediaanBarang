@@ -8,14 +8,8 @@ use App\Models\Barang;
 use App\Models\Gudang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\TransaksiStokOpname;
 use Illuminate\Support\Facades\Log;
-use App\Models\TransaksiBarangMasuk;
-use App\Models\TransaksiBarangKeluar;
-use App\Models\TransaksiItemTransfer;
 use App\Http\Requests\StoreBarangRequest;
-use App\Models\StokBarang;
-use Illuminate\Support\Facades\Validator;
 
 class BarangController extends Controller
 {

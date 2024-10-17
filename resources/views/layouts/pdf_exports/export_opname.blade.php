@@ -4,11 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Gudang</title>
+    <title>Stok Opname</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 14px;
+            font-size: 12px;
+            /* Mengurangi ukuran font agar lebih pas di A4 */
             margin: 20px;
         }
 
@@ -31,7 +32,8 @@
 
         th,
         td {
-            padding: 8px;
+            padding: 6px;
+            /* Mengurangi padding untuk lebih banyak ruang */
             text-align: center;
             vertical-align: middle;
         }
@@ -39,36 +41,48 @@
         th {
             background-color: #f2f2f2;
             font-weight: bold;
-            text-align: center;
-            /* Menambahkan text-align untuk header */
         }
 
-        /* Untuk memastikan kolom Keterangan bisa membungkus teks yang panjang */
         td {
             word-wrap: break-word;
         }
 
-        /* Membuat tabel lebih proporsional */
         td:nth-child(1) {
-            width: 20%;
-            /* Lebar kolom untuk Kode Gudang */
+            width: 5%;
         }
 
-        td:nth-child(2) {
-            width: 30%;
-            /* Lebar kolom untuk Nama Gudang */
-        }
-
+        td:nth-child(2),
         td:nth-child(3) {
-            width: 50%;
-            /* Lebar kolom untuk Keterangan */
+            width: 15%;
+        }
+
+        td:nth-child(4) {
+            width: 10%;
+        }
+
+        td:nth-child(5) {
+            width: 25%;
+        }
+
+        td:nth-child(6) {
+            width: 10%;
+        }
+
+        td:nth-child(7) {
+            width: 20%;
+        }
+
+        td:nth-child(8),
+        td:nth-child(9),
+        td:nth-child(10) {
+            width: 7%;
         }
 
         .date {
             text-align: right;
             font-size: 12px;
             color: #555;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .filter-info {
@@ -80,17 +94,24 @@
 </head>
 
 <body>
-    <h1>Daftar Gudang</h1>
+    <h1>Stok Opname</h1>
+
+    <!-- Tanggal terakhir update -->
     <div class="date">
         Terakhir Update: {{ $date }}
     </div>
+
     <!-- Informasi Filter -->
     <div class="filter-info">
         Filter:
         <ul>
+            <li>Range Tanggal: {{ $start }} - {{ $end }}</li>
+            <li>Gudang: {{ $gudang }}</li>
             <li>Pencarian: {{ $search }}</li>
         </ul>
     </div>
+
+    <!-- Tabel Barang keluar -->
     <table>
         <thead>
             <tr>
@@ -102,9 +123,17 @@
         <tbody>
             @foreach ($datas as $data)
                 <tr>
+                    <td>{{ $data['id'] }}</td>
+                    <td>{{ $data['created_at'] }}</td>
+                    <td>{{ $data['updated_at'] }}</td>
                     <td>{{ $data['kode_gudang'] }}</td>
-                    <td>{{ $data['nama_gudang'] }}</td>
+                    <td>{{ $data['nama_item'] }}</td>
+                    <td>{{ $data['stok_buku'] }}</td>
+                    <td>{{ $data['stok_fisik'] }}</td>
+                    <td>{{ $data['selisih'] }}</td>
                     <td>{{ $data['keterangan'] }}</td>
+                    <td>{{ $data['user_buat_id'] }}</td>
+                    <td>{{ $data['statusBarang'] }}</td>
                 </tr>
             @endforeach
         </tbody>
