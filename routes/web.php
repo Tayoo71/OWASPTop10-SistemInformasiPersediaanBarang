@@ -47,7 +47,6 @@ Route::resource('itemtransfer', ItemTransferController::class)->only(['index', '
 Route::post('itemtransfer/export', [ItemTransferController::class, 'export'])->name('itemtransfer.export');
 
 
-
 // API Route
 Route::get('/barang/search', [APIController::class, 'search']);
 Route::get('/barang/search/barang', [APIController::class, 'searchBarang']);
