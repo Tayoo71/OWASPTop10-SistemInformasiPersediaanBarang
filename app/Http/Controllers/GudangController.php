@@ -43,7 +43,7 @@ class GudangController extends Controller
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Daftar Gudang. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Daftar Gudang. ');
         }
     }
     public function index(Request $request)

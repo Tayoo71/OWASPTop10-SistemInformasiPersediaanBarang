@@ -63,7 +63,7 @@ class StokMinimumController extends Controller
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Informasi Stok Minimum. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Informasi Stok Minimum. ');
         }
     }
     public function index(Request $request)
@@ -129,7 +129,6 @@ class StokMinimumController extends Controller
                 // If no 'gudang' is specified, sum all stokBarangs
                 $totalStok = $barang->stokBarangs->sum('stok');
             }
-
             return $totalStok <= $barang->stok_minimum;
         });
     }

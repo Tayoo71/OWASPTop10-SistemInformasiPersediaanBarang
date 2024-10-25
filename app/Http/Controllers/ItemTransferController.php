@@ -66,7 +66,7 @@ class ItemTransferController extends Controller
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Item Transfer. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Item Transfer. ');
         }
     }
     public function index(Request $request)

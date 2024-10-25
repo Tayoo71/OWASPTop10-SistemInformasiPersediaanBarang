@@ -21,6 +21,7 @@ Route::get('/', function () {
 
 // Master Data
 Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::post('daftarbarang/export', [BarangController::class, 'export'])->name(name: 'daftarbarang.export');
 Route::resource('daftargudang', GudangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::post('daftargudang/export', [GudangController::class, 'export'])->name('daftargudang.export');
 Route::resource('daftarjenis', JenisController::class)->parameters([
@@ -44,6 +45,8 @@ Route::resource('stokopname', StokOpnameController::class)->only(['index', 'stor
 Route::post('stokopname/export', [StokOpnameController::class, 'export'])->name('stokopname.export');
 Route::resource('itemtransfer', ItemTransferController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::post('itemtransfer/export', [ItemTransferController::class, 'export'])->name('itemtransfer.export');
+
+
 
 // API Route
 Route::get('/barang/search', [APIController::class, 'search']);

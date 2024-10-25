@@ -66,7 +66,7 @@ class BarangMasukController extends Controller
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.csv', ExcelExcel::CSV);
             }
         } catch (\Exception $e) {
-            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data Gudang pada halaman Barang Masuk. ');
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Barang Masuk. ');
         }
     }
     public function index(Request $request)
