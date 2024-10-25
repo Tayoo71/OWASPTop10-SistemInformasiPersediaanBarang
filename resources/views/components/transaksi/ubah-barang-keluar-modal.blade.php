@@ -84,71 +84,73 @@
             </button>
         </div>
     </form>
-    <script>
-        function ubahBarangSearch() {
-            return {
-                ubahSearch: '{{ $transaksi->barang->nama_item }}',
-                ubahSelectedGudang: '{{ $transaksi->kode_gudang }}',
-                ubahBarangList: [],
-                ubahKonversiSatuan: @json($transaksi->barang->konversiSatuans),
-                ubahSelectedBarang: '{{ $transaksi->barang_id }}',
-                ubahSelectedKonversiSatuan: '{{ $editTransaksiSatuan['id'] }}',
-                ubahJumlahStokKeluar: '{{ $editTransaksiSatuan['jumlah'] }}',
-                ubahKeterangan: '{{ $transaksi->keterangan }}',
-                ubahStokBarang: '',
+    @push('scripts')
+        <script>
+            function ubahBarangSearch() {
+                return {
+                    ubahSearch: '{{ $transaksi->barang->nama_item }}',
+                    ubahSelectedGudang: '{{ $transaksi->kode_gudang }}',
+                    ubahBarangList: [],
+                    ubahKonversiSatuan: @json($transaksi->barang->konversiSatuans),
+                    ubahSelectedBarang: '{{ $transaksi->barang_id }}',
+                    ubahSelectedKonversiSatuan: '{{ $editTransaksiSatuan['id'] }}',
+                    ubahJumlahStokKeluar: '{{ $editTransaksiSatuan['jumlah'] }}',
+                    ubahKeterangan: '{{ $transaksi->keterangan }}',
+                    ubahStokBarang: '',
 
-                ubahSearchBarang() {
-                    if (this.ubahSelectedBarang && this.ubahSelectedBarang) {
-                        this.ubahResetVariables();
-                    }
-                    if (this.ubahSearch.length > 0) {
+                    ubahSearchBarang() {
+                        if (this.ubahSelectedBarang && this.ubahSelectedBarang) {
+                            this.ubahResetVariables();
+                        }
+                        if (this.ubahSearch.length > 0) {
+                            this.fetchAPI(this.ubahSearch, this.ubahSelectedGudang)
+                                .then(data => {
+                                    this.ubahBarangList = data;
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching data:', error);
+                                });
+                        } else {
+                            this.ubahBarangList = [];
+                        }
+                    },
+
+                    ubahSelectBarang(barang) {
+                        this.ubahSelectedBarang = barang.id;
+                        this.ubahSearch = barang.nama_item;
+                        this.ubahKonversiSatuan = barang.konversi_satuans;
+                        this.ubahBarangList = [];
+                        this.ubahSelectedKonversiSatuan = "";
+                        this.ubahJumlahStokKeluar = "";
+                        this.ubahKeterangan = "";
+                        this.ubahStokBarang = barang.stok;
+                    },
+
+                    updateStok() {
                         this.fetchAPI(this.ubahSearch, this.ubahSelectedGudang)
                             .then(data => {
-                                this.ubahBarangList = data;
+                                this.ubahStokBarang = data[0].stok;
                             })
                             .catch(error => {
                                 console.error('Error fetching data:', error);
                             });
-                    } else {
+                    },
+
+                    fetchAPI(search, gudang) {
+                        return fetch(`/barang/search?search=${search}&gudang=${gudang}`)
+                            .then(response => response.json());
+                    },
+
+                    ubahResetVariables() {
+                        this.ubahSelectedBarang = {};
+                        this.ubahKonversiSatuan = [];
                         this.ubahBarangList = [];
+                        this.ubahStokBarang = '';
+                        this.ubahJumlahStokKeluar = '';
+                        this.ubahSelectedKonversiSatuan = '';
                     }
-                },
-
-                ubahSelectBarang(barang) {
-                    this.ubahSelectedBarang = barang.id;
-                    this.ubahSearch = barang.nama_item;
-                    this.ubahKonversiSatuan = barang.konversi_satuans;
-                    this.ubahBarangList = [];
-                    this.ubahSelectedKonversiSatuan = "";
-                    this.ubahJumlahStokKeluar = "";
-                    this.ubahKeterangan = "";
-                    this.ubahStokBarang = barang.stok;
-                },
-
-                updateStok() {
-                    this.fetchAPI(this.ubahSearch, this.ubahSelectedGudang)
-                        .then(data => {
-                            this.ubahStokBarang = data[0].stok;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching data:', error);
-                        });
-                },
-
-                fetchAPI(search, gudang) {
-                    return fetch(`/barang/search?search=${search}&gudang=${gudang}`)
-                        .then(response => response.json());
-                },
-
-                ubahResetVariables() {
-                    this.ubahSelectedBarang = {};
-                    this.ubahKonversiSatuan = [];
-                    this.ubahBarangList = [];
-                    this.ubahStokBarang = '';
-                    this.ubahJumlahStokKeluar = '';
-                    this.ubahSelectedKonversiSatuan = '';
                 }
             }
-        }
-    </script>
+        </script>
+    @endpush
 </x-modal-update>

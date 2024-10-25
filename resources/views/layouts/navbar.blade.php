@@ -1,13 +1,13 @@
 <nav class="bg-gray-800" x-data="{ isOpen: false, isMasterDataOpen: false, isTransaksiOpen: false }">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <img class="h-8 w-8" src="{{ asset('img/logos/logo_perusahaan.svg') }}" alt="Logo Perusahaan">
+                    <img class="h-8 w-8" src="{{ asset('images/logo/logo_perusahaan.svg') }}" alt="Logo Perusahaan">
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="/"
+                        <a href="{{ route('home_page') }}"
                             class="rounded-md {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 text-sm font-medium">Home</a>
                         <div class="relative">
                             <button @click="isMasterDataOpen = !isMasterDataOpen"
@@ -23,22 +23,22 @@
                                 x-transition:leave-end="opacity-0 scale-95"
                                 class="absolute z-50 mt-2 w-48 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 id="master-data-dropdown">
-                                <a href="/daftarbarang"
+                                <a href="{{ route('daftarbarang.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarbarang') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
                                     Barang</a>
-                                <a href="/kartustok"
+                                <a href="{{ route('kartustok.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('kartustok') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Kartu
                                     Stok</a>
-                                <a href="/daftargudang"
+                                <a href="{{ route('daftargudang.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftargudang') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
                                     Gudang</a>
-                                <a href="/daftarjenis"
+                                <a href="{{ route('daftarjenis.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarjenis') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
                                     Jenis</a>
-                                <a href="/daftarmerek"
+                                <a href="{{ route('daftarmerek.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarmerek') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
                                     Merek</a>
-                                <a href="/stokminimum"
+                                <a href="{{ route('stokminimum.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokminimum') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Informasi
                                     Stok Minimum</a>
                             </div>
@@ -58,24 +58,20 @@
                                 x-transition:leave-end="opacity-0 scale-95"
                                 class="absolute z-50 mt-2 w-48 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 id="transaksi-dropdown">
-                                <a href="/barangmasuk"
+                                <a href="{{ route('barangmasuk.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('barangmasuk') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Barang
                                     Masuk</a>
-                                <a href="/barangkeluar"
+                                <a href="{{ route('barangkeluar.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('barangkeluar') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Barang
                                     Keluar</a>
-                                <a href="/stokopname"
+                                <a href="{{ route('stokopname.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokopname') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Stok
                                     Opname</a>
-                                <a href="/itemtransfer"
+                                <a href="{{ route('itemtransfer.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('itemtransfer') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Item
                                     Transfer</a>
                             </div>
                         </div>
-
-                        <a href="/laporan"
-                            class="rounded-md {{ request()->is('laporan') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 text-sm font-medium">Laporan
-                            Daftar Barang</a>
                     </div>
                 </div>
             </div>
@@ -130,47 +126,44 @@
 
     <div x-show="isOpen" @click.away="isOpen = false" class="md:hidden" id="mobile-menu">
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-            <a href="/"
+            <a href="{{ route('home_page') }}"
                 class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Home</a>
             <p
                 class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
                 Master Data</p>
-            <a href="/daftarbarang"
+            <a href="{{ route('daftarbarang.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarbarang') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
                 Barang</a>
-            <a href="/kartustok"
+            <a href="{{ route('kartustok.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('kartustok') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Kartu
                 Stok</a>
-            <a href="/daftargudang"
+            <a href="{{ route('daftargudang.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftargudang') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
                 Gudang</a>
-            <a href="/daftarjenis"
+            <a href="{{ route('daftarjenis.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarjenis') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
                 Jenis</a>
-            <a href="/daftarmerek"
+            <a href="{{ route('daftarmerek.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarmerek') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
                 Merek</a>
-            <a href="/stokminimum"
+            <a href="{{ route('stokminimum.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokminimum') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Informasi
                 Stok Minimum</a>
             <p
                 class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['barangmasuk', 'barangkeluar', 'stokopname', 'itemtransfer']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
                 Transaksi</p>
-            <a href="/barangmasuk"
+            <a href="{{ route('barangmasuk.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('barangmasuk') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Barang
                 Masuk</a>
-            <a href="/barangkeluar"
+            <a href="{{ route('barangkeluar.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('barangkeluar') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Barang
                 Keluar</a>
-            <a href="/stokopname"
+            <a href="{{ route('stokopname.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokopname') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Stok
                 Opname</a>
-            <a href="/itemtransfer"
+            <a href="{{ route('itemtransfer.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('itemtransfer') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Item
                 Transfer</a>
-            <a href="/laporan"
-                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is('laporan') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Laporan
-                Daftar Barang</a>
         </div>
         <div class="border-t border-gray-700 pb-3 pt-4">
             <div class="flex items-center px-5">
