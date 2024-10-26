@@ -1,4 +1,4 @@
-<x-modal-create title="Tambah Gudang">
+<x-modal.modal-create title="Tambah Gudang">
     <form method="POST" action="{{ route('daftargudang.store') }}?{{ http_build_query(request()->only(['search'])) }}"
         class="p-4 md:p-5">
         @csrf
@@ -35,4 +35,4 @@
             </button>
         </div>
     </form>
-</x-modal-create>
+</x-modal.modal-create>

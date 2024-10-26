@@ -1,4 +1,4 @@
-<x-modal-update title="Ubah Gudang">
+<x-modal.modal-update title="Ubah Gudang">
     <form method="POST"
         action="{{ route('daftargudang.update', $gudang->kode_gudang) }}?{{ http_build_query(request()->only(['search'])) }}"
         class="p-4 md:p-5">
@@ -37,4 +37,4 @@
         </div>
         </div>
     </form>
-</x-modal-update>
+    </x-modal-update>

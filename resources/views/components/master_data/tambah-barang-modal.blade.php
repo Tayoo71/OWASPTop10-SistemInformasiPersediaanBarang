@@ -1,4 +1,4 @@
-<x-modal-create title="Tambah Barang">
+<x-modal.modal-create title="Tambah Barang">
     <form method="POST"
         action="{{ route('daftarbarang.store') }}?{{ http_build_query(request()->only(['search', 'gudang'])) }}"
         class="p-4 md:p-5" x-data="{ konversiSatuan: [{ satuan: '', jumlah: '', harga_pokok: '', harga_jual: '' }] }">
@@ -110,4 +110,4 @@
             </button>
         </div>
     </form>
-</x-modal-create>
+</x-modal.modal-create>

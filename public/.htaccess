@@ -9,6 +9,11 @@
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+    # Block .env
+    <FilesMatch "^\.env">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

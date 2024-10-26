@@ -1,4 +1,4 @@
-<x-modal-update title="Ubah Transaksi Barang Keluar">
+<x-modal.modal-update title="Ubah Transaksi Barang Keluar">
     <form method="POST"
         action="{{ route('barangkeluar.update', $transaksi->id) }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
         class="p-4 md:p-5">
@@ -153,4 +153,4 @@
             }
         </script>
     @endpush
-</x-modal-update>
+</x-modal.modal-update>

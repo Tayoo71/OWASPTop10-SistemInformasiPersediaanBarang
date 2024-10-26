@@ -1,4 +1,4 @@
-<x-modal-create title="Tambah Stok Opname">
+<x-modal.modal-create title="Tambah Stok Opname">
     <form method="POST"
         action="{{ route('stokopname.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
         class="p-4 md:p-5">
@@ -143,4 +143,4 @@
             }
         </script>
     @endpush
-</x-modal-create>
+</x-modal.modal-create>

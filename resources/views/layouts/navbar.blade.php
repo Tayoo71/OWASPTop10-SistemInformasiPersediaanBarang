@@ -64,12 +64,12 @@
                                 <a href="{{ route('barangkeluar.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('barangkeluar') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Barang
                                     Keluar</a>
-                                <a href="{{ route('stokopname.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokopname') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Stok
-                                    Opname</a>
                                 <a href="{{ route('itemtransfer.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('itemtransfer') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Item
                                     Transfer</a>
+                                <a href="{{ route('stokopname.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokopname') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Stok
+                                    Opname</a>
                             </div>
                         </div>
                     </div>
@@ -158,12 +158,12 @@
             <a href="{{ route('barangkeluar.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('barangkeluar') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Barang
                 Keluar</a>
-            <a href="{{ route('stokopname.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokopname') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Stok
-                Opname</a>
             <a href="{{ route('itemtransfer.index') }}"
                 class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('itemtransfer') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Item
                 Transfer</a>
+            <a href="{{ route('stokopname.index') }}"
+                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokopname') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Stok
+                Opname</a>
         </div>
         <div class="border-t border-gray-700 pb-3 pt-4">
             <div class="flex items-center px-5">

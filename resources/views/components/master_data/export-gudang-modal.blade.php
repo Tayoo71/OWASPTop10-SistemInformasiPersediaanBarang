@@ -1,4 +1,4 @@
-<x-modal-export title="Cetak & Konversi Daftar Gudang">
+<x-modal.modal-export title="Cetak & Konversi Daftar Gudang">
     <form method="POST" target="_blank"
         action="{{ route('daftargudang.export') }}?{{ http_build_query(request()->only(['search', 'sort_by', 'direction'])) }}"
         class="p-4 md:p-5"">
@@ -26,4 +26,4 @@
             </button>
         </div>
     </form>
-</x-modal-export>
+</x-modal.modal-export>

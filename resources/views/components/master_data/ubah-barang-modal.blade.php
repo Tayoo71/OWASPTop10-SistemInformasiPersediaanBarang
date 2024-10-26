@@ -1,4 +1,4 @@
-<x-modal-update title="Ubah Barang">
+<x-modal.modal-update title="Ubah Barang">
     <form method="POST"
         action="{{ route('daftarbarang.update', $barang->id) }}?{{ http_build_query(request()->only(['search', 'gudang'])) }}"
         class="p-4 md:p-5" x-data="{ konversiSatuan: {{ json_encode($barang->konversiSatuans) }} }">
@@ -131,4 +131,4 @@
         </div>
         </div>
     </form>
-</x-modal-update>
+    </x-modal-update>

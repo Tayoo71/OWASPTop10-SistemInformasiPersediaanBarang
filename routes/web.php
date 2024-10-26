@@ -1,20 +1,20 @@
 <?php
 
-use App\Http\Controllers\API\APIController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\JenisController;
-use App\Http\Controllers\MerekController;
-use App\Http\Controllers\BarangController;
-use App\Http\Controllers\GudangController;
-use App\Http\Controllers\BarangMasukController;
-use App\Http\Controllers\BarangKeluarController;
-use App\Http\Controllers\ItemTransferController;
-use App\Http\Controllers\KartuStokController;
-use App\Http\Controllers\StokMinimumController;
-use App\Http\Controllers\StokOpnameController;
+use App\Http\Controllers\API\BarangAPIController;
+use App\Http\Controllers\MasterData\JenisController;
+use App\Http\Controllers\MasterData\MerekController;
+use App\Http\Controllers\MasterData\BarangController;
+use App\Http\Controllers\MasterData\GudangController;
+use App\Http\Controllers\Transaksi\BarangMasukController;
+use App\Http\Controllers\Transaksi\BarangKeluarController;
+use App\Http\Controllers\Transaksi\ItemTransferController;
+use App\Http\Controllers\MasterData\KartuStokController;
+use App\Http\Controllers\MasterData\StokMinimumController;
+use App\Http\Controllers\Transaksi\StokOpnameController;
 
 Route::get('/', function () {
-    return view('home', [
+    return view('pages/home', [
         'title' => 'Halaman Utama'
     ]);
 })->name('home_page');
@@ -48,5 +48,5 @@ Route::post('itemtransfer/export', [ItemTransferController::class, 'export'])->n
 
 
 // API Route
-Route::get('/barang/search', [APIController::class, 'search']);
-Route::get('/barang/search/barang', [APIController::class, 'searchBarang']);
+Route::get('/barang/search', [BarangAPIController::class, 'search']);
+Route::get('/barang/search/barang', [BarangAPIController::class, 'searchBarang']);

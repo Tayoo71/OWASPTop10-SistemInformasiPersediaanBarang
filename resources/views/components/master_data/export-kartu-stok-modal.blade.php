@@ -1,4 +1,4 @@
-<x-modal-export title="Cetak & Konversi Kartu Stok">
+<x-modal.modal-export title="Cetak & Konversi Kartu Stok">
     <form method="POST" target="_blank"
         action="{{ route('kartustok.export') }}?{{ http_build_query(request()->only(['start', 'end', 'search', 'gudang'])) }}"
         class="p-4 md:p-5"">
@@ -26,4 +26,4 @@
             </button>
         </div>
     </form>
-</x-modal-export>
+</x-modal.modal-export>

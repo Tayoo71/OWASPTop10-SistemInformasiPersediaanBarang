@@ -1,4 +1,4 @@
-<x-modal-create title="Tambah Transaksi Item Transfer">
+<x-modal.modal-create title="Tambah Transaksi Item Transfer">
     <form method="POST"
         action="{{ route('itemtransfer.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
         class="p-4 md:p-5">
@@ -165,4 +165,4 @@
             }
         </script>
     @endpush
-</x-modal-create>
+</x-modal.modal-create>
