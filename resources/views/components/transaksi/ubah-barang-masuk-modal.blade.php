@@ -138,8 +138,13 @@
                     },
 
                     fetchAPI(search, gudang) {
-                        return fetch(`/barang/search?search=${search}&gudang=${gudang}`)
-                            .then(response => response.json());
+                        return axios.get(`/barang/search`, {
+                                params: {
+                                    search: search,
+                                    gudang: gudang
+                                }
+                            })
+                            .then(response => response.data);
                     },
 
                     ubahResetVariables() {

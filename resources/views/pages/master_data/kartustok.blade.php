@@ -201,8 +201,13 @@
                         this.searchBarangList = [];
                     },
                     fetchAPI(search, mode) {
-                        return fetch(`/barang/search/barang?search=${search}&mode=${mode}`)
-                            .then(response => response.json());
+                        return axios.get(`/barang/search/barang`, {
+                                params: {
+                                    search: search,
+                                    mode: mode
+                                }
+                            })
+                            .then(response => response.data);
                     },
                 }
             }
