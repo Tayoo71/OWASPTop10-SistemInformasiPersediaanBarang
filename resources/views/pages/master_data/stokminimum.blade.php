@@ -324,6 +324,6 @@
 
     @if ($barangs->isNotEmpty())
         {{-- Modal Export --}}
-        <x-master_data.export-stok-minimum-modal />
+        <x-master_data.stokminimum.export-stok-minimum-modal />
     @endif
 </x-layout>

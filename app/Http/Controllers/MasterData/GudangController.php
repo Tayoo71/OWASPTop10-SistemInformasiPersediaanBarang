@@ -2,25 +2,36 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
-use App\Models\MasterData\Gudang;
 use App\Exports\ExcelExport;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Requests\MasterData\DaftarGudang\StoreGudangRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MasterData\Gudang;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use App\Http\Requests\MasterData\DaftarGudang\ViewGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\StoreGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\UpdateGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\DestroyGudangRequest;
 
 class GudangController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewGudangRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'search',
+                'format',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_gudang';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $headers = ["Kode Gudang", "Nama Gudang", "Keterangan"];
             $datas = Gudang::search($filters)
@@ -32,7 +43,7 @@ class GudangController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_gudang', [
+                $pdf = Pdf::loadview('layouts.pdf_export.master_data.daftargudang.export_gudang', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'date' => date('d-F-Y H:i:s T'),
@@ -46,10 +57,20 @@ class GudangController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Daftar Gudang. ', 'daftargudang.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewGudangRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'search',
+                'edit',
+                'delete',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_gudang';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $gudangs = Gudang::with([
                 'transaksiBarangMasuks',
@@ -79,7 +100,7 @@ class GudangController extends Controller
                 'deleteGudang' => !empty($filters['delete'])
                     ? (
                         !$this->getTransactionData(Gudang::find($filters['delete'])) // Check if getTransactionData returns false
-                        ? Gudang::select('kode_gudang', 'nama_gudang')->find($request->delete) // Run the query if the condition is false
+                        ? Gudang::select('kode_gudang', 'nama_gudang')->find($filters['delete']) // Run the query if the condition is false
                         : null // If getTransactionData is true, return null
                     )
                     : null,
@@ -93,55 +114,44 @@ class GudangController extends Controller
     {
         DB::beginTransaction();
         try {
-            Gudang::create([
-                'kode_gudang' => $request->kode_gudang,
-                'nama_gudang' => $request->nama_gudang,
-                'keterangan' => $request->keterangan,
-            ]);
+            $filteredData = $request->validated();
+
+            Gudang::create($filteredData);
             DB::commit();
-            return redirect()->route('daftargudang.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Gudang berhasil ditambahkan.');
+            return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Gudang. ', 'daftargudang.index');
         }
     }
 
-    public function update(StoreGudangRequest $request, $kode_gudang)
+    public function update(UpdateGudangRequest $request, $kode_gudang)
     {
         DB::beginTransaction();
         try {
             $gudang = Gudang::where('kode_gudang', $kode_gudang)->lockForUpdate()->firstOrFail();
-            $gudang->update([
-                'kode_gudang' => $request->kode_gudang,
-                'nama_gudang' => $request->nama_gudang,
-                'keterangan' => $request->keterangan,
-            ]);
+            $filteredData = $request->validated();
+
+            $gudang->update($filteredData);
             DB::commit();
-            return redirect()->route('daftargudang.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Gudang berhasil diubah.');
+            return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Gudang. ', 'daftargudang.index');
         }
     }
 
-    public function destroy(Request $request, $kode_gudang)
+    public function destroy(DestroyGudangRequest $request, $kode_gudang)
     {
         DB::beginTransaction();
         try {
             $gudang = Gudang::findOrFail($kode_gudang);
             $transactions = $this->getTransactionData($gudang);
-
             if (!$transactions) {
                 // Force delete gudang
                 $gudang->delete();
                 DB::commit();
-                return redirect()->route('daftargudang.index', [
-                    'search' => $request->input('search'),
-                ])->with('success', 'Data Gudang berhasil dihapus.');
+                return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil dihapus.');
             } else {
                 throw new \Exception('Data Gudang tidak dapat dihapus dikarenakan terdapat Transaksi Terkait. ');
             }
@@ -149,31 +159,6 @@ class GudangController extends Controller
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Gudang. ', 'daftargudang.index');
         }
-    }
-
-    /**
-     * Helper function to handle exceptions and log the error.
-     */
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:kode_gudang,nama_gudang,keterangan',
-            'direction' => 'nullable|in:asc,desc',
-            'search' => 'nullable|string|max:255',
-            'edit' => 'nullable|exists:gudangs,kode_gudang',
-            'delete' => 'nullable|exists:gudangs,kode_gudang',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? 'nama_gudang',
-            'direction' => $validatedData['direction'] ?? 'asc',
-            'search' => $validatedData['search'] ?? null,
-            'edit' => $validatedData['edit'] ?? null,
-            'delete' => $validatedData['delete'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-        ];
     }
     private function getTransactionData($gudang)
     {

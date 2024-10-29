@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Http\Request;
 
 abstract class Controller
 {
@@ -16,15 +17,53 @@ abstract class Controller
         ]);
         return redirect()->route($redirect)->withErrors($customMessage);
     }
-    protected function logAPIValidationErrors($validator, $request)
+    public function logAPIValidationErrors($validator, $request, $className = null)
     {
         // Log validation errors
-        Log::error('Validation failed in' . get_class($this) .  'APIController', [
+        Log::error('Validation failed in ' . $className, [
             'request_data' => $request->all(),
             'validation_errors' => $validator->errors(),
         ]);
 
         // Abort and return a 404 page
         abort(404);
+    }
+    // Helper Function untuk kembalikan isi validated data
+    protected function getFiltersWithDefaults(array $validatedData, array $keys)
+    {
+        // Isi default null untuk setiap key yang tidak ada di $validatedData
+        $defaults = array_fill_keys($keys, null);
+
+        // Menggabungkan defaults dengan data validasi
+        return array_merge($defaults, $validatedData);
+    }
+    /**
+     * Helper function to build query parameters for redirects.
+     */
+    protected function buildQueryParams(Request $request, $page)
+    {
+        if ($page === "BarangController") {
+            return [
+                'search' => $request->input('search'),
+                'gudang' => $request->input('gudang'),
+                'sort_by' => $request->input('sort_by'),
+                'direction' => $request->input('direction'),
+            ];
+        } else if ($page === "GudangController" || $page === "JenisController" || $page === "MerekController") {
+            return [
+                'search' => $request->input('search'),
+                'sort_by' => $request->input('sort_by'),
+                'direction' => $request->input('direction'),
+            ];
+        } else if ($page === "BarangKeluarController" || $page === "BarangMasukController" || $page === "ItemTransfersController" || $page === "ItemTransferController" || $page === "StokOpnameController") {
+            return [
+                'search' => $request->input('search'),
+                'gudang' => $request->input('gudang'),
+                'start' => $request->input('start'),
+                'end' => $request->input('end'),
+                'sort_by' => $request->input('sort_by'),
+                'direction' => $request->input('direction'),
+            ];
+        }
     }
 }

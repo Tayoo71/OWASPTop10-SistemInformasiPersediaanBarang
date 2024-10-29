@@ -377,11 +377,11 @@
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 @if ($transaksi['statusBarang'] === true)
-                                    <a href="{{ route('barangmasuk.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['edit' => $transaksi['id']])) }}"
+                                    <a href="{{ route('barangmasuk.index', array_merge(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction']), ['edit' => $transaksi['id']])) }}"
                                         class="font-medium text-yellow-300 hover:underline">
                                         Ubah
                                     </a>
-                                    <a href="{{ route('barangmasuk.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
+                                    <a href="{{ route('barangmasuk.index', array_merge(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction']), ['delete' => $transaksi['id']])) }}"
                                         class="font-medium text-red-600 hover:underline ml-3">
                                         Hapus
                                     </a>
@@ -410,19 +410,20 @@
     </div>
 
     {{-- Modal Tambah Transaksi --}}
-    <x-transaksi.tambah-barang-masuk-modal :gudangs="$gudangs" />
+    <x-transaksi.barangmasuk.tambah-barang-masuk-modal :gudangs="$gudangs" />
     @if ($transaksies->isNotEmpty())
         {{-- Modal Export --}}
-        <x-transaksi.export-barang-masuk-modal />
+        <x-transaksi.barangmasuk.export-barang-masuk-modal />
     @endif
     @if ($editTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Ubah Transaksi --}}
-        <x-transaksi.ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />
+        <x-transaksi.barangmasuk.ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />
     @elseif ($deleteTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Hapus Transaksi --}}
         <x-modal.modal-delete :action="route(
             'barangmasuk.destroy',
-            ['barangmasuk' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
+            ['barangmasuk' => $deleteTransaksi->id] +
+                request()->only('search', 'gudang', 'start', 'end', 'sort_by', 'direction'),
         )"
             message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus transaksi barang masuk dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' />
     @endif

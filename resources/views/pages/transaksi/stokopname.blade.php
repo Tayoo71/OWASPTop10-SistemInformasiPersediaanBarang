@@ -406,7 +406,7 @@
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 @if ($transaksi['statusBarang'] === true)
-                                    <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
+                                    <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction']), ['delete' => $transaksi['id']])) }}"
                                         class="font-medium text-red-600 hover:underline ml-3">
                                         Hapus
                                     </a>
@@ -435,16 +435,17 @@
     </div>
 
     {{-- Modal Tambah Transaksi --}}
-    <x-transaksi.tambah-opname-modal :gudangs="$gudangs" />
+    <x-transaksi.stokopname.tambah-opname-modal :gudangs="$gudangs" />
     @if ($transaksies->isNotEmpty())
         {{-- Modal Export --}}
-        <x-transaksi.export-opname-modal />
+        <x-transaksi.stokopname.export-opname-modal />
     @endif
     @if ($deleteTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Hapus Transaksi --}}
         <x-modal.modal-delete :action="route(
             'stokopname.destroy',
-            ['stokopname' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
+            ['stokopname' => $deleteTransaksi->id] +
+                request()->only('search', 'gudang', 'start', 'end', 'sort_by', 'direction'),
         )"
             message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus Stok Opname dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' />
     @endif

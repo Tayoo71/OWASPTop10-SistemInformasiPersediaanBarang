@@ -142,11 +142,11 @@
                         </td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
-                                <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search']), ['edit' => $jenis['id']])) }}"
+                                <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $jenis['id']])) }}"
                                     class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
-                                <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search']), ['delete' => $jenis['id']])) }}"
+                                <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['delete' => $jenis['id']])) }}"
                                     class="font-medium text-red-600 hover:underline ml-3">
                                     Hapus
                                 </a>
@@ -169,17 +169,20 @@
     </div>
 
     {{-- Modal Tambah Jenis --}}
-    <x-master_data.tambah-jenis-modal />
+    <x-master_data.daftarjenis.tambah-jenis-modal />
     @if ($jenises->isNotEmpty())
         {{-- Modal Export --}}
-        <x-master_data.export-jenis-modal />
+        <x-master_data.daftarjenis.export-jenis-modal />
     @endif
     @if ($editJenis && !$errors->any() && !session('error'))
         {{-- Modal Ubah Jenis --}}
-        <x-master_data.ubah-jenis-modal :jenis="$editJenis" />
+        <x-master_data.daftarjenis.ubah-jenis-modal :jenis="$editJenis" />
     @elseif ($deleteJenis && !$errors->any() && !session('error'))
         {{-- Modal Hapus Jenis --}}
-        <x-modal.modal-delete :action="route('daftarjenis.destroy', ['daftarjenis' => $deleteJenis->id] + request()->only('search'))"
+        <x-modal.modal-delete :action="route(
+            'daftarjenis.destroy',
+            ['daftarjenis' => $deleteJenis->id] + request()->only('search', 'sort_by', 'direction'),
+        )"
             message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus Jenis "{{ $deleteJenis->nama_jenis }}"?' />
     @endif
 </x-layout>

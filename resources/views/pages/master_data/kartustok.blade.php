@@ -160,7 +160,7 @@
     </div>
     @if ($kartuStok)
         {{-- Modal Export --}}
-        <x-master_data.export-kartu-stok-modal />
+        <x-master_data.kartustok.export-kartu-stok-modal />
     @endif
     @push('scripts')
         <script>
@@ -201,8 +201,13 @@
                         this.searchBarangList = [];
                     },
                     fetchAPI(search, mode) {
-                        return fetch(`/barang/search/barang?search=${search}&mode=${mode}`)
-                            .then(response => response.json());
+                        return axios.get(`/barang/search/barang`, {
+                                params: {
+                                    search: search,
+                                    mode: mode
+                                }
+                            })
+                            .then(response => response.data);
                     },
                 }
             }

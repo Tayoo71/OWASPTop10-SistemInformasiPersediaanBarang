@@ -5,25 +5,38 @@ namespace App\Http\Controllers\Transaksi;
 use App\Http\Controllers\Controller;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use Illuminate\Http\Request;
 use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
 use App\Models\Transaksi\TransaksiStokOpname;
 use App\Http\Requests\Transaksi\StokOpname\StoreOpnameRequest;
 use App\Exports\ExcelExport;
+use App\Http\Requests\Transaksi\StokOpname\DestroyStokOpnameRequest;
+use App\Http\Requests\Transaksi\StokOpname\ViewStokOpnameRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class StokOpnameController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewStokOpnameRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'format',
+                'start',
+                'end'
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
 
             $headers = ["Nomor Transaksi", "Tanggal Buat", "Tanggal Ubah", "Gudang", "Nama Barang", "Stok Buku", "Stok Fisik", "Selisih", "Keterangan", "User Buat", "Status Barang"];
             $datas = TransaksiStokOpname::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
@@ -54,7 +67,7 @@ class StokOpnameController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_opname', [
+                $pdf = Pdf::loadview('layouts.pdf_export.transaksi.stokopname.export_opname', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'date' => date('d-F-Y H:i:s T'),
@@ -71,10 +84,22 @@ class StokOpnameController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Stok Opname. ', 'stokopname.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewStokOpnameRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'start',
+                'end',
+                'delete',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
 
             $transaksies = TransaksiStokOpname::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
                 ->search($filters)
@@ -121,16 +146,19 @@ class StokOpnameController extends Controller
     {
         DB::beginTransaction();
         try {
-            $this->processTransaction($request, 'opname', 'admin');
+            $filteredData = $request->validated();
+
+            $this->processTransaction($filteredData, 'opname', 'admin');
+
             DB::commit();
-            return redirect()->route('stokopname.index', $this->buildQueryParams($request))
+            return redirect()->route('stokopname.index', $this->buildQueryParams($request, "StokOpnameController"))
                 ->with('success', 'Data Stok Opname berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Data Stok Opname. ', 'stokopname.index');
         }
     }
-    public function destroy(Request $request, $id)
+    public function destroy(DestroyStokOpnameRequest $request, $id)
     {
         DB::beginTransaction();
         try {
@@ -138,7 +166,7 @@ class StokOpnameController extends Controller
             StokBarang::updateStok($transaksi->barang_id, $transaksi->kode_gudang, $transaksi->stok_fisik, 'delete_opname', $transaksi->stok_buku);
             $transaksi->delete();
             DB::commit();
-            return redirect()->route('stokopname.index', $this->buildQueryParams($request))
+            return redirect()->route('stokopname.index', $this->buildQueryParams($request, "StokOpnameController"))
                 ->with('success', 'Data Stok Opname berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -147,10 +175,11 @@ class StokOpnameController extends Controller
     }
     private function processTransaction($request, $operation, $userId, $old_transaksi = null)
     {
-        $selectedGudang = $request->selected_gudang;
-        $barangId = $request->barang_id;
-        $selectedSatuanId = $request->satuan;
-        $stok_fisik = $request->stok_fisik;
+        $barangId = $request['barang_id'];
+        $selectedSatuanId = $request['satuan'];
+        $stok_fisik = $request['stok_fisik'];
+        $selectedGudang = $request['selected_gudang'];
+        $keterangan = $request['keterangan'];
         $stok_buku = StokBarang::where('barang_id', $barangId)
             ->where('kode_gudang', $selectedGudang)
             ->lockForUpdate()
@@ -164,7 +193,7 @@ class StokOpnameController extends Controller
                 'barang_id' => $barangId,
                 'stok_buku' => $stok_buku,
                 'stok_fisik' => $stok_fisik,
-                'keterangan' => $request->keterangan,
+                'keterangan' => $keterangan,
             ]);
         } else {
             TransaksiStokOpname::create([
@@ -173,42 +202,8 @@ class StokOpnameController extends Controller
                 'barang_id' => $barangId,
                 'stok_buku' => $stok_buku,
                 'stok_fisik' => $stok_fisik,
-                'keterangan' => $request->keterangan,
+                'keterangan' => $keterangan,
             ]);
         }
-    }
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,stok_buku,stok_fisik,selisih,keterangan,user_buat_id,user_update_id',
-            'direction' => 'nullable|in:asc,desc',
-            'gudang' => 'nullable|exists:gudangs,kode_gudang',
-            'search' => 'nullable|string|max:255',
-            'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
-            'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
-            'delete' => 'nullable|exists:transaksi_stok_opnames,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? 'created_at',
-            'direction' => $validatedData['direction'] ?? 'desc',
-            'gudang' => $validatedData['gudang'] ?? null,
-            'search' => $validatedData['search'] ?? null,
-            'start' => $validatedData['start'] ?? null,
-            'end' => $validatedData['end'] ?? null,
-            'delete' => $validatedData['delete'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-        ];
-    }
-    private function buildQueryParams($request)
-    {
-        return [
-            'search' => $request->input('search'),
-            'gudang' => $request->input('gudang'),
-            'start' => $request->input('start'),
-            'end' => $request->input('end'),
-        ];
     }
 }

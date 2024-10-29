@@ -371,12 +371,12 @@
                         <td class="px-6 py-4 align-middle">{{ $barang['status'] }}</td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
-                                <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['edit' => $barang['id']])) }}"
+                                <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang', 'sort_by', 'direction']), ['edit' => $barang['id']])) }}"
                                     class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
                                 @if ($barang['statusTransaksi'] === false)
-                                    <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang']), ['delete' => $barang['id']])) }}"
+                                    <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang', 'sort_by', 'direction']), ['delete' => $barang['id']])) }}"
                                         class="font-medium text-red-600 hover:underline ml-3">
                                         Hapus
                                     </a>
@@ -400,19 +400,19 @@
     </div>
 
     {{-- Modal Tambah Barang --}}
-    <x-master_data.tambah-barang-modal :jenises="$jenises" :mereks="$mereks" />
+    <x-master_data.daftarbarang.tambah-barang-modal :jenises="$jenises" :mereks="$mereks" />
     @if ($barangs->isNotEmpty())
         {{-- Modal Export --}}
-        <x-master_data.export-barang-modal />
+        <x-master_data.daftarbarang.export-barang-modal />
     @endif
     @if ($editBarang && !$errors->any() && !session('error'))
         {{-- Modal Ubah Barang --}}
-        <x-master_data.ubah-barang-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" />
+        <x-master_data.daftarbarang.ubah-barang-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" />
     @elseif ($deleteBarang && !$errors->any() && !session('error'))
         {{-- Modal Hapus Barang --}}
         <x-modal.modal-delete :action="route(
             'daftarbarang.destroy',
-            ['daftarbarang' => $deleteBarang->id] + request()->only('search', 'gudang'),
+            ['daftarbarang' => $deleteBarang->id] + request()->only('search', 'gudang', 'sort_by', 'direction'),
         )"
             message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus barang dengan Nama Item "{{ $deleteBarang->nama_item }}"?' />
     @endif

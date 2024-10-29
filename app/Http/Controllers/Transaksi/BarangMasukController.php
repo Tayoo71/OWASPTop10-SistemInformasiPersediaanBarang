@@ -5,25 +5,39 @@ namespace App\Http\Controllers\Transaksi;
 use App\Http\Controllers\Controller;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use Illuminate\Http\Request;
 use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
 use App\Models\Transaksi\TransaksiBarangMasuk;
 use App\Http\Requests\Transaksi\BarangMasuk\StoreBarangMasukRequest;
 use App\Exports\ExcelExport;
+use App\Http\Requests\Transaksi\BarangMasuk\DestroyBarangMasukRequest;
+use App\Http\Requests\Transaksi\BarangMasuk\UpdateBarangMasukRequest;
+use App\Http\Requests\Transaksi\BarangMasuk\ViewBarangMasukRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class BarangMasukController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewBarangMasukRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'format',
+                'start',
+                'end'
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
 
             $headers = ["Nomor Transaksi", "Tanggal Buat", "Tanggal Ubah", "Gudang", "Nama Barang", "Jumlah Stok Masuk", "Keterangan", "User Buat", "User Ubah", "Status Barang"];
             $datas = TransaksiBarangMasuk::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
@@ -52,7 +66,7 @@ class BarangMasukController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_barangmasuk', [
+                $pdf = Pdf::loadview('layouts.pdf_export.transaksi.barangmasuk.export_barangmasuk', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'date' => date('d-F-Y H:i:s T'),
@@ -69,10 +83,23 @@ class BarangMasukController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Barang Masuk. ', 'barangmasuk.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewBarangMasukRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'start',
+                'end',
+                'edit',
+                'delete',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
 
             $transaksies = TransaksiBarangMasuk::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
                 ->search($filters)
@@ -132,9 +159,12 @@ class BarangMasukController extends Controller
     {
         DB::beginTransaction();
         try {
-            $this->processTransaction($request, 'masuk', 'admin');
+            $filteredData = $request->validated();
+
+            $this->processTransaction($filteredData, 'masuk', 'admin');
+
             DB::commit();
-            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
+            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request, "BarangMasukController"))
                 ->with('success', 'Transaksi Barang Masuk berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -142,20 +172,21 @@ class BarangMasukController extends Controller
         }
     }
 
-    public function update(StoreBarangMasukRequest $request, $idTransaksi)
+    public function update(UpdateBarangMasukRequest $request, $idTransaksi)
     {
         DB::beginTransaction();
         try {
             $old_transaksi = TransaksiBarangMasuk::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
+            $filteredData = $request->validated();
 
             // Revert old transaction stock before updating
             $this->revertStok($old_transaksi, 'delete_masuk');
 
             // Process new transaction data
-            $this->processTransaction($request, 'masuk', 'antony', $old_transaksi);
+            $this->processTransaction($filteredData, 'masuk', 'antony', $old_transaksi);
 
             DB::commit();
-            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
+            return redirect()->route('barangmasuk.index',  $this->buildQueryParams($request, "BarangMasukController"))
                 ->with('success', 'Transaksi Barang Masuk berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -163,7 +194,7 @@ class BarangMasukController extends Controller
         }
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(DestroyBarangMasukRequest $request, $id)
     {
         DB::beginTransaction();
         try {
@@ -171,7 +202,7 @@ class BarangMasukController extends Controller
             $this->revertStok($transaksi, 'delete_masuk');
             $transaksi->delete();
             DB::commit();
-            return redirect()->route('barangmasuk.index', $this->buildQueryParams($request))
+            return redirect()->route('barangmasuk.index',  $this->buildQueryParams($request, "BarangMasukController"))
                 ->with('success', 'Transaksi Barang Masuk berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -186,10 +217,11 @@ class BarangMasukController extends Controller
 
     private function processTransaction($request, $operation, $userId, $old_transaksi = null)
     {
-        $barangId = $request->barang_id;
-        $selectedSatuanId = $request->satuan;
-        $jumlahStokMasuk = $request->jumlah_stok_masuk;
-        $selectedGudang = $request->selected_gudang;
+        $barangId = $request['barang_id'];
+        $selectedSatuanId = $request['satuan'];
+        $jumlahStokMasuk = $request['jumlah_stok_masuk'];
+        $selectedGudang = $request['selected_gudang'];
+        $keterangan = $request['keterangan'];
 
         $jumlahMasukSatuanDasar = KonversiSatuan::convertToSatuanDasar($barangId, $selectedSatuanId, $jumlahStokMasuk);
 
@@ -201,7 +233,7 @@ class BarangMasukController extends Controller
                 'kode_gudang' => $selectedGudang,
                 'barang_id' => $barangId,
                 'jumlah_stok_masuk' => $jumlahMasukSatuanDasar,
-                'keterangan' => $request->keterangan,
+                'keterangan' => $keterangan,
             ]);
         } else {
             TransaksiBarangMasuk::create([
@@ -209,44 +241,8 @@ class BarangMasukController extends Controller
                 'kode_gudang' => $selectedGudang,
                 'barang_id' => $barangId,
                 'jumlah_stok_masuk' => $jumlahMasukSatuanDasar,
-                'keterangan' => $request->keterangan,
+                'keterangan' => $keterangan,
             ]);
         }
-    }
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,jumlah_stok_masuk,keterangan,user_buat_id,user_update_id',
-            'direction' => 'nullable|in:asc,desc',
-            'gudang' => 'nullable|exists:gudangs,kode_gudang',
-            'search' => 'nullable|string|max:255',
-            'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
-            'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
-            'edit' => 'nullable|exists:transaksi_barang_masuks,id',
-            'delete' => 'nullable|exists:transaksi_barang_masuks,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? 'created_at',
-            'direction' => $validatedData['direction'] ?? 'desc',
-            'gudang' => $validatedData['gudang'] ?? null,
-            'search' => $validatedData['search'] ?? null,
-            'start' => $validatedData['start'] ?? null,
-            'end' => $validatedData['end'] ?? null,
-            'edit' => $validatedData['edit'] ?? null,
-            'delete' => $validatedData['delete'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-        ];
-    }
-    private function buildQueryParams($request)
-    {
-        return [
-            'search' => $request->input('search'),
-            'gudang' => $request->input('gudang'),
-            'start' => $request->input('start'),
-            'end' => $request->input('end'),
-        ];
     }
 }

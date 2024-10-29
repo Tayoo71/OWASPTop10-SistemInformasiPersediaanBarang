@@ -6,19 +6,29 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
 use App\Models\MasterData\KonversiSatuan;
-use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Exports\ExcelExport;
+use App\Http\Requests\MasterData\StokMinimum\ViewStokMinimumRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class StokMinimumController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewStokMinimumRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'format'
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_item';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
@@ -51,7 +61,7 @@ class StokMinimumController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_stokminimum', [
+                $pdf = Pdf::loadview('layouts.pdf_export.master_data.stokminimum.export_stokminimum', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'gudang' => $gudang,
@@ -66,10 +76,20 @@ class StokMinimumController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Informasi Stok Minimum. ', 'stokminimum.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewStokMinimumRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'format'
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_item';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
                 ->search($filters)
@@ -131,27 +151,5 @@ class StokMinimumController extends Controller
             }
             return $totalStok <= $barang->stok_minimum;
         });
-    }
-    /**
-     * Helper function to handle exceptions and log the error.
-     */
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:id,nama_item,stok,jenis,merek,stok_minimum,keterangan,rak',
-            'direction' => 'nullable|in:asc,desc',
-            'gudang' => 'nullable|exists:gudangs,kode_gudang',
-            'search' => 'nullable|string|max:255',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? 'nama_item',
-            'direction' => $validatedData['direction'] ?? 'asc',
-            'gudang' => $validatedData['gudang'] ?? null,
-            'search' => $validatedData['search'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-        ];
     }
 }

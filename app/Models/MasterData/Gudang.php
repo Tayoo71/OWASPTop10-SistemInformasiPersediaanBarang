@@ -13,6 +13,7 @@ class Gudang extends Model
 {
     protected $fillable = ['kode_gudang', 'nama_gudang', 'keterangan'];
     protected $primaryKey = 'kode_gudang';
+    protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = false;
 
