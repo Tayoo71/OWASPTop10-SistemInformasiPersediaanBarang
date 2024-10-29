@@ -406,11 +406,11 @@
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
                                 @if ($transaksi['statusBarang'] === true)
-                                    <a href="{{ route('itemtransfer.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['edit' => $transaksi['id']])) }}"
+                                    <a href="{{ route('itemtransfer.index', array_merge(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction']), ['edit' => $transaksi['id']])) }}"
                                         class="font-medium text-yellow-300 hover:underline">
                                         Ubah
                                     </a>
-                                    <a href="{{ route('itemtransfer.index', array_merge(request()->only(['search', 'gudang', 'start', 'end']), ['delete' => $transaksi['id']])) }}"
+                                    <a href="{{ route('itemtransfer.index', array_merge(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction']), ['delete' => $transaksi['id']])) }}"
                                         class="font-medium text-red-600 hover:underline ml-3">
                                         Hapus
                                     </a>
@@ -451,7 +451,8 @@
         {{-- Modal Hapus Transaksi --}}
         <x-modal.modal-delete :action="route(
             'itemtransfer.destroy',
-            ['itemtransfer' => $deleteTransaksi->id] + request()->only('search', 'gudang', 'start', 'end'),
+            ['itemtransfer' => $deleteTransaksi->id] +
+                request()->only('search', 'gudang', 'start', 'end', 'sort_by', 'direction'),
         )"
             message='Tindakan ini tidak dapat dibatalkan. Apakah Anda yakin ingin menghapus transaksi item transfer dengan Nomor Transaksi "{{ $deleteTransaksi->id }}" | Nama Item "{{ $deleteTransaksi->barang->nama_item }}"?' />
     @endif

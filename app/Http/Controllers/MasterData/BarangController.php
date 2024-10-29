@@ -7,20 +7,33 @@ use App\Models\MasterData\Jenis;
 use App\Models\MasterData\Merek;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\MasterData\DaftarBarang\StoreBarangRequest;
 use App\Exports\ExcelExport;
+use App\Http\Requests\MasterData\DaftarBarang\DestroyBarangRequest;
+use App\Http\Requests\MasterData\DaftarBarang\UpdateBarangRequest;
+use App\Http\Requests\MasterData\DaftarBarang\ViewBarangRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class BarangController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewBarangRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'format',
+                'data_type',
+                'stok',
+                'status'
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             if (is_null($filters['format']) || is_null($filters['data_type'] || is_null($filters['stok']) || is_null($filters['status']))) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
@@ -132,10 +145,19 @@ class BarangController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Daftar Barang. ', 'daftarbarang.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewBarangRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'edit',
+                'delete',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
 
             // Query Barang dengan scopeSearch
             $barangs = Barang::with([
@@ -192,9 +214,11 @@ class BarangController extends Controller
     {
         DB::beginTransaction();
         try {
-            $barang = Barang::create($this->getBarangData($request));
+            $filteredData = $request->validated();
 
-            foreach ($request->konversiSatuan as $konversi) {
+            $barang = Barang::create($filteredData);
+
+            foreach ($filteredData['konversiSatuan'] as $konversi) {
                 $barang->konversiSatuans()->create([
                     'satuan' => $konversi['satuan'],
                     'jumlah' => $konversi['jumlah'],
@@ -204,21 +228,22 @@ class BarangController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('daftarbarang.index', $this->buildQueryParams($request))
+            return redirect()->route('daftarbarang.index', $this->buildQueryParams($request, "BarangController"))
                 ->with('success', 'Data Barang berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data barang. ', 'daftarbarang.index');
         }
     }
-    public function update(StoreBarangRequest $request, $kode_item)
+    public function update(UpdateBarangRequest $request, $kode_item)
     {
         DB::beginTransaction();
         try {
             $barang = Barang::where('id', $kode_item)->lockForUpdate()->firstOrFail();
+            $filteredData = $request->validated();
 
-            $barang->update($this->getBarangData($request));
-            foreach ($request->konversiSatuan as $konversi) {
+            $barang->update($filteredData);
+            foreach ($filteredData['konversiSatuan'] as $konversi) {
                 $barang->konversiSatuans()
                     ->where('id', $konversi['id'])
                     ->update([
@@ -228,7 +253,7 @@ class BarangController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('daftarbarang.index', $this->buildQueryParams($request))
+            return redirect()->route('daftarbarang.index', $this->buildQueryParams($request, "BarangController"))
                 ->with('success', 'Data Barang berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -236,7 +261,7 @@ class BarangController extends Controller
         }
     }
 
-    public function destroy(Request $request, $kode_item)
+    public function destroy(DestroyBarangRequest $request, $kode_item)
     {
         DB::beginTransaction();
         try {
@@ -247,7 +272,7 @@ class BarangController extends Controller
                 // Force delete barang
                 $barang->delete();
                 DB::commit();
-                return redirect()->route('daftarbarang.index', $this->buildQueryParams($request))
+                return redirect()->route('daftarbarang.index', $this->buildQueryParams($request, "BarangController"))
                     ->with('success', 'Data Barang berhasil dihapus secara permanen.');
             } else {
                 DB::rollBack();
@@ -258,64 +283,6 @@ class BarangController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data barang. ', 'daftarbarang.index');
         }
     }
-
-    /**
-     * Helper function to build query parameters for redirects.
-     */
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:id,nama_item,stok,jenis,merek,harga_pokok,harga_jual,keterangan,rak,status',
-            'direction' => 'nullable|in:asc,desc',
-            'gudang' => 'nullable|exists:gudangs,kode_gudang',
-            'search' => 'nullable|string|max:255',
-            'edit' => 'nullable|exists:barangs,id',
-            'delete' => 'nullable|exists:barangs,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-            'data_type' => 'nullable|in:lengkap,harga_pokok,harga_jual,tanpa_harga',
-            'stok' => 'nullable|in:tampil_kosong,tidak_tampil_kosong',
-            'status' => 'nullable|in:semua,aktif,tidak_aktif',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? null,
-            'direction' => $validatedData['direction'] ?? null,
-            'gudang' => $validatedData['gudang'] ?? null,
-            'search' => $validatedData['search'] ?? null,
-            'start' => $validatedData['start'] ?? null,
-            'end' => $validatedData['end'] ?? null,
-            'edit' => $validatedData['edit'] ?? null,
-            'delete' => $validatedData['delete'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-            'data_type' => $validatedData['data_type'] ?? null,
-            'stok' => $validatedData['stok'] ?? null,
-            'status' => $validatedData['status'] ?? null,
-        ];
-    }
-    private function buildQueryParams(Request $request)
-    {
-        return [
-            'search' => $request->input('search'),
-            'gudang' => $request->input('gudang'),
-        ];
-    }
-
-    /**
-     * Helper function to extract barang data from the request.
-     */
-    private function getBarangData(StoreBarangRequest $request)
-    {
-        return [
-            'nama_item' => $request->nama_item,
-            'jenis_id' => $request->jenis,
-            'merek_id' => $request->merek,
-            'rak' => $request->rak,
-            'keterangan' => $request->keterangan,
-            'stok_minimum' => $request->stok_minimum ?? 0,
-            'status' =>  $request->status ?? "Aktif",
-        ];
-    }
     private function getTransactionData($barang)
     {
         return $barang->transaksiBarangMasuks->isNotEmpty() ||
@@ -324,6 +291,7 @@ class BarangController extends Controller
             $barang->transaksiItemTransfers->isNotEmpty() ||
             $barang->stokBarangs->isNotEmpty();
     }
+    // Untuk Fitur Filter Stok Barang pada Function Export
     private function filteredStokBarangTidakKosong($filters, $barangs)
     {
         // Filter barang yang stoknya Tidak Kosong

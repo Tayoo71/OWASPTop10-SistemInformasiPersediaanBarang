@@ -1,6 +1,6 @@
 <x-modal.modal-update title="Ubah Transaksi Barang Keluar">
     <form method="POST"
-        action="{{ route('barangkeluar.update', $transaksi->id) }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
+        action="{{ route('barangkeluar.update', $transaksi->id) }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction'])) }}"
         class="p-4 md:p-5">
         @csrf
         @method('PUT')

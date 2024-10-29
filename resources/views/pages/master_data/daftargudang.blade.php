@@ -141,12 +141,12 @@
                         </td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
-                                <a href="{{ route('daftargudang.index', array_merge(request()->only(['search']), ['edit' => $gudang['kode_gudang']])) }}"
+                                <a href="{{ route('daftargudang.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $gudang['kode_gudang']])) }}"
                                     class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
                                 @if ($gudang['statusTransaksi'] === false)
-                                    <a href="{{ route('daftargudang.index', array_merge(request()->only(['search']), ['delete' => $gudang['kode_gudang']])) }}"
+                                    <a href="{{ route('daftargudang.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['delete' => $gudang['kode_gudang']])) }}"
                                         class="font-medium text-red-600 hover:underline ml-3">
                                         Hapus
                                     </a>
@@ -182,7 +182,7 @@
         {{-- Modal Hapus Gudang --}}
         <x-modal.modal-delete :action="route(
             'daftargudang.destroy',
-            ['daftargudang' => $deleteGudang->kode_gudang] + request()->only('search'),
+            ['daftargudang' => $deleteGudang->kode_gudang] + request()->only('search', 'sort_by', 'direction'),
         )"
             message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus Gudang "{{ $deleteGudang->nama_gudang }}"?' />
     @endif

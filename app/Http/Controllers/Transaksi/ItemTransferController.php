@@ -5,25 +5,39 @@ namespace App\Http\Controllers\Transaksi;
 use App\Http\Controllers\Controller;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use Illuminate\Http\Request;
 use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
 use App\Models\Transaksi\TransaksiItemTransfer;
 use App\Http\Requests\Transaksi\ItemTransfer\StoreItemTransferRequest;
 use App\Exports\ExcelExport;
+use App\Http\Requests\Transaksi\ItemTransfer\DestroyItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\UpdateItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\ViewItemTransferRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class ItemTransferController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewItemTransferRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'format',
+                'start',
+                'end'
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
 
             $headers = ["Nomor Transaksi", "Tanggal Buat", "Tanggal Ubah", "Gudang Asal", "Gudang Tujuan", "Nama Barang", "Jumlah Stok Transfer", "Keterangan", "User Buat", "User Ubah", "Status Barang"];
             $datas = TransaksiItemTransfer::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
@@ -69,10 +83,23 @@ class ItemTransferController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Item Transfer. ', 'itemtransfer.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewItemTransferRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'gudang',
+                'search',
+                'start',
+                'end',
+                'edit',
+                'delete',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'created_at';
+            $filters['direction'] = $validatedData['direction'] ?? 'desc';
 
             $transaksies = TransaksiItemTransfer::with(['barang.konversiSatuans:id,barang_id,satuan,jumlah'])
                 ->search($filters)
@@ -133,30 +160,36 @@ class ItemTransferController extends Controller
     {
         DB::beginTransaction();
         try {
-            $this->processTransaction($request, 'tambah_item_transfer', 'admin');
+            $filteredData = $request->validated();
+
+            $this->processTransaction($filteredData, 'tambah_item_transfer', 'admin');
+
             DB::commit();
-            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request))
+            return redirect()->route('itemtransfer.index',  $this->buildQueryParams($request, "ItemTransferController"))
                 ->with('success', 'Transaksi Item Transfer berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah Transaksi Item Transfer. ', 'itemtransfer.index');
         }
     }
-    public function update(StoreItemTransferRequest $request, $idTransaksi)
+    public function update(UpdateItemTransferRequest $request, $idTransaksi)
     {
         DB::beginTransaction();
         try {
             $old_transaksi = TransaksiItemTransfer::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
-            $this->processTransaction($request, 'update_item_transfer', 'antony', $old_transaksi);
+            $filteredData = $request->validated();
+
+            $this->processTransaction($filteredData, 'update_item_transfer', 'antony', $old_transaksi);
+
             DB::commit();
-            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request))
+            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request, "ItemTransferController"))
                 ->with('success', 'Transaksi Item Transfer berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah Transaksi Item Transfer. ', 'itemtransfer.index');
         }
     }
-    public function destroy(Request $request, $id)
+    public function destroy(DestroyItemTransferRequest $request, $id)
     {
         DB::beginTransaction();
         try {
@@ -164,7 +197,7 @@ class ItemTransferController extends Controller
             $this->processTransaction($transaksi, 'delete_item_transfer');
             $transaksi->delete();
             DB::commit();
-            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request))
+            return redirect()->route('itemtransfer.index', $this->buildQueryParams($request, "ItemTransferController"))
                 ->with('success', 'Transaksi Item Transfer berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -173,11 +206,12 @@ class ItemTransferController extends Controller
     }
     private function processTransaction($request, $operation, $userId = '', $old_transaksi = null)
     {
-        $barangId = $request->barang_id;
-        $selectedSatuanId = $operation === 'delete_item_transfer' ? null : $request->satuan;
-        $jumlahStokTransfer = $request->jumlah_stok_transfer;
-        $selectedGudangAsal = $operation === 'delete_item_transfer' ? $request->gudang_asal : $request->selected_gudang_asal;
-        $selectedGudangTujuan = $operation === 'delete_item_transfer' ? $request->gudang_tujuan : $request->selected_gudang_tujuan;
+        $barangId = $request['barang_id'];
+        $keterangan = $request['keterangan'];
+        $selectedSatuanId = $operation === 'delete_item_transfer' ? null : $request['satuan'];
+        $jumlahStokTransfer = $request['jumlah_stok_transfer'];
+        $selectedGudangAsal = $operation === 'delete_item_transfer' ? $request['gudang_asal'] : $request['selected_gudang_asal'];
+        $selectedGudangTujuan = $operation === 'delete_item_transfer' ? $request['gudang_tujuan'] : $request['selected_gudang_tujuan'];
         $jumlahTransferSatuanDasar = $operation === 'delete_item_transfer' ? null : KonversiSatuan::convertToSatuanDasar($barangId, $selectedSatuanId, $jumlahStokTransfer);
 
         if ($operation === 'tambah_item_transfer') {
@@ -190,7 +224,7 @@ class ItemTransferController extends Controller
                 'gudang_tujuan' => $selectedGudangTujuan,
                 'barang_id' => $barangId,
                 'jumlah_stok_transfer' => $jumlahTransferSatuanDasar,
-                'keterangan' => $request->keterangan,
+                'keterangan' => $keterangan,
             ]);
         } elseif ($operation === 'update_item_transfer') {
             // Kembalikan Stok pada Transaksi Lama
@@ -206,7 +240,7 @@ class ItemTransferController extends Controller
                 'gudang_tujuan' => $selectedGudangTujuan,
                 'barang_id' => $barangId,
                 'jumlah_stok_transfer' => $jumlahTransferSatuanDasar,
-                'keterangan' => $request->keterangan,
+                'keterangan' => $keterangan,
             ]);
         } else if ($operation === 'delete_item_transfer') {
             $this->operationStok($barangId, $selectedGudangAsal, $selectedGudangTujuan, $jumlahStokTransfer, 'delete_item');
@@ -225,41 +259,5 @@ class ItemTransferController extends Controller
             // Hapus Stok pada gudang tujuan
             StokBarang::updateStok($barangId, $selectedGudangTujuan, $jumlahTransferSatuanDasar, 'delete_masuk');
         }
-    }
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:id,created_at,updated_at,gudang_asal,gudang_tujuan,nama_item,jumlah_stok_transfer,keterangan,user_buat_id,user_update_id',
-            'direction' => 'nullable|in:asc,desc',
-            'gudang' => 'nullable|exists:gudangs,kode_gudang',
-            'search' => 'nullable|string|max:255',
-            'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
-            'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
-            'edit' => 'nullable|exists:transaksi_item_transfers,id',
-            'delete' => 'nullable|exists:transaksi_item_transfers,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? 'created_at',
-            'direction' => $validatedData['direction'] ?? 'desc',
-            'gudang' => $validatedData['gudang'] ?? null,
-            'search' => $validatedData['search'] ?? null,
-            'start' => $validatedData['start'] ?? null,
-            'end' => $validatedData['end'] ?? null,
-            'edit' => $validatedData['edit'] ?? null,
-            'delete' => $validatedData['delete'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-        ];
-    }
-    private function buildQueryParams($request)
-    {
-        return [
-            'search' => $request->input('search'),
-            'gudang' => $request->input('gudang'),
-            'start' => $request->input('start'),
-            'end' => $request->input('end'),
-        ];
     }
 }

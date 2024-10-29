@@ -1,5 +1,6 @@
 <x-modal.modal-create title="Tambah Gudang">
-    <form method="POST" action="{{ route('daftargudang.store') }}?{{ http_build_query(request()->only(['search'])) }}"
+    <form method="POST"
+        action="{{ route('daftargudang.store') }}?{{ http_build_query(request()->only(['search', 'sort_by', 'direction'])) }}"
         class="p-4 md:p-5">
         @csrf
         <div class="grid gap-4 mb-4">

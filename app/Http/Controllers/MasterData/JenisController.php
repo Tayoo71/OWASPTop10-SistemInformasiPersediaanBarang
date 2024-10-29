@@ -5,22 +5,34 @@ namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
 use App\Models\MasterData\Jenis;
 use App\Exports\ExcelExport;
-use Illuminate\Http\Request;
+use App\Http\Requests\MasterData\DaftarBarang\ViewBarangRequest;
+use App\Http\Requests\MasterData\DaftarJenis\DestroyJenisRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\MasterData\DaftarJenis\StoreJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\UpdateJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\ViewJenisRequest;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class JenisController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewJenisRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'search',
+                'format',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_jenis';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $headers = ["Kode Jenis", "Nama Jenis", "Keterangan"];
             $datas = Jenis::search($filters)
@@ -46,10 +58,20 @@ class JenisController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Daftar Jenis. ', redirect: 'daftarjenis.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewBarangRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'search',
+                'edit',
+                'delete',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_jenis';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $jenises = Jenis::search($filters)
                 ->orderBy($filters['sort_by'], $filters['direction'])
@@ -71,76 +93,44 @@ class JenisController extends Controller
     {
         DB::beginTransaction();
         try {
-            Jenis::create([
-                'nama_jenis' => $request->nama_jenis,
-                'keterangan' => $request->keterangan,
-            ]);
+            $filteredData = $request->validated();
+
+            Jenis::create($filteredData);
+
             DB::commit();
-            return redirect()->route('daftarjenis.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Jenis berhasil ditambahkan.');
+            return redirect()->route('daftarjenis.index', $this->buildQueryParams($request, "JenisController"))->with('success', 'Data Jenis berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Jenis. ', redirect: 'daftarjenis.index');
         }
     }
 
-    public function update(StoreJenisRequest $request, $id)
+    public function update(UpdateJenisRequest $request, $id)
     {
         DB::beginTransaction();
         try {
             $jenis = Jenis::where('id', $id)->lockForUpdate()->firstOrFail();
-            $jenis->update([
-                'nama_jenis' => $request->nama_jenis,
-                'keterangan' => $request->keterangan,
-            ]);
+            $filteredData = $request->validated();
+
+            $jenis->update($filteredData);
             DB::commit();
-            return redirect()->route('daftarjenis.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Jenis berhasil diubah.');
+            return redirect()->route('daftarjenis.index', $this->buildQueryParams($request, "JenisController"))->with('success', 'Data Jenis berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Jenis. ', redirect: 'daftarjenis.index');
         }
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(DestroyJenisRequest $request, $id)
     {
         DB::beginTransaction();
         try {
             Jenis::findOrFail($id)->delete();
             DB::commit();
-            return redirect()->route('daftarjenis.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Jenis berhasil dihapus.');
+            return redirect()->route('daftarjenis.index', $this->buildQueryParams($request, "JenisController"))->with('success', 'Data Jenis berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Jenis. ', redirect: 'daftarjenis.index');
         }
-    }
-
-    /**
-     * Helper function to handle exceptions and log the error.
-     */
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:id,nama_jenis,keterangan',
-            'direction' => 'nullable|in:asc,desc',
-            'search' => 'nullable|string|max:255',
-            'edit' => 'nullable|exists:jenises,id',
-            'delete' => 'nullable|exists:jenises,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? 'nama_jenis',
-            'direction' => $validatedData['direction'] ?? 'asc',
-            'search' => $validatedData['search'] ?? null,
-            'edit' => $validatedData['edit'] ?? null,
-            'delete' => $validatedData['delete'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-        ];
     }
 }

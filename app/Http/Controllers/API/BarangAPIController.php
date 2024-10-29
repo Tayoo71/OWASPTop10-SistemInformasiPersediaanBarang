@@ -3,27 +3,16 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\MasterData\Barang;
-use Illuminate\Http\Request;
 use App\Models\MasterData\KonversiSatuan;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\API\SearchBarangFunctionRequest;
+use App\Http\Requests\API\SearchFunctionRequest;
 
 class BarangAPIController extends Controller
 {
-    // Fetch API For Searching Barang - AJAX
-    public function search(Request $request)
+    public function search(SearchFunctionRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'gudang' => 'nullable|exists:gudangs,kode_gudang',
-            'search' => 'nullable|string|max:255',
-        ]);
-
-        // If validation fails, log the validation errors and return a 404 error page
-        if ($validator->fails()) {
-            $this->logAPIValidationErrors($validator, $request);
-        }
-
-        $validatedData = $validator->validated();
+        $validatedData = $request->validated();
         $search = $validatedData['search'] ?? null;
         $gudang = $validatedData['gudang'] ?? null;
 
@@ -62,19 +51,9 @@ class BarangAPIController extends Controller
 
         return response()->json($barangs);
     }
-    public function searchBarang(Request $request)
+    public function searchBarang(SearchBarangFunctionRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'search' => 'nullable|string|max:255',
-            'mode' => 'required|in:search,update',
-        ]);
-
-        // If validation fails, log the validation errors and return a 404 error page
-        if ($validator->fails()) {
-            $this->logAPIValidationErrors($validator, $request);
-        }
-
-        $validatedData = $validator->validated();
+        $validatedData = $request->validated();
         $search = $validatedData['search'] ?? null;
         $mode = $validatedData['mode'];
 

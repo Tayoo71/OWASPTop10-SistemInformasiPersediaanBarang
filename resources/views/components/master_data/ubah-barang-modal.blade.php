@@ -1,6 +1,6 @@
 <x-modal.modal-update title="Ubah Barang">
     <form method="POST"
-        action="{{ route('daftarbarang.update', $barang->id) }}?{{ http_build_query(request()->only(['search', 'gudang'])) }}"
+        action="{{ route('daftarbarang.update', $barang->id) }}?{{ http_build_query(request()->only(['search', 'gudang', 'sort_by', 'direction'])) }}"
         class="p-4 md:p-5" x-data="{ konversiSatuan: {{ json_encode($barang->konversiSatuans) }} }">
         @csrf
         @method('PUT')
@@ -18,10 +18,10 @@
 
             <!-- Dropdown Jenis -->
             <div class="col-span-2">
-                <label for="jenis" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <label for="jenis_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Jenis
                 </label>
-                <select name="jenis" id="jenis"
+                <select name="jenis_id" id="jenis_id"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
                     <option value="">-</option>
                     @foreach ($jenises as $option)
@@ -34,10 +34,10 @@
 
             <!-- Dropdown Merek -->
             <div class="col-span-2">
-                <label for="merek" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <label for="merek_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Merek
                 </label>
-                <select name="merek" id="merek"
+                <select name="merek_id" id="merek_id"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
                     <option value="">-</option>
                     @foreach ($mereks as $option)

@@ -21,7 +21,7 @@ Route::get('/', function () {
 
 // Master Data
 Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
-Route::post('daftarbarang/export', [BarangController::class, 'export'])->name(name: 'daftarbarang.export');
+Route::post('daftarbarang/export', [BarangController::class, 'export'])->name('daftarbarang.export');
 Route::resource('daftargudang', GudangController::class)->only(['index', 'store', 'update', 'destroy']);
 Route::post('daftargudang/export', [GudangController::class, 'export'])->name('daftargudang.export');
 Route::resource('daftarjenis', JenisController::class)->parameters([
@@ -48,5 +48,7 @@ Route::post('itemtransfer/export', [ItemTransferController::class, 'export'])->n
 
 
 // API Route
+// Used on Fitur Transaksi Create, Update
 Route::get('/barang/search', [BarangAPIController::class, 'search']);
+// Used on Kartu Stok
 Route::get('/barang/search/barang', [BarangAPIController::class, 'searchBarang']);

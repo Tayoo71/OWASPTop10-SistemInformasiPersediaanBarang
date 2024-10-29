@@ -1,6 +1,6 @@
 <x-modal.modal-create title="Tambah Transaksi Item Transfer">
     <form method="POST"
-        action="{{ route('itemtransfer.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end'])) }}"
+        action="{{ route('itemtransfer.store') }}?{{ http_build_query(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction'])) }}"
         class="p-4 md:p-5">
         @csrf
         <div x-data="barangSearch()" class="relative">

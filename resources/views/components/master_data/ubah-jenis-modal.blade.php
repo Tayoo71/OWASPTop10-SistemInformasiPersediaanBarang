@@ -1,6 +1,6 @@
 <x-modal.modal-update title="Ubah Jenis">
     <form method="POST"
-        action="{{ route('daftarjenis.update', $jenis->id) }}?{{ http_build_query(request()->only(['search'])) }}"
+        action="{{ route('daftarjenis.update', $jenis->id) }}?{{ http_build_query(request()->only(['search', 'sort_by', 'direction'])) }}"
         class="p-4 md:p-5">
         @csrf
         @method('PUT')

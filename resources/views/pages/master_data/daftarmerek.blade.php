@@ -142,11 +142,11 @@
                         </td>
                         <td class="px-6 py-4 align-middle">
                             <div class="flex justify-center items-center">
-                                <a href="{{ route('daftarmerek.index', array_merge(request()->only(['search']), ['edit' => $merek['id']])) }}"
+                                <a href="{{ route('daftarmerek.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $merek['id']])) }}"
                                     class="font-medium text-yellow-300 hover:underline">
                                     Ubah
                                 </a>
-                                <a href="{{ route('daftarmerek.index', array_merge(request()->only(['search']), ['delete' => $merek['id']])) }}"
+                                <a href="{{ route('daftarmerek.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['delete' => $merek['id']])) }}"
                                     class="font-medium text-red-600 hover:underline ml-3">
                                     Hapus
                                 </a>
@@ -179,7 +179,10 @@
         <x-master_data.ubah-merek-modal :merek="$editMerek" />
     @elseif ($deleteMerek && !$errors->any() && !session('error'))
         {{-- Modal Hapus Merek --}}
-        <x-modal.modal-delete :action="route('daftarmerek.destroy', ['daftarmerek' => $deleteMerek->id] + request()->only('search'))"
+        <x-modal.modal-delete :action="route(
+            'daftarmerek.destroy',
+            ['daftarmerek' => $deleteMerek->id] + request()->only('search', 'sort_by', 'direction'),
+        )"
             message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus Merek "{{ $deleteMerek->nama_merek }}"?' />
     @endif
 </x-layout>

@@ -8,7 +8,7 @@ use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
 use App\Exports\ExcelExport;
-use Illuminate\Http\Request;
+use App\Http\Requests\MasterData\KartuStok\ViewKartuStok;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Transaksi\TransaksiStokOpname;
 use App\Models\Transaksi\TransaksiBarangMasuk;
@@ -19,10 +19,11 @@ use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class KartuStokController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewKartuStok $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $filters = $this->getValidatedFilters($validatedData);
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
@@ -55,11 +56,11 @@ class KartuStokController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Kartu Stok. ', redirect: 'kartustok.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewKartuStok $request)
     {
         try {
-            // Validate request data
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $filters = $this->getValidatedFilters($validatedData);
 
             if (!$filters['search'] || !$filters['start'] || !$filters['end']) {
                 return view('pages/master_data/kartustok', [
@@ -80,6 +81,16 @@ class KartuStokController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Kartu Stok.', 'kartustok.index');
         }
     }
+    private function getValidatedFilters($validatedData)
+    {
+        return [
+            'search' => $validatedData['search'] ?? null,
+            'gudang' => $validatedData['gudang'] ?? 'all',
+            'start' => !empty($validatedData['start']) ? Carbon::createFromFormat('d/m/Y', $validatedData['start'])->startOfDay() : null,
+            'end' => !empty($validatedData['end']) ? Carbon::createFromFormat('d/m/Y', $validatedData['end'])->endOfDay() : null,
+            'format' => $validatedData['format'] ?? null,
+        ];
+    }
     private function getDataKartuStok($barangId, $gudang, $start, $end)
     {
         // Get saldo akhir and transactions
@@ -91,25 +102,6 @@ class KartuStokController extends Controller
         // Generate Kartu Stok
         return $this->generateKartuStok($saldoAwal, $gudang, $start, $end, $transaksiDalamPeriode);
     }
-    private function getValidatedFilters(Request $request)
-    {
-        $validatedData = $request->validate([
-            'search' => 'nullable|exists:barangs,id',
-            'gudang' => 'nullable|exists:gudangs,kode_gudang',
-            'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
-            'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'search' => $validatedData['search'] ?? null,
-            'gudang' => $validatedData['gudang'] ?? 'all',
-            'start' => !empty($validatedData['start']) ? Carbon::createFromFormat('d/m/Y', $validatedData['start'])->startOfDay() : null,
-            'end' => !empty($validatedData['end']) ? Carbon::createFromFormat('d/m/Y', $validatedData['end'])->endOfDay() : null,
-            'format' => $validatedData['format'] ?? null,
-        ];
-    }
-
     /**
      * Get saldo akhir and all transactions within the specified period.
      */

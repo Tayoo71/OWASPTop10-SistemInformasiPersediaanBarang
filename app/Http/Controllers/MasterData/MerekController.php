@@ -4,23 +4,34 @@ namespace App\Http\Controllers\MasterData;
 
 use App\Http\Controllers\Controller;
 use App\Models\MasterData\Merek;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\MasterData\DaftarMerek\StoreMerekRequest;
 use App\Exports\ExcelExport;
+use App\Http\Requests\MasterData\DaftarMerek\DestroyMerekRequest;
+use App\Http\Requests\MasterData\DaftarMerek\UpdateMerekRequest;
+use App\Http\Requests\MasterData\DaftarMerek\ViewMerekRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class MerekController extends Controller
 {
-    public function export(Request $request)
+    public function export(ViewMerekRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'search',
+                'format',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             if (is_null($filters['format'])) {
                 throw new \InvalidArgumentException('Format data tidak boleh kosong. Pilih salah satu format yang tersedia.');
             }
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_merek';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $headers = ["Kode Merek", "Nama Merek", "Keterangan"];
             $datas = Merek::search($filters)
@@ -46,10 +57,20 @@ class MerekController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Daftar Merek. ', 'daftarmerek.index');
         }
     }
-    public function index(Request $request)
+    public function index(ViewMerekRequest $request)
     {
         try {
-            $filters = $this->getValidatedFilters($request);
+            $validatedData = $request->validated();
+            $keys = [
+                'sort_by',
+                'direction',
+                'search',
+                'edit',
+                'delete',
+            ];
+            $filters = $this->getFiltersWithDefaults($validatedData, $keys);
+            $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_merek';
+            $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $mereks = Merek::search($filters)
                 ->orderBy($filters['sort_by'], $filters['direction'])
@@ -71,76 +92,45 @@ class MerekController extends Controller
     {
         DB::beginTransaction();
         try {
-            Merek::create([
-                'nama_merek' => $request->nama_merek,
-                'keterangan' => $request->keterangan,
-            ]);
+            $filteredData = $request->validated();
+
+            Merek::create($filteredData);
+
             DB::commit();
-            return redirect()->route('daftarmerek.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Merek berhasil ditambahkan.');
+            return redirect()->route('daftarmerek.index', $this->buildQueryParams($request, "MerekController"))->with('success', 'Data Merek berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data Merek. ', 'daftarmerek.index');
         }
     }
 
-    public function update(StoreMerekRequest $request, $id)
+    public function update(UpdateMerekRequest $request, $id)
     {
         DB::beginTransaction();
         try {
             $merek = Merek::where('id', $id)->lockForUpdate()->firstOrFail();
-            $merek->update([
-                'nama_merek' => $request->nama_merek,
-                'keterangan' => $request->keterangan,
-            ]);
+            $filteredData = $request->validated();
+
+            $merek->update($filteredData);
+
             DB::commit();
-            return redirect()->route('daftarmerek.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Merek berhasil diubah.');
+            return redirect()->route('daftarmerek.index', $this->buildQueryParams($request, "MerekController"))->with('success', 'Data Merek berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Merek. ', 'daftarmerek.index');
         }
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(DestroyMerekRequest $request, $id)
     {
         DB::beginTransaction();
         try {
             Merek::findOrFail($id)->delete();
             DB::commit();
-            return redirect()->route('daftarmerek.index', [
-                'search' => $request->input('search'),
-            ])->with('success', 'Data Merek berhasil dihapus.');
+            return redirect()->route('daftarmerek.index', $this->buildQueryParams($request, "MerekController"))->with('success', 'Data Merek berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus data Merek. ', 'daftarmerek.index');
         }
-    }
-
-    /**
-     * Helper function to handle exceptions and log the error.
-     */
-    private function getValidatedFilters(Request $request)
-    {
-        // Lakukan validasi dan kembalikan filter
-        $validatedData = $request->validate([
-            'sort_by' => 'nullable|in:id,nama_merek,keterangan',
-            'direction' => 'nullable|in:asc,desc',
-            'search' => 'nullable|string|max:255',
-            'edit' => 'nullable|exists:mereks,id',
-            'delete' => 'nullable|exists:mereks,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-        ]);
-
-        return [
-            'sort_by' => $validatedData['sort_by'] ?? 'nama_merek',
-            'direction' => $validatedData['direction'] ?? 'asc',
-            'search' => $validatedData['search'] ?? null,
-            'edit' => $validatedData['edit'] ?? null,
-            'delete' => $validatedData['delete'] ?? null,
-            'format' => $validatedData['format'] ?? null,
-        ];
     }
 }
