@@ -130,7 +130,7 @@ class BarangController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_daftarbarang', [
+                $pdf = Pdf::loadview('layouts.pdf_export.master_data.daftarbarang.export_daftarbarang', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'date' => date('d-F-Y H:i:s T'),

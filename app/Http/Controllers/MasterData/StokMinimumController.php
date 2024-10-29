@@ -61,7 +61,7 @@ class StokMinimumController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_stokminimum', [
+                $pdf = Pdf::loadview('layouts.pdf_export.master_data.stokminimum.export_stokminimum', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'gudang' => $gudang,

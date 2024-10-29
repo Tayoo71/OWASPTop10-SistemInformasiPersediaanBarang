@@ -400,14 +400,14 @@
     </div>
 
     {{-- Modal Tambah Barang --}}
-    <x-master_data.tambah-barang-modal :jenises="$jenises" :mereks="$mereks" />
+    <x-master_data.daftarbarang.tambah-barang-modal :jenises="$jenises" :mereks="$mereks" />
     @if ($barangs->isNotEmpty())
         {{-- Modal Export --}}
-        <x-master_data.export-barang-modal />
+        <x-master_data.daftarbarang.export-barang-modal />
     @endif
     @if ($editBarang && !$errors->any() && !session('error'))
         {{-- Modal Ubah Barang --}}
-        <x-master_data.ubah-barang-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" />
+        <x-master_data.daftarbarang.ubah-barang-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" />
     @elseif ($deleteBarang && !$errors->any() && !session('error'))
         {{-- Modal Hapus Barang --}}
         <x-modal.modal-delete :action="route(

@@ -435,10 +435,10 @@
     </div>
 
     {{-- Modal Tambah Transaksi --}}
-    <x-transaksi.tambah-opname-modal :gudangs="$gudangs" />
+    <x-transaksi.stokopname.tambah-opname-modal :gudangs="$gudangs" />
     @if ($transaksies->isNotEmpty())
         {{-- Modal Export --}}
-        <x-transaksi.export-opname-modal />
+        <x-transaksi.stokopname.export-opname-modal />
     @endif
     @if ($deleteTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Hapus Transaksi --}}

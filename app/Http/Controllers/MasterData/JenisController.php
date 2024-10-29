@@ -44,7 +44,7 @@ class JenisController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_jenis', [
+                $pdf = Pdf::loadview('layouts.pdf_export.master_data.daftarjenis.export_jenis', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'date' => date('d-F-Y H:i:s T'),

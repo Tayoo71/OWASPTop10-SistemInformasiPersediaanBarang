@@ -410,14 +410,14 @@
     </div>
 
     {{-- Modal Tambah Transaksi --}}
-    <x-transaksi.tambah-barang-masuk-modal :gudangs="$gudangs" />
+    <x-transaksi.barangmasuk.tambah-barang-masuk-modal :gudangs="$gudangs" />
     @if ($transaksies->isNotEmpty())
         {{-- Modal Export --}}
-        <x-transaksi.export-barang-masuk-modal />
+        <x-transaksi.barangmasuk.export-barang-masuk-modal />
     @endif
     @if ($editTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Ubah Transaksi --}}
-        <x-transaksi.ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />
+        <x-transaksi.barangmasuk.ubah-barang-masuk-modal :gudangs="$gudangs" :transaksi="$editTransaksi" :editTransaksiSatuan="$editTransaksiSatuan" />
     @elseif ($deleteTransaksi && !$errors->any() && !session('error'))
         {{-- Modal Hapus Transaksi --}}
         <x-modal.modal-delete :action="route(

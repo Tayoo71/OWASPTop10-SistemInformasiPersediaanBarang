@@ -169,14 +169,14 @@
     </div>
 
     {{-- Modal Tambah Jenis --}}
-    <x-master_data.tambah-jenis-modal />
+    <x-master_data.daftarjenis.tambah-jenis-modal />
     @if ($jenises->isNotEmpty())
         {{-- Modal Export --}}
-        <x-master_data.export-jenis-modal />
+        <x-master_data.daftarjenis.export-jenis-modal />
     @endif
     @if ($editJenis && !$errors->any() && !session('error'))
         {{-- Modal Ubah Jenis --}}
-        <x-master_data.ubah-jenis-modal :jenis="$editJenis" />
+        <x-master_data.daftarjenis.ubah-jenis-modal :jenis="$editJenis" />
     @elseif ($deleteJenis && !$errors->any() && !session('error'))
         {{-- Modal Hapus Jenis --}}
         <x-modal.modal-delete :action="route(

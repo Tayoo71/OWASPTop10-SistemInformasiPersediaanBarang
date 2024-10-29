@@ -169,14 +169,14 @@
     </div>
 
     {{-- Modal Tambah Merek --}}
-    <x-master_data.tambah-merek-modal />
+    <x-master_data.daftarmerek.tambah-merek-modal />
     @if ($mereks->isNotEmpty())
         {{-- Modal Export --}}
-        <x-master_data.export-merek-modal />
+        <x-master_data.daftarmerek.export-merek-modal />
     @endif
     @if ($editMerek && !$errors->any() && !session('error'))
         {{-- Modal Ubah Merek --}}
-        <x-master_data.ubah-merek-modal :merek="$editMerek" />
+        <x-master_data.daftarmerek.ubah-merek-modal :merek="$editMerek" />
     @elseif ($deleteMerek && !$errors->any() && !session('error'))
         {{-- Modal Hapus Merek --}}
         <x-modal.modal-delete :action="route(

@@ -160,7 +160,7 @@
     </div>
     @if ($kartuStok)
         {{-- Modal Export --}}
-        <x-master_data.export-kartu-stok-modal />
+        <x-master_data.kartustok.export-kartu-stok-modal />
     @endif
     @push('scripts')
         <script>

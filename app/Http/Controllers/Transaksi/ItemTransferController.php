@@ -66,7 +66,7 @@ class ItemTransferController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_itemtransfer', [
+                $pdf = Pdf::loadview('layouts.pdf_export.transaksi.itemtransfer.export_itemtransfer', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'date' => date('d-F-Y H:i:s T'),

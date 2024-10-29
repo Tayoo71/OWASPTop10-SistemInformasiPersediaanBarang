@@ -170,14 +170,14 @@
     </div>
 
     {{-- Modal Tambah Gudang --}}
-    <x-master_data.tambah-gudang-modal />
+    <x-master_data.daftargudang.tambah-gudang-modal />
     @if ($gudangs->isNotEmpty())
         {{-- Modal Export --}}
-        <x-master_data.export-gudang-modal />
+        <x-master_data.daftargudang.export-gudang-modal />
     @endif
     @if ($editGudang && !$errors->any() && !session('error'))
         {{-- Modal Ubah Gudang --}}
-        <x-master_data.ubah-gudang-modal :gudang="$editGudang" />
+        <x-master_data.daftargudang.ubah-gudang-modal :gudang="$editGudang" />
     @elseif ($deleteGudang && !$errors->any() && !session('error'))
         {{-- Modal Hapus Gudang --}}
         <x-modal.modal-delete :action="route(

@@ -38,7 +38,7 @@ class KartuStokController extends Controller
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
             } else if ($filters['format'] === "pdf") {
-                $pdf = Pdf::loadview('layouts.pdf_exports.export_kartustok', [
+                $pdf = Pdf::loadview('layouts.pdf_export.master_data.kartustok.export_kartustok', [
                     'headers' => $headers,
                     'datas' => $datas,
                     'barang' => $barang,
