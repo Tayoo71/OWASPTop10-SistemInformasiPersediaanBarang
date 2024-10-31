@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Actions\Fortify\CreateNewUser;
 
 class UserSeeder extends Seeder
 {
@@ -13,23 +13,16 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->insert([
-            [
-                'id' => 'admin',
-                'password' => 'admin',
-                'remember_token' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
-        DB::table('users')->insert([
-            [
-                'id' => 'antony',
-                'password' => 'antony',
-                'remember_token' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        $createNewUser = new CreateNewUser();
+        $userData = [
+            'id' => 'Admin',
+            'password' => 'Admin123!'
+        ];
+        $createNewUser->create($userData);
+        $userData = [
+            'id' => 'Antony',
+            'password' => 'Antony123!'
+        ];
+        $createNewUser->create($userData);
     }
 }

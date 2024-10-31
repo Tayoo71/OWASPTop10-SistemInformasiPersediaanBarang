@@ -3,7 +3,7 @@
         <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <img class="h-8 w-8" src="{{ asset('images/logo/logo_perusahaan.svg') }}" alt="Logo Perusahaan">
+                    <img class="h-8 w-8" src="{{ asset('images/logo/logo_perusahaan.png') }}" alt="Logo Perusahaan">
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
@@ -84,7 +84,8 @@
                                 id="user-menu-button">
                                 <span class="absolute -inset-1.5"></span>
                                 <span class="sr-only">Open user menu</span>
-                                <div class="underline text-base font-medium leading-none text-white">Halo, Pengguna
+                                <div class="underline text-base font-medium leading-none text-white">Halo,
+                                    {{ Auth::id() }}
                                 </div>
                             </button>
                         </div>
@@ -99,7 +100,8 @@
                             <a href="#"
                                 class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('pengaturan') ? 'bg-gray-300' : 'hover:bg-gray-100' }} role="menuitem"
                                 tabindex="-1" id="user-menu-item-1">Pengaturan</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            <a href="#logout-form" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                 role="menuitem" tabindex="-1" id="user-menu-item-2">Logout</a>
                         </div>
                     </div>
@@ -168,15 +170,20 @@
         <div class="border-t border-gray-700 pb-3 pt-4">
             <div class="flex items-center px-5">
                 <div class="">
-                    <div class="text-base font-medium leading-none text-gray-400">Halo, Pengguna</div>
+                    <div class="text-base font-medium leading-none text-gray-400">Halo, {{ Auth::id() }}</div>
                 </div>
             </div>
             <div class="mt-3 space-y-1 px-2">
                 <a href="#"
                     class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('pengaturan') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Pengaturan</a>
-                <a href="#"
+                <a href="#logout-form"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                     class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</a>
             </div>
         </div>
     </div>
 </nav>
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>

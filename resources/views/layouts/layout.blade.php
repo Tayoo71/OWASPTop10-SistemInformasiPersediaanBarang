@@ -1,18 +1,5 @@
-<!DOCTYPE html>
-<html lang="id" class="h-full bg-gray-100">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="robots" content="noindex,nofollow,noarchive">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/css/app.css', 'resources/css/inter.css', 'resources/js/app.js'])
-    <link rel="icon" href="{{ asset('images/logo/logo_perusahaan.svg') }}">
-    <title>{{ $title }} - Aplikasi Persediaan Toko X</title>
-</head>
-
-<body class="h-full">
+<x-header-layout>
+    <x-slot:title>{{ $title }}</x-slot:title>
     <div class="min-h-full">
         <x-navbar />
         <header class="bg-white shadow">
@@ -42,8 +29,6 @@
                 {{ $slot }}
             </div>
         </main>
+        @stack('scripts')
     </div>
-    @stack('scripts')
-</body>
-
-</html>
+</x-header-layout>

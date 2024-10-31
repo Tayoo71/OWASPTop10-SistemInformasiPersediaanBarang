@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers\Transaksi;
 
-use App\Http\Controllers\Controller;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
-use App\Models\Transaksi\TransaksiBarangKeluar;
-use App\Http\Requests\Transaksi\BarangKeluar\StoreBarangKeluarRequest;
-use App\Exports\ExcelExport;
-use App\Http\Requests\Transaksi\BarangKeluar\DestroyBarangKeluarRequest;
-use App\Http\Requests\Transaksi\BarangKeluar\UpdateBarangKeluarRequest;
-use App\Http\Requests\Transaksi\BarangKeluar\ViewBarangKeluarRequest;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MasterData\KonversiSatuan;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use App\Models\Transaksi\TransaksiBarangKeluar;
+use App\Http\Requests\Transaksi\BarangKeluar\ViewBarangKeluarRequest;
+use App\Http\Requests\Transaksi\BarangKeluar\StoreBarangKeluarRequest;
+use App\Http\Requests\Transaksi\BarangKeluar\UpdateBarangKeluarRequest;
+use App\Http\Requests\Transaksi\BarangKeluar\DestroyBarangKeluarRequest;
 
 class BarangKeluarController extends Controller
 {
@@ -160,7 +161,7 @@ class BarangKeluarController extends Controller
         try {
             $filteredData = $request->validated();
 
-            $this->processTransaction($filteredData, 'keluar', 'admin');
+            $this->processTransaction($filteredData, 'keluar', Auth::id());
 
             DB::commit();
             return redirect()->route('barangkeluar.index', $this->buildQueryParams($request, "BarangKeluarController"))
@@ -181,7 +182,7 @@ class BarangKeluarController extends Controller
             $this->revertStok($old_transaksi, 'delete_keluar');
 
             // Process new transaction data
-            $this->processTransaction($filteredData, 'keluar', 'antony', $old_transaksi);
+            $this->processTransaction($filteredData, 'keluar', Auth::id(), $old_transaksi);
 
             DB::commit();
             return redirect()->route('barangkeluar.index', $this->buildQueryParams($request, "BarangKeluarController"))

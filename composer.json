@@ -1,16 +1,19 @@
 {
-    "name": "laravel/laravel",
+    "name": "tayoo71/aplikasi-persediaan-toko-x",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Sistem Informasi Persediaan Barang Toko X berbasis Laravel untuk mengelola Stok Barang Sparepart Kendaraan Roda Dua",
     "keywords": [
         "laravel",
-        "framework"
+        "inventory",
+        "management",
+        "inventory-management"
     ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
         "enlightn/enlightn": "^2.10",
+        "laravel/fortify": "^1.24",
         "laravel/framework": "^11.9",
         "maatwebsite/excel": "^3.1"
     },

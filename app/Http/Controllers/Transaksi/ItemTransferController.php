@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers\Transaksi;
 
-use App\Http\Controllers\Controller;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
-use App\Models\Transaksi\TransaksiItemTransfer;
-use App\Http\Requests\Transaksi\ItemTransfer\StoreItemTransferRequest;
-use App\Exports\ExcelExport;
-use App\Http\Requests\Transaksi\ItemTransfer\DestroyItemTransferRequest;
-use App\Http\Requests\Transaksi\ItemTransfer\UpdateItemTransferRequest;
-use App\Http\Requests\Transaksi\ItemTransfer\ViewItemTransferRequest;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MasterData\KonversiSatuan;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use App\Models\Transaksi\TransaksiItemTransfer;
+use App\Http\Requests\Transaksi\ItemTransfer\ViewItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\StoreItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\UpdateItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\DestroyItemTransferRequest;
 
 class ItemTransferController extends Controller
 {
@@ -162,7 +163,7 @@ class ItemTransferController extends Controller
         try {
             $filteredData = $request->validated();
 
-            $this->processTransaction($filteredData, 'tambah_item_transfer', 'admin');
+            $this->processTransaction($filteredData, 'tambah_item_transfer', Auth::id());
 
             DB::commit();
             return redirect()->route('itemtransfer.index',  $this->buildQueryParams($request, "ItemTransferController"))
@@ -179,7 +180,7 @@ class ItemTransferController extends Controller
             $old_transaksi = TransaksiItemTransfer::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
             $filteredData = $request->validated();
 
-            $this->processTransaction($filteredData, 'update_item_transfer', 'antony', $old_transaksi);
+            $this->processTransaction($filteredData, 'update_item_transfer', Auth::id(), $old_transaksi);
 
             DB::commit();
             return redirect()->route('itemtransfer.index', $this->buildQueryParams($request, "ItemTransferController"))

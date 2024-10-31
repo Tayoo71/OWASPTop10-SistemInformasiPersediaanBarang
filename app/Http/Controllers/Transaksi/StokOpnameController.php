@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Transaksi;
 
-use App\Http\Controllers\Controller;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\MasterData\KonversiSatuan;
+use Maatwebsite\Excel\Excel as ExcelExcel;
 use App\Models\Transaksi\TransaksiStokOpname;
 use App\Http\Requests\Transaksi\StokOpname\StoreOpnameRequest;
-use App\Exports\ExcelExport;
-use App\Http\Requests\Transaksi\StokOpname\DestroyStokOpnameRequest;
 use App\Http\Requests\Transaksi\StokOpname\ViewStokOpnameRequest;
-use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Maatwebsite\Excel\Excel as ExcelExcel;
+use App\Http\Requests\Transaksi\StokOpname\DestroyStokOpnameRequest;
 
 class StokOpnameController extends Controller
 {
@@ -148,7 +149,7 @@ class StokOpnameController extends Controller
         try {
             $filteredData = $request->validated();
 
-            $this->processTransaction($filteredData, 'opname', 'admin');
+            $this->processTransaction($filteredData, 'opname', Auth::id());
 
             DB::commit();
             return redirect()->route('stokopname.index', $this->buildQueryParams($request, "StokOpnameController"))
