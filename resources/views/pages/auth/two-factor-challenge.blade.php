@@ -4,7 +4,7 @@
         <div class="sm:mx-auto sm:w-full sm:max-w-sm">
             <img class="mx-auto h-10 w-auto" src="{{ asset('images/logo/logo_perusahaan.png') }}" alt="Logo Perusahaan">
             <h2 id="titlePageLabel" class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-                Masukkan Kode Autentikasi 2 Langkah Anda
+                Masukkan Kode Autentikasi 2 Faktor (2FA) Anda
             </h2>
         </div>
 

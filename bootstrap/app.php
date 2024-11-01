@@ -2,7 +2,6 @@
 
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\EnsureTwoFactorEnabled;
-use App\Http\Middleware\ValidateTwoFactor;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -14,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'twofactor' => EnsureTwoFactorEnabled::class
+            'twofactor' => EnsureTwoFactorEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

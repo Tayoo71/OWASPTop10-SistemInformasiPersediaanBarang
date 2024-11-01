@@ -16,13 +16,18 @@ use App\Http\Controllers\Transaksi\StokOpnameController;
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-        return view('pages/home', [
-            'title' => 'Halaman Utama'
-        ]);
-    })->name('home_page');
+    Route::get('/two-factor-activate', function () {
+        return view('pages/auth/two-factor-activate');
+    })->name('two_factor_activate');
 
     Route::middleware('twofactor')->group(function () {
+        // Halaman Utama
+        Route::get('/', function () {
+            return view('pages/home', [
+                'title' => 'Halaman Utama'
+            ]);
+        })->name('home_page');
+
         // Master Data
         Route::resource('daftarbarang', BarangController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::post('daftarbarang/export', [BarangController::class, 'export'])->name('daftarbarang.export');

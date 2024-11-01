@@ -10,8 +10,11 @@
                         d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                    Untuk melanjutkan penggunaan aplikasi ini, harap aktifkan autentikasi dua faktor sebagai langkah
-                    keamanan tambahan. Pilih 'Aktifkan' untuk memulai proses pengaturan
+                    Untuk melanjutkan penggunaan Aplikasi ini, harap Aktifkan Autentikasi Dua Faktor (2FA) sebagai
+                    langkah
+                    keamanan tambahan. Pastikan Anda memasukkan Kode Autentikasi dengan benar. Pilih 'Aktifkan' untuk
+                    memulai proses
+                    pengaturan
                 </h3>
                 <div class="flex justify-center space-x-4">
                     <form method="POST" action="{{ url('/user/two-factor-authentication') }}">

@@ -17,10 +17,16 @@ class EnsureTwoFactorEnabled
     {
         $user = $request->user();
 
-        // Jika pengguna login tapi belum mengaktifkan 2FA
-        if ($user && !$user->two_factor_confirmed_at) {
-            return redirect()->route('home_page')
+        // Jika pengguna belum mengaktifkan 2fa
+        if ($user && !$user->two_factor_confirmed_at && !$user->two_factor_secret) {
+            return redirect()->route('two_factor_activate')
                 ->with('showTwoFactorModal', true);
+        }
+        // Jika pengguna gagal verifikasi 2fa
+        else if ($user && !$user->two_factor_confirmed_at) {
+            return redirect()->route('two_factor_activate')
+                ->with('showTwoFactorModal', true)
+                ->with('warning', 'Anda harus mengaktifkan autentikasi dua faktor untuk mengakses fitur ini.');
         }
 
         return $next($request);
