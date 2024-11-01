@@ -8,7 +8,8 @@
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="{{ route('home_page') }}"
-                            class="rounded-md {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 text-sm font-medium">Home</a>
+                            class="rounded-md {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 text-sm font-medium">Halaman
+                            Utama</a>
                         <div class="relative">
                             <button @click="isMasterDataOpen = !isMasterDataOpen"
                                 class="rounded-md px-3 py-2 text-sm font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
@@ -129,7 +130,8 @@
     <div x-show="isOpen" @click.away="isOpen = false" class="md:hidden" id="mobile-menu">
         <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
             <a href="{{ route('home_page') }}"
-                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Home</a>
+                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Halaman
+                Utama</a>
             <p
                 class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
                 Master Data</p>
