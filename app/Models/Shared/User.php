@@ -4,10 +4,11 @@ namespace App\Models\Shared;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, TwoFactorAuthenticatable;
 
     protected $keyType = 'string';
     public $incrementing = false;
@@ -18,7 +19,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'id',
         'password',
     ];
 
