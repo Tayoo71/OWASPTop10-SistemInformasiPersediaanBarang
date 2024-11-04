@@ -9,23 +9,7 @@
         </div>
 
         <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            @if ($errors->any())
-                <x-alert type="error">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </x-alert>
-            @elseif (session('success'))
-                <x-alert type="success">
-                    {{ session('success') }}
-                </x-alert>
-            @elseif (session('error'))
-                <x-alert type="error">
-                    {{ session('error') }}
-                </x-alert>
-            @endif
+            <x-display-error />
 
             <form id="twoFactorForm" class="space-y-6" action="{{ url('two-factor-challenge') }}" method="POST">
                 @csrf

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Pengaturan\AksesKelompokController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\BarangAPIController;
 use App\Http\Controllers\MasterData\JenisController;
@@ -11,6 +12,9 @@ use App\Http\Controllers\Transaksi\BarangKeluarController;
 use App\Http\Controllers\Transaksi\ItemTransferController;
 use App\Http\Controllers\MasterData\KartuStokController;
 use App\Http\Controllers\MasterData\StokMinimumController;
+use App\Http\Controllers\Pengaturan\ActivityLogController;
+use App\Http\Controllers\Pengaturan\KelompokUserController;
+use App\Http\Controllers\Pengaturan\UserController;
 use App\Http\Controllers\Transaksi\StokOpnameController;
 
 
@@ -54,6 +58,12 @@ Route::middleware('auth')->group(function () {
         Route::post('stokopname/export', [StokOpnameController::class, 'export'])->name('stokopname.export');
         Route::resource('itemtransfer', ItemTransferController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::post('itemtransfer/export', [ItemTransferController::class, 'export'])->name('itemtransfer.export');
+
+        // Pengaturan
+        Route::resource('daftaruser', UserController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('kelompokuser', KelompokUserController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('akseskelompok', AksesKelompokController::class)->only(['index', 'update']);
+        Route::resource('logaktivitas', ActivityLogController::class)->only(['index']);
 
         // API Route
         // Used on Fitur Transaksi Create, Update

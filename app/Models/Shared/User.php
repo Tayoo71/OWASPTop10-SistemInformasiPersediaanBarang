@@ -2,13 +2,15 @@
 
 namespace App\Models\Shared;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable, TwoFactorAuthenticatable;
+    use HasRoles;
 
     protected $keyType = 'string';
     public $incrementing = false;

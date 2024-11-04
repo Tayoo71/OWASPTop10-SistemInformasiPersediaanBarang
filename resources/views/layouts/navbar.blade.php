@@ -98,8 +98,8 @@
                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                             class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                             role="menu" tabindex="-1">
-                            <a href="#"
-                                class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('pengaturan') ? 'bg-gray-300' : 'hover:bg-gray-100' }} role="menuitem"
+                            <a href="{{ route('daftaruser.index') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem"
                                 tabindex="-1" id="user-menu-item-1">Pengaturan</a>
                             <a href="#logout-form" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -176,15 +176,13 @@
                 </div>
             </div>
             <div class="mt-3 space-y-1 px-2">
-                <a href="#"
-                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('pengaturan') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Pengaturan</a>
+                <a href="{{ route('daftaruser.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pengaturan</a>
                 <a href="#logout-form"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                     class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</a>
             </div>
         </div>
     </div>
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-        @csrf
-    </form>
+    <x-auth.logout-form />
 </nav>

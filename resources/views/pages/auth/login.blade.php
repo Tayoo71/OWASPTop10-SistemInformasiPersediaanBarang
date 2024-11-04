@@ -8,27 +8,11 @@
         </div>
 
         <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            @if ($errors->any())
-                <x-alert type="error">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </x-alert>
-            @elseif (session('success'))
-                <x-alert type="success">
-                    {{ session('success') }}
-                </x-alert>
-            @elseif (session('error'))
-                <x-alert type="error">
-                    {{ session('error') }}
-                </x-alert>
-            @endif
+            <x-display-error />
             <form class="space-y-6" action="{{ route('login') }}" method="POST">
                 @csrf
                 <div>
-                    <label for="id" class="block text-sm/6 font-medium text-gray-900">User ID</label>
+                    <label for="id" class="block text-sm/6 font-medium text-gray-900">Username</label>
                     <div class="mt-2">
                         <input id="id" name="id" type="text" autocomplete="off" required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-700 sm:text-sm/6">

@@ -9,15 +9,7 @@
         </div>
 
         <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            @if ($errors->any())
-                <x-alert type="error">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </x-alert>
-            @endif
+            <x-display-error />
 
             <form id="twoFactorForm" class="space-y-6" action="{{ url('/user/confirm-password') }}" method="POST">
                 @csrf

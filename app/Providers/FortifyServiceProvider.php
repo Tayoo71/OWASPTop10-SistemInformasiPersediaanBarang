@@ -30,9 +30,6 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Fortify::confirmPasswordView(function () {
-            return view('pages.auth.confirm-password');
-        });
         Fortify::twoFactorChallengeView(function () {
             return view('pages.auth.two-factor-challenge');
         });
