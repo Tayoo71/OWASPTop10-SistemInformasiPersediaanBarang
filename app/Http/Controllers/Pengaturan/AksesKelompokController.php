@@ -12,6 +12,24 @@ use App\Http\Requests\Pengaturan\AksesKelompok\UpdateAksesKelompokRequest;
 
 class AksesKelompokController extends Controller
 {
+    // Fitur Aplikasi yang akan diatur aksesnya
+    private $features = [
+        'daftar_barang' => ['read', 'create', 'update', 'delete', 'export'],
+        'daftar_barang.harga_pokok' => ['akses'],
+        'daftar_barang.harga_jual' => ['akses'],
+        'kartu_stok' => ['read', 'export'],
+        'daftar_gudang' => ['read', 'create', 'update', 'delete', 'export'],
+        'daftar_jenis' => ['read', 'create', 'update', 'delete', 'export'],
+        'daftar_merek' => ['read', 'create', 'update', 'delete', 'export'],
+        'stok_minimum' => ['read', 'export'],
+        'barang_masuk' => ['read', 'create', 'update', 'delete', 'export'],
+        'barang_keluar' => ['read', 'create', 'update', 'delete', 'export'],
+        'item_transfer' => ['read', 'create', 'update', 'delete', 'export'],
+        'stok_opname' => ['read', 'create', 'delete', 'export'],
+        'transaksi.tampil_stok' => ['akses'],
+        'user_manajemen' => ['akses'],
+        'log_aktivitas' => ['akses'],
+    ];
     public function index(ViewAksesKelompokRequest $request)
     {
         try {
@@ -29,7 +47,8 @@ class AksesKelompokController extends Controller
             return view('pages/pengaturan/akseskelompok', [
                 'title' => 'Akses Kelompok',
                 'roles' => $roles,
-                'permissions' => $permissions ?? []
+                'permissions' => $permissions ?? [],
+                'featuresName' => $this->getFormattedFeatures($this->features)
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Akses Kelompok pada halaman Akses Kelompok. ', 'home_page');
@@ -39,11 +58,12 @@ class AksesKelompokController extends Controller
     {
         DB::beginTransaction();
         try {
+            $request->setFeatures($this->features);
             $filteredData = $request->validated();
 
             $role = Role::findOrFail($filteredData['role_id']);
 
-            $permissions = array_keys($filteredData['permissions']);
+            $permissions = !(empty($filteredData['permissions'])) ? array_keys($filteredData['permissions']) : [];
 
             // Pastikan semua permission tersedia di database
             foreach ($permissions as $permissionName) {
@@ -60,5 +80,30 @@ class AksesKelompokController extends Controller
             DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data Akses Kelompok. ', redirect: 'akseskelompok.index');
         }
+    }
+    private function getFormattedFeatures($features)
+    {
+        // Nama khusus untuk beberapa fitur
+        $customNames = [
+            'daftar_barang.harga_pokok' => 'Tampil Harga Pokok Pada Daftar Barang',
+            'daftar_barang.harga_jual' => 'Tampil Harga Jual Pada Daftar Barang',
+            'user_manajemen' => 'User Manajemen (Daftar User, Kelompok User, Akses Kelompok)',
+            'transaksi.tampil_stok' => 'Tampil Stok Saat Ini Pada Transaksi'
+        ];
+
+        // Proses seluruh fitur untuk menghasilkan array yang sudah diformat
+        $formattedFeatures = [];
+        foreach ($features as $feature => $actions) {
+            // Format nama fitur: gunakan nama khusus atau nama default
+            $formattedName = $customNames[$feature] ?? ucwords(str_replace('_', ' ', $feature));
+
+            // Tambahkan ke array hasil dengan nama dan aksi yang terkait
+            $formattedFeatures[] = [
+                'name' => $formattedName,
+                'feature' => $feature,
+                'actions' => $actions
+            ];
+        }
+        return $formattedFeatures;
     }
 }
