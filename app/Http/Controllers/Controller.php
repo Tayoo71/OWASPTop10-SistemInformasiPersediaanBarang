@@ -49,7 +49,7 @@ abstract class Controller
                 'sort_by' => $request->input('sort_by'),
                 'direction' => $request->input('direction'),
             ];
-        } else if ($page === "GudangController" || $page === "JenisController" || $page === "MerekController") {
+        } else if ($page === "GudangController" || $page === "JenisController" || $page === "MerekController" || $page === "KelompokUserController") {
             return [
                 'search' => $request->input('search'),
                 'sort_by' => $request->input('sort_by'),
@@ -63,6 +63,10 @@ abstract class Controller
                 'end' => $request->input('end'),
                 'sort_by' => $request->input('sort_by'),
                 'direction' => $request->input('direction'),
+            ];
+        } else if ($page === "AksesKelompokController") {
+            return [
+                'role_id' => $request->input('role_id'),
             ];
         }
     }

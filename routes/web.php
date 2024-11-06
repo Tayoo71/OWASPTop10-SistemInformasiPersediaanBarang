@@ -62,7 +62,9 @@ Route::middleware('auth')->group(function () {
         // Pengaturan
         Route::resource('daftaruser', UserController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('kelompokuser', KelompokUserController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::resource('akseskelompok', AksesKelompokController::class)->only(['index', 'update']);
+        Route::resource('akseskelompok', AksesKelompokController::class)->only(['index']);
+        Route::put('akseskelompok/update', [AksesKelompokController::class, 'update'])->name('akseskelompok.update');
+
         Route::resource('logaktivitas', ActivityLogController::class)->only(['index']);
 
         // API Route
