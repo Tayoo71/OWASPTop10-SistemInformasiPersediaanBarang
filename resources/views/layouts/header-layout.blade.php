@@ -14,6 +14,7 @@
 
     <body class="h-full">
         {{ $slot }}
+        @stack('scripts')
     </body>
 
 </html>

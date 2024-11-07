@@ -7,6 +7,7 @@
                 <h3 class="text-3xl font-bold text-gray-900">{{ $title }}</h3>
             </header>
             <main class="flex-1 p-6 bg-gray-100 overflow-auto">
+                <x-display-error />
                 <form class="w-full max-w-lg lg:max-w-3xl xl:max-w-4xl mx-auto mb-2" method="GET" action="">
                     <div class="flex justify-between items-center relative">
                         <div class="flex flex-grow">
@@ -122,8 +123,6 @@
                                         @endif
                                     </a>
                                 </th>
-
-                                <!-- Kolom Aksi -->
                                 <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
                             </tr>
                         </thead>
@@ -135,10 +134,8 @@
                                     <td class="px-6 py-4 align-middle">{{ $user['status'] }}</td>
                                     <td class="px-6 py-4 align-middle">
                                         <div class="flex justify-center items-center">
-                                            <a href="{{ route('daftaruser.index.edit', $user['id']) }}"
+                                            <a href="{{ route('daftaruser.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $user['id']])) }}"
                                                 class="font-medium text-yellow-300 hover:underline">Ubah</a>
-                                            <a href="{{ route('daftaruser.index.delete', $user['id']) }}"
-                                                class="font-medium text-red-600 hover:underline ml-3">Hapus</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -153,10 +150,12 @@
                     </table>
                 </div>
                 <div class="py-4 px-4 mt-4">
-                    {{ $roles->links() }}
+                    {{ $users->links() }}
                 </div>
             </main>
         </div>
     </div>
+    <x-pengaturan.daftaruser.tambah-user-modal :roles="$roles" />
+
     <x-auth.logout-form />
 </x-header-layout>

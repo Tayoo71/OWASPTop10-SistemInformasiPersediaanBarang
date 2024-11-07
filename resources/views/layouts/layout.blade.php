@@ -13,6 +13,5 @@
                 {{ $slot }}
             </div>
         </main>
-        @stack('scripts')
     </div>
 </x-header-layout>

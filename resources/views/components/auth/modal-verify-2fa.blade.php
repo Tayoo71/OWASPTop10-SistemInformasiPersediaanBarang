@@ -20,7 +20,7 @@
                     {{ auth()->user()->twoFactorQrCodeUrl() }}</p>
                 <form method="POST" action="{{ url('/user/confirmed-two-factor-authentication') }}" class="space-y-4">
                     @csrf
-                    <input type="number" id="code" name="code" required
+                    <input type="number" id="code" name="code" required maxlength="6" minlength="6"
                         class="block w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                         placeholder="Masukkan Kode Autentikasi">
                     <button type="submit"

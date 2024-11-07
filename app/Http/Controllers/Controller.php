@@ -49,7 +49,7 @@ abstract class Controller
                 'sort_by' => $request->input('sort_by'),
                 'direction' => $request->input('direction'),
             ];
-        } else if ($page === "GudangController" || $page === "JenisController" || $page === "MerekController" || $page === "KelompokUserController") {
+        } else if ($page === "GudangController" || $page === "JenisController" || $page === "MerekController" || $page === "KelompokUserController" || $page === "UserController") {
             return [
                 'search' => $request->input('search'),
                 'sort_by' => $request->input('sort_by'),

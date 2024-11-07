@@ -94,8 +94,7 @@ class StokMinimumController extends Controller
             $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
                 ->search($filters)
                 ->where('status', 'Aktif')
-                ->paginate(20)
-                ->withQueryString();
+                ->get();
 
             // Filter barang yang stoknya di bawah atau sama dengan stok minimum
             $filteredBarangs = $this->filteredStokBarang($filters, $barangs);

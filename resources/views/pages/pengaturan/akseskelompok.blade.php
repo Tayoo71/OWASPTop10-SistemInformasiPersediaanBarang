@@ -30,9 +30,8 @@
                             Simpan Akses User
                         </button>
                     </div>
-                    <!-- Matrix RBAC CRUD -->
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                        <table class="w-full text-sm text-center text-gray-500">
+                        <table class="w-full text-s text-center text-gray-500">
                             <thead class="text-sm text-gray-700 bg-gray-50 sticky top-0 shadow-md">
                                 <tr>
                                     <th class="px-6 py-3 bg-gray-50">FITUR</th>
@@ -47,10 +46,7 @@
                             <tbody>
                                 @foreach ($featuresName as $feature)
                                     <tr class="odd:bg-white even:bg-gray-50 border-b">
-                                        {{-- Nama fitur yang sudah diformat --}}
                                         <td class="px-6 py-4 align-middle">{{ $feature['name'] }}</td>
-
-                                        {{-- AKSES --}}
                                         <td class="px-6 py-4 align-middle">
                                             @if (in_array('akses', $feature['actions']))
                                                 <input type="checkbox"
@@ -59,8 +55,6 @@
                                                     {{ in_array("{$feature['feature']}.akses", $permissions) ? 'checked' : '' }}>
                                             @endif
                                         </td>
-
-                                        {{-- BACA (READ) --}}
                                         <td class="px-6 py-4 align-middle">
                                             @if (in_array('read', $feature['actions']))
                                                 <input type="checkbox"
@@ -69,8 +63,6 @@
                                                     {{ in_array("{$feature['feature']}.read", $permissions) ? 'checked' : '' }}>
                                             @endif
                                         </td>
-
-                                        {{-- BARU (CREATE) --}}
                                         <td class="px-6 py-4 align-middle">
                                             @if (in_array('create', $feature['actions']))
                                                 <input type="checkbox"
@@ -79,8 +71,6 @@
                                                     {{ in_array("{$feature['feature']}.create", $permissions) ? 'checked' : '' }}>
                                             @endif
                                         </td>
-
-                                        {{-- UBAH (UPDATE) --}}
                                         <td class="px-6 py-4 align-middle">
                                             @if (in_array('update', $feature['actions']))
                                                 <input type="checkbox"
@@ -89,8 +79,6 @@
                                                     {{ in_array("{$feature['feature']}.update", $permissions) ? 'checked' : '' }}>
                                             @endif
                                         </td>
-
-                                        {{-- HAPUS (DELETE) --}}
                                         <td class="px-6 py-4 align-middle">
                                             @if (in_array('delete', $feature['actions']))
                                                 <input type="checkbox"
@@ -99,8 +87,6 @@
                                                     {{ in_array("{$feature['feature']}.delete", $permissions) ? 'checked' : '' }}>
                                             @endif
                                         </td>
-
-                                        {{-- CETAK & KONVERSI (EXPORT) --}}
                                         <td class="px-6 py-4 align-middle">
                                             @if (in_array('export', $feature['actions']))
                                                 <input type="checkbox"
@@ -112,7 +98,6 @@
                                     </tr>
                                 @endforeach
                             </tbody>
-
                         </table>
                     </div>
                 </form>
