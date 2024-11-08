@@ -47,4 +47,10 @@ class UpdateAksesKelompokRequest extends FormRequest
 
         return $rules;
     }
+    public function attributes()
+    {
+        return [
+            'role_id' => 'kelompok',
+        ];
+    }
 }

@@ -17,8 +17,7 @@
                     <label id="codeLabel" for="code" class="block text-sm/6 font-medium text-gray-900">Kode
                         Autentikasi</label>
                     <div class="mt-2">
-                        <input id="codeInput" name="code" type="text" autofocus required maxlength="6"
-                            minlength="6"
+                        <input id="codeInput" name="code" type="text" autofocus required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-700 sm:text-sm/6">
                     </div>
                 </div>

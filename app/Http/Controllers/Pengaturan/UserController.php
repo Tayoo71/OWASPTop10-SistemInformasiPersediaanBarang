@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Requests\Pengaturan\DaftarUser\ViewUserRequest;
 use App\Http\Requests\Pengaturan\DaftarUser\StoreUserRequest;
+use App\Http\Requests\Pengaturan\DaftarUser\UpdateUserRequest;
 
 class UserController extends Controller
 {
@@ -27,6 +28,7 @@ class UserController extends Controller
             $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
             $users = User::with('roles')
+                ->where('id', '!=', "admin")
                 ->where('id', 'like', '%' . $request->input('search', '') . '%')
                 ->get();
 
@@ -60,12 +62,23 @@ class UserController extends Controller
                 ];
             });
 
+            if (!empty($filters['edit'])) {
+                $editUser = User::where('id', '!=', 'admin')
+                    ->findOrFail($filters['edit']);
+
+                $editUser = [
+                    'id' => $editUser->id,
+                    'status' => $editUser->status,
+                    'role_id' => $editUser->roles->first()->id ?? null,
+                    'is_2fa_active' => !empty($editUser->two_factor_confirmed_at) ? true : false
+                ];
+            }
+
             return view('pages/pengaturan/daftaruser', [
                 'title' => 'Daftar User',
                 'users' => $paginatedUsers,
                 'roles' => Role::where('id', '!=', 1)->get()->pluck('name', 'id'),
-                // 'editRole' => !empty($filters['edit']) ? Role::find($filters['edit']) : null,
-                // 'deleteRole' => !empty($filters['delete']) ? Role::select('id', 'name')->find($filters['delete']) : null,
+                'editUser' => $editUser ?? null
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data User pada halaman Daftar User. ', 'home_page');
@@ -88,8 +101,40 @@ class UserController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data User. ', redirect: 'daftaruser.index');
         }
     }
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, $id)
     {
-        //
+        DB::beginTransaction();
+        try {
+            $filteredData = $request->validated();
+
+            $user = User::where('id', $id)->lockForUpdate()->firstOrFail();
+            $role = Role::where('id', $filteredData['ubah_role_id'])->lockForUpdate()->firstOrFail();
+
+            $dataToUpdate = [
+                'id' => $filteredData['ubah_id'],
+                'status' => $filteredData['ubah_status'],
+            ];
+            if (!empty($filteredData['ubah_password'])) {
+                $dataToUpdate['password'] = $filteredData['ubah_password'];
+            }
+
+            $user->roles()->detach();
+            $user->update($dataToUpdate);
+            $user->syncRoles($role);
+
+            if (!empty($filteredData['reset_2fa'])) {
+                $user->forceFill([
+                    'two_factor_secret' => null,
+                    'two_factor_recovery_codes' => null,
+                    'two_factor_confirmed_at' => null,
+                ])->save();
+            }
+
+            DB::commit();
+            return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil diubah.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data User. ', redirect: 'daftaruser.index');
+        }
     }
 }

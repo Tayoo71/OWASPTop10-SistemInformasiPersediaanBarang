@@ -25,8 +25,7 @@ class ViewUserRequest extends FormRequest
             'sort_by' => 'nullable|in:id,role,status',
             'direction' => 'nullable|in:asc,desc',
             'search' => 'nullable|string|max:255',
-            'edit' => 'nullable|exists:users,id',
-            'delete' => 'nullable|exists:users,id',
+            'edit' => 'nullable|not_in:admin|exists:users,id',
         ];
     }
 }

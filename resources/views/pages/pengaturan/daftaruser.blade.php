@@ -156,6 +156,47 @@
         </div>
     </div>
     <x-pengaturan.daftaruser.tambah-user-modal :roles="$roles" />
+    @if ($editUser && !$errors->any() && !session('error'))
+        <x-pengaturan.daftaruser.ubah-user-modal :roles="$roles" :editUser="$editUser" />
+    @endif
 
     <x-auth.logout-form />
+
+    @push('scripts')
+        <script>
+            function togglePasswordVisibility(inputId, iconId) {
+                const passwordInput = document.getElementById(inputId);
+                const eyeIcon = document.getElementById(iconId);
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    eyeIcon.innerHTML = `
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5c7 0 10 7 10 7s-3 7-10 7-10-7-10-7 3-7 10-7z"/>
+                <circle cx="12" cy="12" r="3" />
+                <path d="M1 1l22 22" stroke="currentColor" stroke-width="2" /> <!-- Slash for eye-off effect -->
+            `;
+                } else {
+                    passwordInput.type = 'password';
+                    eyeIcon.innerHTML = `
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5c7 0 10 7 10 7s-3 7-10 7-10-7-10-7 3-7 10-7z"/>
+                <circle cx="12" cy="12" r="3" />
+            `;
+                }
+            }
+
+            function generatePassword(inputId, length = 30) {
+                const passwordInput = document.getElementById(inputId);
+                const crypto = window.crypto || window.msCrypto;
+                if (typeof crypto === 'undefined') {
+                    throw new Error('Crypto API is not supported. Please upgrade your web browser');
+                }
+                const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()';
+                const indexes = crypto.getRandomValues(new Uint32Array(length));
+                let secret = '';
+                for (const index of indexes) {
+                    secret += charset[index % charset.length];
+                }
+                passwordInput.value = secret;
+            }
+        </script>
+    @endpush
 </x-header-layout>

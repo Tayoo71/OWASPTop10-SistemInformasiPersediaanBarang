@@ -14,7 +14,7 @@
                     @method('PUT')
                     <div class="mb-4">
                         <div class="flex items-center space-x-4">
-                            <select name= "role_id" x-model="role_id"
+                            <select name= "role_id" x-model="role_id" required
                                 @change="if (role_id) window.location.href = `?role_id=${role_id}`"
                                 class="flex-grow block p-2.5 text-gray-900 bg-white border rounded-lg focus:ring focus:ring-blue-300">
                                 <option value="" disabled selected>Pilih Kelompok</option>
