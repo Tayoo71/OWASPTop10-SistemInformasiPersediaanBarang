@@ -11,7 +11,7 @@ class ViewBarangMasukRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('barang_masuk.read');
     }
 
     /**
@@ -30,7 +30,6 @@ class ViewBarangMasukRequest extends FormRequest
             'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
             'edit' => 'nullable|exists:transaksi_barang_masuks,id',
             'delete' => 'nullable|exists:transaksi_barang_masuks,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
         ];
     }
 }

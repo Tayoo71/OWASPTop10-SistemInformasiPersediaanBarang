@@ -12,8 +12,8 @@ use App\Http\Controllers\Transaksi\BarangKeluarController;
 use App\Http\Controllers\Transaksi\ItemTransferController;
 use App\Http\Controllers\MasterData\KartuStokController;
 use App\Http\Controllers\MasterData\StokMinimumController;
-use App\Http\Controllers\Pengaturan\ActivityLogController;
 use App\Http\Controllers\Pengaturan\KelompokUserController;
+use App\Http\Controllers\Pengaturan\LogAktivitasController;
 use App\Http\Controllers\Pengaturan\UserController;
 use App\Http\Controllers\Transaksi\StokOpnameController;
 
@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('akseskelompok', AksesKelompokController::class)->only(['index']);
         Route::put('akseskelompok/update', [AksesKelompokController::class, 'update'])->name('akseskelompok.update');
 
-        Route::resource('logaktivitas', ActivityLogController::class)->only(['index']);
+        Route::resource('logaktivitas', LogAktivitasController::class)->only(['index']);
 
         // API Route
         // Used on Fitur Transaksi Create, Update

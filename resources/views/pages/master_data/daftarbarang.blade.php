@@ -62,11 +62,13 @@
     <!-- Tambah Barang Button -->
     <div class="flex justify-between items-center mb-4">
         <!-- Modal Trigger -->
-        <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-            Tambah Barang
-        </button>
-        @if ($barangs->isNotEmpty())
+        @if ($canCreateDaftarBarang)
+            <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                Tambah Barang
+            </button>
+        @endif
+        @if ($barangs->isNotEmpty() && $canExportDaftarBarang)
             <button data-modal-target="export-modal" data-modal-toggle="export-modal"
                 class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center">
                 <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -218,60 +220,64 @@
                             @endif
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">
-                        <a href="{{ route('daftarbarang.index', array_merge(request()->query(), ['sort_by' => 'harga_pokok', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                            class="flex justify-center items-center">
-                            HARGA POKOK
-                            @if (request('sort_by') === 'harga_pokok')
-                                @if (request('direction') === 'asc')
-                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 9l4-4 4 4" />
-                                    </svg>
+                    @if ($canAccessHargaPokok)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">
+                            <a href="{{ route('daftarbarang.index', array_merge(request()->query(), ['sort_by' => 'harga_pokok', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                                class="flex justify-center items-center">
+                                HARGA POKOK
+                                @if (request('sort_by') === 'harga_pokok')
+                                    @if (request('direction') === 'asc')
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 9l4-4 4 4" />
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 15l-4 4-4-4" />
+                                        </svg>
+                                    @endif
                                 @else
                                     <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 15l-4 4-4-4" />
+                                            d="M8 9l4-4 4 4M8 15l4 4 4-4" />
                                     </svg>
                                 @endif
-                            @else
-                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-                                </svg>
-                            @endif
-                        </a>
-                    </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">
-                        <a href="{{ route('daftarbarang.index', array_merge(request()->query(), ['sort_by' => 'harga_jual', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                            class="flex justify-center items-center">
-                            HARGA JUAL
-                            @if (request('sort_by') === 'harga_jual')
-                                @if (request('direction') === 'asc')
-                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 9l4-4 4 4" />
-                                    </svg>
+                            </a>
+                        </th>
+                    @endif
+                    @if ($canAccessHargaJual)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">
+                            <a href="{{ route('daftarbarang.index', array_merge(request()->query(), ['sort_by' => 'harga_jual', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                                class="flex justify-center items-center">
+                                HARGA JUAL
+                                @if (request('sort_by') === 'harga_jual')
+                                    @if (request('direction') === 'asc')
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 9l4-4 4 4" />
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 15l-4 4-4-4" />
+                                        </svg>
+                                    @endif
                                 @else
                                     <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 15l-4 4-4-4" />
+                                            d="M8 9l4-4 4 4M8 15l4 4 4-4" />
                                     </svg>
                                 @endif
-                            @else
-                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-                                </svg>
-                            @endif
-                        </a>
-                    </th>
+                            </a>
+                        </th>
+                    @endif
                     <th scope="col" class="px-6 py-3 bg-gray-50">
                         <a href="{{ route('daftarbarang.index', array_merge(request()->query(), ['sort_by' => 'rak', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
                             class="flex justify-center items-center">
@@ -353,7 +359,9 @@
                             @endif
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @if ($canUpdateDaftarBarang || $canDeleteDaftarBarang)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -364,25 +372,33 @@
                         <td class="px-6 py-4 align-middle">{{ $barang['stok'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['jenis'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['merek'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['harga_pokok'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $barang['harga_jual'] }}</td>
+                        @if ($canAccessHargaPokok)
+                            <td class="px-6 py-4 align-middle">{{ $barang['harga_pokok'] }}</td>
+                        @endif
+                        @if ($canAccessHargaJual)
+                            <td class="px-6 py-4 align-middle">{{ $barang['harga_jual'] }}</td>
+                        @endif
                         <td class="px-6 py-4 align-middle">{{ $barang['rak'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['keterangan'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $barang['status'] }}</td>
-                        <td class="px-6 py-4 align-middle">
-                            <div class="flex justify-center items-center">
-                                <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang', 'sort_by', 'direction']), ['edit' => $barang['id']])) }}"
-                                    class="font-medium text-yellow-300 hover:underline">
-                                    Ubah
-                                </a>
-                                @if ($barang['statusTransaksi'] === false)
-                                    <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang', 'sort_by', 'direction']), ['delete' => $barang['id']])) }}"
-                                        class="font-medium text-red-600 hover:underline ml-3">
-                                        Hapus
-                                    </a>
-                                @endif
-                            </div>
-                        </td>
+                        @if ($canUpdateDaftarBarang || $canDeleteDaftarBarang)
+                            <td class="px-6 py-4 align-middle">
+                                <div class="flex justify-center items-center">
+                                    @if ($canUpdateDaftarBarang)
+                                        <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang', 'sort_by', 'direction']), ['edit' => $barang['id']])) }}"
+                                            class="font-medium text-yellow-300 hover:underline">
+                                            Ubah
+                                        </a>
+                                    @endif
+                                    @if ($barang['statusTransaksi'] === false && $canDeleteDaftarBarang)
+                                        <a href="{{ route('daftarbarang.index', array_merge(request()->only(['search', 'gudang', 'sort_by', 'direction']), ['delete' => $barang['id']])) }}"
+                                            class="font-medium text-red-600 hover:underline ml-3">
+                                            Hapus
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -400,15 +416,17 @@
     </div>
 
     {{-- Modal Tambah Barang --}}
-    <x-master_data.daftarbarang.tambah-barang-modal :jenises="$jenises" :mereks="$mereks" />
-    @if ($barangs->isNotEmpty())
-        {{-- Modal Export --}}
-        <x-master_data.daftarbarang.export-barang-modal />
+    @if ($canCreateDaftarBarang)
+        <x-master_data.daftarbarang.tambah-barang-modal :jenises="$jenises" :mereks="$mereks" />
     @endif
-    @if ($editBarang && !$errors->any() && !session('error'))
+    @if ($barangs->isNotEmpty() && $canExportDaftarBarang)
+        {{-- Modal Export --}}
+        <x-master_data.daftarbarang.export-barang-modal :canAccessHargaPokok="$canAccessHargaPokok" :canAccessHargaJual="$canAccessHargaJual" />
+    @endif
+    @if ($editBarang && !$errors->any() && !session('error') && $canUpdateDaftarBarang)
         {{-- Modal Ubah Barang --}}
         <x-master_data.daftarbarang.ubah-barang-modal :barang="$editBarang" :jenises="$jenises" :mereks="$mereks" />
-    @elseif ($deleteBarang && !$errors->any() && !session('error'))
+    @elseif ($deleteBarang && !$errors->any() && !session('error') && $canDeleteDaftarBarang)
         {{-- Modal Hapus Barang --}}
         <x-modal.modal-delete :action="route(
             'daftarbarang.destroy',

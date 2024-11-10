@@ -9,9 +9,17 @@ use App\Http\Requests\Pengaturan\KelompokUser\ViewKelompokUSerRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\StoreKelompokUserRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\UpdateKelompokUserRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\DestroyKelompokUserRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class KelompokUserController extends Controller
+class KelompokUserController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:user_manajemen.akses', only: ['index', 'store', 'update']),
+        ];
+    }
     public function index(ViewKelompokUSerRequest $request)
     {
         try {

@@ -8,7 +8,8 @@ use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
 use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\KartuStok\ViewKartuStok;
+use App\Http\Requests\MasterData\KartuStok\ExportKartuStokRequest;
+use App\Http\Requests\MasterData\KartuStok\ViewKartuStokRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Transaksi\TransaksiStokOpname;
 use App\Models\Transaksi\TransaksiBarangMasuk;
@@ -16,10 +17,19 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Transaksi\TransaksiBarangKeluar;
 use App\Models\Transaksi\TransaksiItemTransfer;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class KartuStokController extends Controller
+class KartuStokController extends Controller implements HasMiddleware
 {
-    public function export(ViewKartuStok $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:kartu_stok.read', only: ['index']),
+            new Middleware('permission:kartu_stok.export', only: ['export']),
+        ];
+    }
+    public function export(ExportKartuStokRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -56,7 +66,7 @@ class KartuStokController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Kartu Stok. ', redirect: 'kartustok.index');
         }
     }
-    public function index(ViewKartuStok $request)
+    public function index(ViewKartuStokRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -72,10 +82,13 @@ class KartuStokController extends Controller
 
             $kartuStok = $this->getDataKartuStok($filters['search'], $filters['gudang'], $filters['start'], $filters['end']);
 
+            $canExportKartuStok = auth()->user()->can('kartu_stok.export');
+
             return view('pages/master_data/kartustok', [
                 'title' => 'Kartu Stok',
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
-                'kartuStok' => $kartuStok
+                'kartuStok' => $kartuStok,
+                'canExportKartuStok' => $canExportKartuStok
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Kartu Stok.', 'kartustok.index');

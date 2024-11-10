@@ -111,7 +111,7 @@
             </div>
         </div>
     </form>
-    @if ($kartuStok)
+    @if ($kartuStok && $canExportKartuStok)
         <div class="flex justify-end items-center">
             <button data-modal-target="export-modal" data-modal-toggle="export-modal"
                 class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center">
@@ -158,7 +158,7 @@
             </tbody>
         </table>
     </div>
-    @if ($kartuStok)
+    @if ($kartuStok && $canExportKartuStok)
         {{-- Modal Export --}}
         <x-master_data.kartustok.export-kartu-stok-modal />
     @endif

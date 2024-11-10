@@ -16,10 +16,22 @@ use App\Models\Transaksi\TransaksiStokOpname;
 use App\Http\Requests\Transaksi\StokOpname\StoreOpnameRequest;
 use App\Http\Requests\Transaksi\StokOpname\ViewStokOpnameRequest;
 use App\Http\Requests\Transaksi\StokOpname\DestroyStokOpnameRequest;
+use App\Http\Requests\Transaksi\StokOpname\ExportStokOpnameRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class StokOpnameController extends Controller
+class StokOpnameController extends Controller implements HasMiddleware
 {
-    public function export(ViewStokOpnameRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:stok_opname.read', only: ['index']),
+            new Middleware('permission:stok_opname.create', only: ['store']),
+            new Middleware('permission:stok_opname.delete', only: ['destroy']),
+            new Middleware('permission:stok_opname.export', only: ['export']),
+        ];
+    }
+    public function export(ExportStokOpnameRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -107,30 +119,38 @@ class StokOpnameController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
-            $transaksies->getCollection()->transform(function ($transaksi) {
-                $convertedStokBuku = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->stok_buku);
+            $canCreateStokOpname = auth()->user()->can('stok_opname.create');
+            $canDeleteStokOpname = auth()->user()->can('stok_opname.delete');
+            $canExportStokOpname = auth()->user()->can('stok_opname.export');
+            $canAccessStok = auth()->user()->can('transaksi.tampil_stok.akses');
+
+            $transaksies->getCollection()->transform(function ($transaksi) use ($canAccessStok) {
                 $convertedStokFisik = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->stok_fisik);
-                $convertedSelisih = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->selisih);
-                return [
+                $data = [
                     'id' => $transaksi->id,
                     'created_at' => $transaksi->created_at->format('d/m/Y H:i:s T'),
                     'updated_at' => $transaksi->updated_at == $transaksi->created_at ? "-" : $transaksi->updated_at->format('d/m/Y H:i:s T'),
                     'kode_gudang' => $transaksi->kode_gudang,
                     'nama_item' => $transaksi->barang->nama_item,
-                    'stok_buku' => $convertedStokBuku,
                     'stok_fisik' => $convertedStokFisik,
-                    'selisih' => $convertedSelisih,
                     'keterangan' => $transaksi->keterangan ?? '-',
                     'user_buat_id' => $transaksi->user_buat_id,
                     'statusBarang' => $transaksi->barang->status === "Aktif" ? true : false
                 ];
+                if ($canAccessStok) {
+                    $convertedStokBuku = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->stok_buku);
+                    $convertedSelisih = KonversiSatuan::getFormattedConvertedStok($transaksi->barang, $transaksi->selisih);
+                    $data['stok_buku'] = $convertedStokBuku;
+                    $data['selisih'] = $convertedSelisih;
+                }
+                return $data;
             });
 
             return view('pages/transaksi/stokopname', [
                 'title' => 'Stok Opname',
                 'transaksies' => $transaksies,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
-                'deleteTransaksi' => !empty($filters['delete']) ?
+                'deleteTransaksi' => !empty($filters['delete']) && $canDeleteStokOpname ?
                     TransaksiStokOpname::where('id', $filters['delete'])
                     ->whereHas('barang', function ($query) {
                         $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
@@ -138,6 +158,10 @@ class StokOpnameController extends Controller
                     ->select('id', 'barang_id')
                     ->first()
                     : null,
+                'canCreateStokOpname' => $canCreateStokOpname,
+                'canDeleteStokOpname' => $canDeleteStokOpname,
+                'canExportStokOpname' => $canExportStokOpname,
+                'canAccessStok' => $canAccessStok
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Stok Opname pada halaman Stok Opname. ', 'home_page');

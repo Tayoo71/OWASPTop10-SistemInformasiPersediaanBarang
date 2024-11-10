@@ -17,10 +17,23 @@ use App\Http\Requests\Transaksi\BarangMasuk\ViewBarangMasukRequest;
 use App\Http\Requests\Transaksi\BarangMasuk\StoreBarangMasukRequest;
 use App\Http\Requests\Transaksi\BarangMasuk\UpdateBarangMasukRequest;
 use App\Http\Requests\Transaksi\BarangMasuk\DestroyBarangMasukRequest;
+use App\Http\Requests\Transaksi\BarangMasuk\ExportBarangMasukRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class BarangMasukController extends Controller
+class BarangMasukController extends Controller implements HasMiddleware
 {
-    public function export(ViewBarangMasukRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:barang_masuk.read', only: ['index']),
+            new Middleware('permission:barang_masuk.create', only: ['store']),
+            new Middleware('permission:barang_masuk.update', only: ['update']),
+            new Middleware('permission:barang_masuk.delete', only: ['destroy']),
+            new Middleware('permission:barang_masuk.export', only: ['export']),
+        ];
+    }
+    public function export(ExportBarangMasukRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -123,9 +136,14 @@ class BarangMasukController extends Controller
                 ];
             });
 
+            $canCreateBarangMasuk = auth()->user()->can('barang_masuk.create');
+            $canUpdateBarangMasuk = auth()->user()->can('barang_masuk.update');
+            $canDeleteBarangMasuk = auth()->user()->can('barang_masuk.delete');
+            $canExportBarangMasuk = auth()->user()->can('barang_masuk.export');
+
             $editTransaksi = null;
             $editTransaksiSatuan = null;
-            if (!empty($filters['edit'])) {
+            if (!empty($filters['edit']) && $canUpdateBarangMasuk) {
                 $editTransaksi = TransaksiBarangMasuk::select('id', 'kode_gudang', 'barang_id', 'jumlah_stok_masuk', 'keterangan')
                     ->whereHas('barang', function ($query) {
                         $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
@@ -143,13 +161,17 @@ class BarangMasukController extends Controller
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
                 'editTransaksi' => $editTransaksi,
                 'editTransaksiSatuan' => $editTransaksiSatuan,
-                'deleteTransaksi' => !empty($filters['delete']) ?
+                'deleteTransaksi' => !empty($filters['delete']) && $canDeleteBarangMasuk ?
                     TransaksiBarangMasuk::where('id', $filters['delete'])->whereHas('barang', function ($query) {
                         $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
                     })
                     ->select('id', 'barang_id')
                     ->first()
                     : null,
+                'canCreateBarangMasuk' => $canCreateBarangMasuk,
+                'canUpdateBarangMasuk' => $canUpdateBarangMasuk,
+                'canDeleteBarangMasuk' => $canDeleteBarangMasuk,
+                'canExportBarangMasuk' => $canExportBarangMasuk
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Barang Masuk pada halaman Barang Masuk. ', 'home_page');

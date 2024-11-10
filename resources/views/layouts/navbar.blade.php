@@ -11,67 +11,99 @@
                             class="rounded-md {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }} px-3 py-2 text-sm font-medium">Halaman
                             Utama</a>
                         <div class="relative">
-                            <button @click="isMasterDataOpen = !isMasterDataOpen"
-                                class="rounded-md px-3 py-2 text-sm font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                Master Data
-                            </button>
-                            <div x-show="isMasterDataOpen" @click.away="isMasterDataOpen = false"
-                                x-transition:enter="transition ease-out duration-100 transform"
-                                x-transition:enter-start="opacity-0 scale-95"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75 transform"
-                                x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute z-50 mt-2 w-48 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                id="master-data-dropdown">
-                                <a href="{{ route('daftarbarang.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarbarang') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
-                                    Barang</a>
-                                <a href="{{ route('kartustok.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('kartustok') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Kartu
-                                    Stok</a>
-                                <a href="{{ route('daftargudang.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftargudang') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
-                                    Gudang</a>
-                                <a href="{{ route('daftarjenis.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarjenis') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
-                                    Jenis</a>
-                                <a href="{{ route('daftarmerek.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarmerek') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
-                                    Merek</a>
-                                <a href="{{ route('stokminimum.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokminimum') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Informasi
-                                    Stok Minimum</a>
-                            </div>
+                            @if (auth()->user()->can('daftar_barang.read') ||
+                                    auth()->user()->can('kartu_stok.read') ||
+                                    auth()->user()->can('daftar_gudang.read') ||
+                                    auth()->user()->can('daftar_jenis.read') ||
+                                    auth()->user()->can('daftar_merek.read') ||
+                                    auth()->user()->can('stok_minimum.read'))
+                                <button @click="isMasterDataOpen = !isMasterDataOpen"
+                                    class="rounded-md px-3 py-2 text-sm font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                    Master Data
+                                </button>
+                                <div x-show="isMasterDataOpen" @click.away="isMasterDataOpen = false"
+                                    x-transition:enter="transition ease-out duration-100 transform"
+                                    x-transition:enter-start="opacity-0 scale-95"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75 transform"
+                                    x-transition:leave-start="opacity-100 scale-100"
+                                    x-transition:leave-end="opacity-0 scale-95"
+                                    class="absolute z-50 mt-2 w-48 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                    id="master-data-dropdown">
+                                    @if (auth()->user()->can('daftar_barang.read'))
+                                        <a href="{{ route('daftarbarang.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarbarang') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
+                                            Barang</a>
+                                    @endif
+                                    @if (auth()->user()->can('kartu_stok.read'))
+                                        <a href="{{ route('kartustok.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('kartustok') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Kartu
+                                            Stok</a>
+                                    @endif
+                                    @if (auth()->user()->can('daftar_gudang.read'))
+                                        <a href="{{ route('daftargudang.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftargudang') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
+                                            Gudang</a>
+                                    @endif
+                                    @if (auth()->user()->can('daftar_jenis.read'))
+                                        <a href="{{ route('daftarjenis.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarjenis') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
+                                            Jenis</a>
+                                    @endif
+                                    @if (auth()->user()->can('daftar_merek.read'))
+                                        <a href="{{ route('daftarmerek.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftarmerek') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Daftar
+                                            Merek</a>
+                                    @endif
+                                    @if (auth()->user()->can('stok_minimum.read'))
+                                        <a href="{{ route('stokminimum.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokminimum') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Informasi
+                                            Stok Minimum</a>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
 
                         <div class="relative">
-                            <button @click="isTransaksiOpen = !isTransaksiOpen"
-                                class="rounded-md px-3 py-2 text-sm font-medium {{ request()->is(['barangmasuk', 'barangkeluar', 'stokopname', 'itemtransfer']) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
-                                Transaksi
-                            </button>
-                            <div x-show="isTransaksiOpen" @click.away="isTransaksiOpen = false"
-                                x-transition:enter="transition ease-out duration-100 transform"
-                                x-transition:enter-start="opacity-0 scale-95"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75 transform"
-                                x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute z-50 mt-2 w-48 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                id="transaksi-dropdown">
-                                <a href="{{ route('barangmasuk.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('barangmasuk') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Barang
-                                    Masuk</a>
-                                <a href="{{ route('barangkeluar.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('barangkeluar') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Barang
-                                    Keluar</a>
-                                <a href="{{ route('itemtransfer.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('itemtransfer') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Item
-                                    Transfer</a>
-                                <a href="{{ route('stokopname.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokopname') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Stok
-                                    Opname</a>
-                            </div>
+                            @if (auth()->user()->can('barang_masuk.read') ||
+                                    auth()->user()->can('barang_keluar.read') ||
+                                    auth()->user()->can('stok_opname.read') ||
+                                    auth()->user()->can('item_transfer.read'))
+                                <button @click="isTransaksiOpen = !isTransaksiOpen"
+                                    class="rounded-md px-3 py-2 text-sm font-medium {{ request()->is(['barangmasuk', 'barangkeluar', 'stokopname', 'itemtransfer']) ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                    Transaksi
+                                </button>
+                                <div x-show="isTransaksiOpen" @click.away="isTransaksiOpen = false"
+                                    x-transition:enter="transition ease-out duration-100 transform"
+                                    x-transition:enter-start="opacity-0 scale-95"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-75 transform"
+                                    x-transition:leave-start="opacity-100 scale-100"
+                                    x-transition:leave-end="opacity-0 scale-95"
+                                    class="absolute z-50 mt-2 w-48 origin-top-left rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                    id="transaksi-dropdown">
+                                    @if (auth()->user()->can('barang_masuk.read'))
+                                        <a href="{{ route('barangmasuk.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('barangmasuk') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Barang
+                                            Masuk</a>
+                                    @endif
+                                    @if (auth()->user()->can('barang_keluar.read'))
+                                        <a href="{{ route('barangkeluar.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('barangkeluar') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Barang
+                                            Keluar</a>
+                                    @endif
+                                    @if (auth()->user()->can('item_transfer.read'))
+                                        <a href="{{ route('itemtransfer.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('itemtransfer') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Item
+                                            Transfer</a>
+                                    @endif
+                                    @if (auth()->user()->can('stok_opname.read'))
+                                        <a href="{{ route('stokopname.index') }}"
+                                            class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('stokopname') ? 'bg-gray-300' : 'hover:bg-gray-100' }}">Stok
+                                            Opname</a>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -98,9 +130,15 @@
                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                             class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                             role="menu" tabindex="-1">
-                            <a href="{{ route('daftaruser.index') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem"
-                                tabindex="-1" id="user-menu-item-1">Pengaturan</a>
+                            @if (auth()->user()->can('user_manajemen.akses'))
+                                <a href="{{ route('daftaruser.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem"
+                                    tabindex="-1" id="user-menu-item-1">Pengaturan</a>
+                            @elseif (auth()->user()->can('log_aktivitas.akses'))
+                                <a href="{{ route('logaktivitas.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem"
+                                    tabindex="-1" id="user-menu-item-1">Pengaturan</a>
+                            @endif
                             <a href="#logout-form" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                                 role="menuitem" tabindex="-1" id="user-menu-item-2">Logout</a>
@@ -132,42 +170,74 @@
             <a href="{{ route('home_page') }}"
                 class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is('/') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Halaman
                 Utama</a>
-            <p
-                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
-                Master Data</p>
-            <a href="{{ route('daftarbarang.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarbarang') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
-                Barang</a>
-            <a href="{{ route('kartustok.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('kartustok') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Kartu
-                Stok</a>
-            <a href="{{ route('daftargudang.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftargudang') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
-                Gudang</a>
-            <a href="{{ route('daftarjenis.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarjenis') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
-                Jenis</a>
-            <a href="{{ route('daftarmerek.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarmerek') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
-                Merek</a>
-            <a href="{{ route('stokminimum.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokminimum') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Informasi
-                Stok Minimum</a>
-            <p
-                class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['barangmasuk', 'barangkeluar', 'stokopname', 'itemtransfer']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
-                Transaksi</p>
-            <a href="{{ route('barangmasuk.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('barangmasuk') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Barang
-                Masuk</a>
-            <a href="{{ route('barangkeluar.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('barangkeluar') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Barang
-                Keluar</a>
-            <a href="{{ route('itemtransfer.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('itemtransfer') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Item
-                Transfer</a>
-            <a href="{{ route('stokopname.index') }}"
-                class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokopname') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Stok
-                Opname</a>
+            @if (auth()->user()->can('daftar_barang.read') ||
+                    auth()->user()->can('kartu_stok.read') ||
+                    auth()->user()->can('daftar_gudang.read') ||
+                    auth()->user()->can('daftar_jenis.read') ||
+                    auth()->user()->can('daftar_merek.read') ||
+                    auth()->user()->can('stok_minimum.read'))
+                <p
+                    class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['daftarbarang', 'daftargudang', 'kartustok', 'daftarjenis', 'daftarmerek', 'stokminimum']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
+                    Master Data</p>
+            @endif
+            @if (auth()->user()->can('daftar_barang.read'))
+                <a href="{{ route('daftarbarang.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarbarang') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
+                    Barang</a>
+            @endif
+            @if (auth()->user()->can('kartu_stok.read'))
+                <a href="{{ route('kartustok.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('kartustok') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Kartu
+                    Stok</a>
+            @endif
+            @if (auth()->user()->can('daftar_gudang.read'))
+                <a href="{{ route('daftargudang.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftargudang') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
+                    Gudang</a>
+            @endif
+            @if (auth()->user()->can('daftar_jenis.read'))
+                <a href="{{ route('daftarjenis.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarjenis') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
+                    Jenis</a>
+            @endif
+            @if (auth()->user()->can('daftar_merek.read'))
+                <a href="{{ route('daftarmerek.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('daftarmerek') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
+                    Merek</a>
+            @endif
+            @if (auth()->user()->can('stok_minimum.read'))
+                <a href="{{ route('stokminimum.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokminimum') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Informasi
+                    Stok Minimum</a>
+            @endif
+            @if (auth()->user()->can('barang_masuk.read') ||
+                    auth()->user()->can('barang_keluar.read') ||
+                    auth()->user()->can('stok_opname.read') ||
+                    auth()->user()->can('item_transfer.read'))
+                <p
+                    class="block rounded-md px-3 py-2 text-base font-medium {{ request()->is(['barangmasuk', 'barangkeluar', 'stokopname', 'itemtransfer']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
+                    Transaksi</p>
+            @endif
+            @if (auth()->user()->can('barang_masuk.read'))
+                <a href="{{ route('barangmasuk.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('barangmasuk') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Barang
+                    Masuk</a>
+            @endif
+            @if (auth()->user()->can('barang_keluar.read'))
+                <a href="{{ route('barangkeluar.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('barangkeluar') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Barang
+                    Keluar</a>
+            @endif
+            @if (auth()->user()->can('item_transfer.read'))
+                <a href="{{ route('itemtransfer.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('itemtransfer') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Item
+                    Transfer</a>
+            @endif
+            @if (auth()->user()->can('stok_opname.read'))
+                <a href="{{ route('stokopname.index') }}"
+                    class="block rounded-md px-8 py-1 text-base font-medium {{ request()->is('stokopname') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Stok
+                    Opname</a>
+            @endif
         </div>
         <div class="border-t border-gray-700 pb-3 pt-4">
             <div class="flex items-center px-5">
@@ -176,8 +246,13 @@
                 </div>
             </div>
             <div class="mt-3 space-y-1 px-2">
-                <a href="{{ route('daftaruser.index') }}"
-                    class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pengaturan</a>
+                @if (auth()->user()->can('user_manajemen.akses'))
+                    <a href="{{ route('daftaruser.index') }}"
+                        class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pengaturan</a>
+                @elseif (auth()->user()->can('log_aktivitas.akses'))
+                    <a href="{{ route('logaktivitas.index') }}"
+                        class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pengaturan</a>
+                @endif
                 <a href="#logout-form"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                     class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</a>

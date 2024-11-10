@@ -25,11 +25,13 @@
 
     <div class="flex justify-between items-center mb-4">
         <!-- Modal Trigger -->
-        <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-            Tambah Gudang
-        </button>
-        @if ($gudangs->isNotEmpty())
+        @if ($canCreateDaftarGudang)
+            <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                Tambah Gudang
+            </button>
+        @endif
+        @if ($gudangs->isNotEmpty() && $canExportDaftarGudang)
             <button data-modal-target="export-modal" data-modal-toggle="export-modal"
                 class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center">
                 <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -128,7 +130,9 @@
                             @endif
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @if ($canUpdateDaftarGudang || $canDeleteDaftarGudang)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -139,20 +143,24 @@
                         <td class="px-6 py-4 align-middle">
                             {{ $gudang['keterangan'] ? $gudang['keterangan'] : '-' }}
                         </td>
-                        <td class="px-6 py-4 align-middle">
-                            <div class="flex justify-center items-center">
-                                <a href="{{ route('daftargudang.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $gudang['kode_gudang']])) }}"
-                                    class="font-medium text-yellow-300 hover:underline">
-                                    Ubah
-                                </a>
-                                @if ($gudang['statusTransaksi'] === false)
-                                    <a href="{{ route('daftargudang.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['delete' => $gudang['kode_gudang']])) }}"
-                                        class="font-medium text-red-600 hover:underline ml-3">
-                                        Hapus
-                                    </a>
-                                @endif
-                            </div>
-                        </td>
+                        @if ($canUpdateDaftarGudang || $canDeleteDaftarGudang)
+                            <td class="px-6 py-4 align-middle">
+                                <div class="flex justify-center items-center">
+                                    @if ($canUpdateDaftarGudang)
+                                        <a href="{{ route('daftargudang.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $gudang['kode_gudang']])) }}"
+                                            class="font-medium text-yellow-300 hover:underline">
+                                            Ubah
+                                        </a>
+                                    @endif
+                                    @if ($gudang['statusTransaksi'] === false && $canDeleteDaftarGudang)
+                                        <a href="{{ route('daftargudang.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['delete' => $gudang['kode_gudang']])) }}"
+                                            class="font-medium text-red-600 hover:underline ml-3">
+                                            Hapus
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -170,15 +178,17 @@
     </div>
 
     {{-- Modal Tambah Gudang --}}
-    <x-master_data.daftargudang.tambah-gudang-modal />
-    @if ($gudangs->isNotEmpty())
+    @if ($canCreateDaftarGudang)
+        <x-master_data.daftargudang.tambah-gudang-modal />
+    @endif
+    @if ($gudangs->isNotEmpty() && $canExportDaftarGudang)
         {{-- Modal Export --}}
         <x-master_data.daftargudang.export-gudang-modal />
     @endif
-    @if ($editGudang && !$errors->any() && !session('error'))
+    @if ($editGudang && !$errors->any() && !session('error') && $canUpdateDaftarGudang)
         {{-- Modal Ubah Gudang --}}
         <x-master_data.daftargudang.ubah-gudang-modal :gudang="$editGudang" />
-    @elseif ($deleteGudang && !$errors->any() && !session('error'))
+    @elseif ($deleteGudang && !$errors->any() && !session('error') && $canDeleteDaftarGudang)
         {{-- Modal Hapus Gudang --}}
         <x-modal.modal-delete :action="route(
             'daftargudang.destroy',

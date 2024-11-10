@@ -11,7 +11,7 @@ class ViewStokMinimumRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('stok_minimum.read');
     }
 
     /**
@@ -26,7 +26,6 @@ class ViewStokMinimumRequest extends FormRequest
             'direction' => 'nullable|in:asc,desc',
             'gudang' => 'nullable|exists:gudangs,kode_gudang',
             'search' => 'nullable|string|max:255',
-            'format' => 'nullable|in:pdf,xlsx,csv',
         ];
     }
 }

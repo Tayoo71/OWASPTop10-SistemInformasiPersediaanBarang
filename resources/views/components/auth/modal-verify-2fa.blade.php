@@ -16,8 +16,10 @@
                 <div class="flex justify-center mb-4">
                     {!! auth()->user()->twoFactorQrCodeSvg() !!}
                 </div>
-                <p for="otp-code" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-6">
-                    {{ auth()->user()->twoFactorQrCodeUrl() }}</p>
+                <p for="otp-code"
+                    class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-6 break-words overflow-hidden">
+                    {{ auth()->user()->twoFactorQrCodeUrl() }}
+                </p>
                 <form method="POST" action="{{ url('/user/confirmed-two-factor-authentication') }}" class="space-y-4">
                     @csrf
                     <input type="text" id="code" name="code" required maxlength="6" minlength="6"

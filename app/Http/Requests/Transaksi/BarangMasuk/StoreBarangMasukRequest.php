@@ -11,7 +11,7 @@ class StoreBarangMasukRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('barang_masuk.create');
     }
 
     /**

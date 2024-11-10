@@ -2,8 +2,11 @@
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
+use Spatie\Permission\Models\Role;
 use App\Actions\Fortify\CreateNewUser;
+use Spatie\Permission\Models\Permission;
 
 class CreateAdminUser extends Command
 {
@@ -26,14 +29,25 @@ class CreateAdminUser extends Command
      */
     public function handle()
     {
-        $userid = $this->ask('Masukkan UserID');
-        $password = $this->secret('Masukkan Password');
-        $createNewUser = new CreateNewUser();
-        $userData = [
-            'id' => $userid,
-            'password' => $password
-        ];
-        $createNewUser->create($userData);
-        $this->info('Admin user created successfully');
+        try {
+            $userid = $this->ask('Masukkan UserID');
+            $password = $this->secret('Masukkan Password');
+
+            $userRole = Role::firstOrCreate(['name' => 'admin-panel']);
+            $permissionRole = Permission::firstOrCreate(['name' => 'user_manajemen.akses']);
+            $userRole->syncPermissions($permissionRole);
+
+            $createNewUser = new CreateNewUser();
+            $createNewUser->create([
+                'id' => $userid,
+                'password' => $password,
+                'status' => 'Aktif',
+                'role_id' => $userRole->id,
+            ]);
+
+            $this->info('Admin user created successfully');
+        } catch (Exception $e) {
+            $this->error('Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 }

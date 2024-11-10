@@ -9,9 +9,17 @@ use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\Pengaturan\AksesKelompok\ViewAksesKelompokRequest;
 use App\Http\Requests\Pengaturan\AksesKelompok\UpdateAksesKelompokRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class AksesKelompokController extends Controller
+class AksesKelompokController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:user_manajemen.akses', only: ['index', 'store', 'update']),
+        ];
+    }
     // Fitur Aplikasi yang akan diatur aksesnya
     private $features = [
         'daftar_barang' => ['read', 'create', 'update', 'delete', 'export'],

@@ -2,59 +2,79 @@
 
 namespace App\Actions\Fortify;
 
-use App\Models\Shared\User;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
+use App\Models\Shared\User;
+use Illuminate\Support\Facades\Validator;
 
-class UpdateUserProfileInformation implements UpdatesUserProfileInformation
+class UpdateUserProfileInformation
 {
     /**
-     * Validate and update the given user's profile information.
+     * Update the given user's profile information.
      *
-     * @param  array<string, string>  $input
+     * @param  \App\Models\User  $user
+     * @param  array  $input
+     * @return void
      */
-    public function update(User $user, array $input): void
+    public function update($id, array $input)
     {
+        $user = User::where('id', $id)->lockForUpdate()->firstOrFail();
+        $role = Role::where('id', $input['ubah_role_id'])->lockForUpdate()->firstOrFail();
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-
-            'email' => [
+            'ubah_id' => [
                 'required',
                 'string',
-                'email',
+                'min:3',
                 'max:255',
-                Rule::unique('users')->ignore($user->id),
+                Rule::unique('users', 'id')->ignore($user->id),
             ],
-        ])->validateWithBag('updateProfileInformation');
+            'ubah_password' => [
+                'nullable',
+                Password::min(12)
+                    ->max(50)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(),
+            ],
+            'ubah_role_id' => ['required', 'exists:roles,id'],
+            'ubah_status' => ['required', 'in:Aktif,Tidak Aktif'],
+            'reset_2fa' => ['sometimes', 'accepted'],
+        ])->validate();
 
-        if (
-            $input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail
-        ) {
-            $this->updateVerifiedUser($user, $input);
-        } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'email' => $input['email'],
-            ])->save();
+        DB::beginTransaction();
+
+        try {
+            $dataToUpdate = [
+                'id' => $input['ubah_id'],
+                'status' => $input['ubah_status'],
+            ];
+
+            if (!empty($input['ubah_password'])) {
+                $dataToUpdate['password'] = Hash::make($input['ubah_password']);
+            }
+
+            $user->roles()->detach();
+            $user->update($dataToUpdate);
+
+            $user->syncRoles($role);
+
+            if (!empty($input['reset_2fa'])) {
+                $user->forceFill([
+                    'two_factor_secret' => null,
+                    'two_factor_recovery_codes' => null,
+                    'two_factor_confirmed_at' => null,
+                ])->save();
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-    }
-
-    /**
-     * Update the given verified user's profile information.
-     *
-     * @param  array<string, string>  $input
-     */
-    protected function updateVerifiedUser(User $user, array $input): void
-    {
-        $user->forceFill([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'email_verified_at' => null,
-        ])->save();
-
-        $user->sendEmailVerificationNotification();
     }
 }

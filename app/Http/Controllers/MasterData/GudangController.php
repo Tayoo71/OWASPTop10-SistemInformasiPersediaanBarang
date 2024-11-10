@@ -13,10 +13,23 @@ use App\Http\Requests\MasterData\DaftarGudang\ViewGudangRequest;
 use App\Http\Requests\MasterData\DaftarGudang\StoreGudangRequest;
 use App\Http\Requests\MasterData\DaftarGudang\UpdateGudangRequest;
 use App\Http\Requests\MasterData\DaftarGudang\DestroyGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\ExportGudangRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class GudangController extends Controller
+class GudangController extends Controller implements HasMiddleware
 {
-    public function export(ViewGudangRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:daftar_gudang.read', only: ['index']),
+            new Middleware('permission:daftar_gudang.create', only: ['store']),
+            new Middleware('permission:daftar_gudang.update', only: ['update']),
+            new Middleware('permission:daftar_gudang.delete', only: ['destroy']),
+            new Middleware('permission:daftar_gudang.export', only: ['export']),
+        ];
+    }
+    public function export(ExportGudangRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -93,17 +106,26 @@ class GudangController extends Controller
                 ];
             });
 
+            $canCreateDaftarGudang = auth()->user()->can('daftar_gudang.create');
+            $canUpdateDaftarGudang = auth()->user()->can('daftar_gudang.update');
+            $canDeleteDaftarGudang = auth()->user()->can('daftar_gudang.delete');
+            $canExportDaftarGudang = auth()->user()->can('daftar_gudang.export');
+
             return view('pages/master_data/daftargudang', [
                 'title' => 'Daftar Gudang',
                 'gudangs' => $gudangs,
-                'editGudang' => !empty($filters['edit']) ? Gudang::find($filters['edit']) : null,
-                'deleteGudang' => !empty($filters['delete'])
+                'editGudang' => !empty($filters['edit']) && $canUpdateDaftarGudang ? Gudang::find($filters['edit']) : null,
+                'deleteGudang' => !empty($filters['delete']) && $canDeleteDaftarGudang
                     ? (
                         !$this->getTransactionData(Gudang::find($filters['delete'])) // Check if getTransactionData returns false
                         ? Gudang::select('kode_gudang', 'nama_gudang')->find($filters['delete']) // Run the query if the condition is false
                         : null // If getTransactionData is true, return null
                     )
                     : null,
+                'canCreateDaftarGudang' => $canCreateDaftarGudang,
+                'canUpdateDaftarGudang' => $canUpdateDaftarGudang,
+                'canDeleteDaftarGudang' => $canDeleteDaftarGudang,
+                'canExportDaftarGudang' => $canExportDaftarGudang
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Gudang pada halaman Daftar Gudang. ', 'home_page');

@@ -3,16 +3,25 @@
 namespace App\Http\Controllers\Pengaturan;
 
 use App\Models\Shared\User;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use App\Actions\Fortify\CreateNewUser;
 use Illuminate\Pagination\LengthAwarePaginator;
+use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Requests\Pengaturan\DaftarUser\ViewUserRequest;
 use App\Http\Requests\Pengaturan\DaftarUser\StoreUserRequest;
 use App\Http\Requests\Pengaturan\DaftarUser\UpdateUserRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:user_manajemen.akses', only: ['index', 'store', 'update']),
+        ];
+    }
     public function index(ViewUserRequest $request)
     {
         try {
@@ -86,54 +95,21 @@ class UserController extends Controller
     }
     public function store(StoreUserRequest $request)
     {
-        DB::beginTransaction();
         try {
-            $filteredData = $request->validated();
+            app(CreateNewUser::class)->create($request->validated());
 
-            $role = Role::findOrFail($filteredData['role_id']);
-            $user = User::create($filteredData);
-            $user->assignRole($role);
-
-            DB::commit();
             return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil ditambahkan.');
         } catch (\Exception $e) {
-            DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menambah data User. ', redirect: 'daftaruser.index');
         }
     }
     public function update(UpdateUserRequest $request, $id)
     {
-        DB::beginTransaction();
         try {
-            $filteredData = $request->validated();
+            app(UpdateUserProfileInformation::class)->update($id, $request->validated());
 
-            $user = User::where('id', $id)->lockForUpdate()->firstOrFail();
-            $role = Role::where('id', $filteredData['ubah_role_id'])->lockForUpdate()->firstOrFail();
-
-            $dataToUpdate = [
-                'id' => $filteredData['ubah_id'],
-                'status' => $filteredData['ubah_status'],
-            ];
-            if (!empty($filteredData['ubah_password'])) {
-                $dataToUpdate['password'] = $filteredData['ubah_password'];
-            }
-
-            $user->roles()->detach();
-            $user->update($dataToUpdate);
-            $user->syncRoles($role);
-
-            if (!empty($filteredData['reset_2fa'])) {
-                $user->forceFill([
-                    'two_factor_secret' => null,
-                    'two_factor_recovery_codes' => null,
-                    'two_factor_confirmed_at' => null,
-                ])->save();
-            }
-
-            DB::commit();
             return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil diubah.');
         } catch (\Exception $e) {
-            DB::rollBack();
             return $this->handleException($e, $request, 'Terjadi kesalahan saat mengubah data User. ', redirect: 'daftaruser.index');
         }
     }

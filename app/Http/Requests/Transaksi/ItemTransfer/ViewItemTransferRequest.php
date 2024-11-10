@@ -11,7 +11,7 @@ class ViewItemTransferRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('item_transfer.read');
     }
 
     /**
@@ -30,7 +30,6 @@ class ViewItemTransferRequest extends FormRequest
             'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
             'edit' => 'nullable|exists:transaksi_item_transfers,id',
             'delete' => 'nullable|exists:transaksi_item_transfers,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
         ];
     }
 }

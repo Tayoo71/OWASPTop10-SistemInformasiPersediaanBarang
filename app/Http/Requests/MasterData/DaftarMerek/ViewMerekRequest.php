@@ -11,7 +11,7 @@ class ViewMerekRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('daftar_merek.read');
     }
 
     /**
@@ -27,7 +27,6 @@ class ViewMerekRequest extends FormRequest
             'search' => 'nullable|string|max:255',
             'edit' => 'nullable|exists:mereks,id',
             'delete' => 'nullable|exists:mereks,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
         ];
     }
 }

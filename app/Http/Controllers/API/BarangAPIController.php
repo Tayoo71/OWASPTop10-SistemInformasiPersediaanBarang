@@ -7,9 +7,18 @@ use App\Models\MasterData\KonversiSatuan;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\SearchBarangFunctionRequest;
 use App\Http\Requests\API\SearchFunctionRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class BarangAPIController extends Controller
+class BarangAPIController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:barang_masuk.create|barang_masuk.update|barang_keluar.create|barang_keluar.update|item_transfer.create|item_transfer.update|stok_opname.create', only: ['search']),
+            new Middleware('permission:kartu_stok.read|kartu_stok.export', only: ['searchBarang']),
+        ];
+    }
     public function search(SearchFunctionRequest $request)
     {
         $validatedData = $request->validated();
@@ -33,13 +42,12 @@ class BarangAPIController extends Controller
             ->limit(5)
             ->get();
 
-
         $barangs->transform(function ($barang) {
+            $canAccessStok = auth()->user()->can('transaksi.tampil_stok.akses');
             $convertedStok = KonversiSatuan::getFormattedConvertedStok($barang, $barang->stokBarangs->sum('stok'));
-            return [
+            $data = [
                 'id' => $barang->id,
                 'nama_item' => $barang->nama_item,
-                'stok' => $convertedStok,
                 'konversi_satuans' => $barang->konversiSatuans->map(function ($konversi) {
                     return [
                         'id' => $konversi->id,
@@ -47,6 +55,10 @@ class BarangAPIController extends Controller
                     ];
                 })
             ];
+            if ($canAccessStok) {
+                $data['stok'] = $convertedStok;
+            }
+            return $data;
         });
 
         return response()->json($barangs);
