@@ -13,7 +13,13 @@ class SearchFunctionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('barang_masuk.create') ||
+            $this->user()->can('barang_masuk.update') ||
+            $this->user()->can('barang_keluar.create') ||
+            $this->user()->can('barang_keluar.update') ||
+            $this->user()->can('item_transfer.create') ||
+            $this->user()->can('item_transfer.update') ||
+            $this->user()->can('stok_opname.create');
     }
 
     /**

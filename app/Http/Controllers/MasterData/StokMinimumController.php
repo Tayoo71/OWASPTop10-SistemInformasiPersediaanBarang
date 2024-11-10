@@ -8,14 +8,24 @@ use App\Models\MasterData\Gudang;
 use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Exports\ExcelExport;
+use App\Http\Requests\MasterData\StokMinimum\ExportStokMinimumRequest;
 use App\Http\Requests\MasterData\StokMinimum\ViewStokMinimumRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class StokMinimumController extends Controller
+class StokMinimumController extends Controller implements HasMiddleware
 {
-    public function export(ViewStokMinimumRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:stok_minimum.read', only: ['index']),
+            new Middleware('permission:stok_minimum.export', only: ['export']),
+        ];
+    }
+    public function export(ExportStokMinimumRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -94,8 +104,7 @@ class StokMinimumController extends Controller
             $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
                 ->search($filters)
                 ->where('status', 'Aktif')
-                ->paginate(20)
-                ->withQueryString();
+                ->get();
 
             // Filter barang yang stoknya di bawah atau sama dengan stok minimum
             $filteredBarangs = $this->filteredStokBarang($filters, $barangs);
@@ -126,10 +135,13 @@ class StokMinimumController extends Controller
                 ];
             });
 
+            $canExportStokMinimum = auth()->user()->can('stok_minimum.export');
+
             return view('pages/master_data/stokminimum', [
                 'title' => 'Informasi Stok Minimum',
                 'barangs' => $paginatedBarangs,
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
+                'canExportStokMinimum' => $canExportStokMinimum
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data stok minimum. ', 'home_page');

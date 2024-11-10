@@ -11,7 +11,7 @@ class StoreItemTransferRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('item_transfer.create');
     }
 
     /**

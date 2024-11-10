@@ -11,7 +11,7 @@ class UpdateGudangRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('daftar_gudang.update');
     }
 
     /**

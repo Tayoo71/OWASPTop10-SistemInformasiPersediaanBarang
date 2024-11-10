@@ -11,7 +11,7 @@ class UpdateBarangKeluarRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('barang_keluar.update');
     }
 
     /**

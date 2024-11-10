@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require("tailwindcss/defaultTheme");
+
 export default {
     content: [
         "./resources/**/*.blade.php",
@@ -16,5 +17,8 @@ export default {
             },
         },
     },
-    plugins: [require("flowbite/plugin")],
+    plugins: [
+        require("flowbite/plugin"),
+        require("@tailwindcss/forms"),
+    ],
 };

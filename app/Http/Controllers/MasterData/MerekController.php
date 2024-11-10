@@ -8,15 +8,28 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\MasterData\DaftarMerek\StoreMerekRequest;
 use App\Exports\ExcelExport;
 use App\Http\Requests\MasterData\DaftarMerek\DestroyMerekRequest;
+use App\Http\Requests\MasterData\DaftarMerek\ExportMerekRequest;
 use App\Http\Requests\MasterData\DaftarMerek\UpdateMerekRequest;
 use App\Http\Requests\MasterData\DaftarMerek\ViewMerekRequest;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class MerekController extends Controller
+class MerekController extends Controller implements HasMiddleware
 {
-    public function export(ViewMerekRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:daftar_merek.read', only: ['index']),
+            new Middleware('permission:daftar_merek.create', only: ['store']),
+            new Middleware('permission:daftar_merek.update', only: ['update']),
+            new Middleware('permission:daftar_merek.delete', only: ['destroy']),
+            new Middleware('permission:daftar_merek.export', only: ['export']),
+        ];
+    }
+    public function export(ExportMerekRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -77,11 +90,20 @@ class MerekController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
+            $canCreateDaftarMerek = auth()->user()->can('daftar_merek.create');
+            $canUpdateDaftarMerek = auth()->user()->can('daftar_merek.update');
+            $canDeleteDaftarMerek = auth()->user()->can('daftar_merek.delete');
+            $canExportDaftarMerek = auth()->user()->can('daftar_merek.export');
+
             return view('pages/master_data/daftarmerek', [
                 'title' => 'Daftar Merek',
                 'mereks' => $mereks,
-                'editMerek' => !empty($filters['edit']) ? Merek::find($filters['edit']) : null,
-                'deleteMerek' => !empty($filters['delete']) ? Merek::select('id', 'nama_merek')->find($filters['delete']) : null,
+                'editMerek' => !empty($filters['edit']) && $canUpdateDaftarMerek ? Merek::find($filters['edit']) : null,
+                'deleteMerek' => !empty($filters['delete']) && $canDeleteDaftarMerek ? Merek::select('id', 'nama_merek')->find($filters['delete']) : null,
+                'canCreateDaftarMerek' => $canCreateDaftarMerek,
+                'canUpdateDaftarMerek' => $canUpdateDaftarMerek,
+                'canDeleteDaftarMerek' => $canDeleteDaftarMerek,
+                'canExportDaftarMerek' => $canExportDaftarMerek,
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Merek pada halaman Daftar Merek. ', 'home_page');

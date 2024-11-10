@@ -52,17 +52,21 @@
                 </div>
             </div>
             <input type="hidden" name="barang_id" x-model="ubahSelectedBarang" />
-            <div class="mb-4"
-                x-show="ubahSelectedBarang !== '' && ubahKonversiSatuan.length > 0 && ubahSelectedGudangAsal !== ''">
-                <label for="ubahStokBarang" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
-                    Barang Saat Ini</label>
-                <input type="text" name="ubahStokBarang" id="ubahStokBarang" x-model="ubahStokBarang"
-                    class="bg-gray-200 border border-gray-400 text-gray-900 cursor-not-allowed text-sm rounded-lg w-full p-2.5"
-                    placeholder="Loading..." disabled>
-            </div>
+            @if (auth()->user()->can('transaksi.tampil_stok.akses'))
+                <div class="mb-4"
+                    x-show="ubahSelectedBarang !== '' && ubahKonversiSatuan.length > 0 && ubahSelectedGudangAsal !== ''">
+                    <label for="ubahStokBarang"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
+                        Barang Saat Ini Pada Gudang Asal</label>
+                    <input type="text" name="ubahStokBarang" id="ubahStokBarang" x-model="ubahStokBarang"
+                        class="bg-gray-200 border border-gray-400 text-gray-900 cursor-not-allowed text-sm rounded-lg w-full p-2.5"
+                        placeholder="Loading..." disabled>
+                </div>
+            @endif
             <div class="mb-4"
                 x-show="ubahKonversiSatuan.length > 0 && ubahSelectedGudangAsal !== '' && ubahSelectedBarang !== ''">
-                <label for="satuan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih Satuan
+                <label for="satuan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih
+                    Satuan
                     Stok</label>
                 <select name="satuan" id="satuan" x-model="ubahSelectedKonversiSatuan"
                     @change="ubahSearch !== '' ? updateStok() : null"
@@ -77,7 +81,8 @@
             <div class="mb-4"
                 x-show="ubahSelectedBarang !== '' && ubahKonversiSatuan.length > 0 && ubahSelectedGudangAsal !== ''">
                 <label for="jumlah_stok_transfer"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Stok Transfer</label>
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah Stok
+                    Transfer</label>
                 <input type="number" name="jumlah_stok_transfer" id="jumlah_stok_transfer" min="1"
                     step="1" x-model="ubahJumlahStokTransfer" @input.debounce.500ms="updateStok()"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"

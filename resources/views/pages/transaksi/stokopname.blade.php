@@ -95,11 +95,13 @@
     <!-- Tambah Barang Button -->
     <div class="flex justify-between items-center mb-4">
         <!-- Modal Trigger -->
-        <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-            Tambah Stok Opname
-        </button>
-        @if ($transaksies->isNotEmpty())
+        @if ($canCreateStokOpname)
+            <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                Tambah Stok Opname
+            </button>
+        @endif
+        @if ($transaksies->isNotEmpty() && $canExportStokOpname)
             <button data-modal-target="export-modal" data-modal-toggle="export-modal"
                 class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center">
                 <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -252,33 +254,35 @@
                             @endif
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">
-                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'stok_buku', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                            class="flex justify-center items-center">
-                            STOK BUKU
-                            @if (request('sort_by') === 'stok_buku')
-                                @if (request('direction') === 'asc')
-                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 9l4-4 4 4" />
-                                    </svg>
+                    @if ($canAccessStok)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">
+                            <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'stok_buku', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                                class="flex justify-center items-center">
+                                STOK BUKU
+                                @if (request('sort_by') === 'stok_buku')
+                                    @if (request('direction') === 'asc')
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 9l4-4 4 4" />
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 15l-4 4-4-4" />
+                                        </svg>
+                                    @endif
                                 @else
                                     <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 15l-4 4-4-4" />
+                                            d="M8 9l4-4 4 4M8 15l4 4 4-4" />
                                     </svg>
                                 @endif
-                            @else
-                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-                                </svg>
-                            @endif
-                        </a>
-                    </th>
+                            </a>
+                        </th>
+                    @endif
                     <th scope="col" class="px-6 py-3 bg-gray-50">
                         <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'stok_fisik', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
                             class="flex justify-center items-center">
@@ -306,33 +310,35 @@
                             @endif
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">
-                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'selisih', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                            class="flex justify-center items-center">
-                            SELISIH
-                            @if (request('sort_by') === 'selisih')
-                                @if (request('direction') === 'asc')
-                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 9l4-4 4 4" />
-                                    </svg>
+                    @if ($canAccessStok)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">
+                            <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'selisih', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                                class="flex justify-center items-center">
+                                SELISIH
+                                @if (request('sort_by') === 'selisih')
+                                    @if (request('direction') === 'asc')
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 9l4-4 4 4" />
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 15l-4 4-4-4" />
+                                        </svg>
+                                    @endif
                                 @else
                                     <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 15l-4 4-4-4" />
+                                            d="M8 9l4-4 4 4M8 15l4 4 4-4" />
                                     </svg>
                                 @endif
-                            @else
-                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-                                </svg>
-                            @endif
-                        </a>
-                    </th>
+                            </a>
+                        </th>
+                    @endif
                     <th scope="col" class="px-6 py-3 bg-gray-50">
                         <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'keterangan', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
                             class="flex justify-center items-center">
@@ -387,7 +393,9 @@
                             @endif
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @if ($canDeleteStokOpname)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -398,25 +406,31 @@
                         <td class="px-6 py-4 align-middle">{{ $transaksi['updated_at'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['kode_gudang'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['nama_item'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $transaksi['stok_buku'] }}</td>
+                        @if ($canAccessStok)
+                            <td class="px-6 py-4 align-middle">{{ $transaksi['stok_buku'] }}</td>
+                        @endif
                         <td class="px-6 py-4 align-middle">{{ $transaksi['stok_fisik'] }}</td>
-                        <td class="px-6 py-4 align-middle">{{ $transaksi['selisih'] }}</td>
+                        @if ($canAccessStok)
+                            <td class="px-6 py-4 align-middle">{{ $transaksi['selisih'] }}</td>
+                        @endif
                         <td class="px-6 py-4 align-middle">{{ $transaksi['keterangan'] }}</td>
                         <td class="px-6 py-4 align-middle">{{ $transaksi['user_buat_id'] }}</td>
-                        <td class="px-6 py-4 align-middle">
-                            <div class="flex justify-center items-center">
-                                @if ($transaksi['statusBarang'] === true)
-                                    <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction']), ['delete' => $transaksi['id']])) }}"
-                                        class="font-medium text-red-600 hover:underline ml-3">
-                                        Hapus
-                                    </a>
-                                @else
-                                    <span class="font-medium text-gray-500">
-                                        Status Barang Tidak Aktif
-                                    </span>
-                                @endif
-                            </div>
-                        </td>
+                        @if ($canDeleteStokOpname)
+                            <td class="px-6 py-4 align-middle">
+                                <div class="flex justify-center items-center">
+                                    @if ($transaksi['statusBarang'] === true)
+                                        <a href="{{ route('stokopname.index', array_merge(request()->only(['search', 'gudang', 'start', 'end', 'sort_by', 'direction']), ['delete' => $transaksi['id']])) }}"
+                                            class="font-medium text-red-600 hover:underline ml-3">
+                                            Hapus
+                                        </a>
+                                    @else
+                                        <span class="font-medium text-gray-500">
+                                            Status Barang Tidak Aktif
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -435,12 +449,14 @@
     </div>
 
     {{-- Modal Tambah Transaksi --}}
-    <x-transaksi.stokopname.tambah-opname-modal :gudangs="$gudangs" />
-    @if ($transaksies->isNotEmpty())
+    @if ($canCreateStokOpname)
+        <x-transaksi.stokopname.tambah-opname-modal :gudangs="$gudangs" />
+    @endif
+    @if ($transaksies->isNotEmpty() && $canExportStokOpname)
         {{-- Modal Export --}}
         <x-transaksi.stokopname.export-opname-modal />
     @endif
-    @if ($deleteTransaksi && !$errors->any() && !session('error'))
+    @if ($deleteTransaksi && !$errors->any() && !session('error') && $canDeleteStokOpname)
         {{-- Modal Hapus Transaksi --}}
         <x-modal.modal-delete :action="route(
             'stokopname.destroy',

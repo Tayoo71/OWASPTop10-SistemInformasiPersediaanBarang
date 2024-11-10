@@ -11,7 +11,7 @@ class ViewStokOpnameRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('stok_opname.read');
     }
 
     /**
@@ -29,7 +29,6 @@ class ViewStokOpnameRequest extends FormRequest
             'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
             'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
             'delete' => 'nullable|exists:transaksi_stok_opnames,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
         ];
     }
 }

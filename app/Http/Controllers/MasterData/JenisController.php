@@ -5,8 +5,8 @@ namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
 use App\Models\MasterData\Jenis;
 use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\DaftarBarang\ViewBarangRequest;
 use App\Http\Requests\MasterData\DaftarJenis\DestroyJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\ExportJenisRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -14,10 +14,22 @@ use App\Http\Requests\MasterData\DaftarJenis\StoreJenisRequest;
 use App\Http\Requests\MasterData\DaftarJenis\UpdateJenisRequest;
 use App\Http\Requests\MasterData\DaftarJenis\ViewJenisRequest;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class JenisController extends Controller
+class JenisController extends Controller implements HasMiddleware
 {
-    public function export(ViewJenisRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:daftar_jenis.read', only: ['index']),
+            new Middleware('permission:daftar_jenis.create', only: ['store']),
+            new Middleware('permission:daftar_jenis.update', only: ['update']),
+            new Middleware('permission:daftar_jenis.delete', only: ['destroy']),
+            new Middleware('permission:daftar_jenis.export', only: ['export']),
+        ];
+    }
+    public function export(ExportJenisRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -58,7 +70,7 @@ class JenisController extends Controller
             return $this->handleException($e, $request, 'Terjadi kesalahan saat melakukan Konversi Data pada halaman Daftar Jenis. ', redirect: 'daftarjenis.index');
         }
     }
-    public function index(ViewBarangRequest $request)
+    public function index(ViewJenisRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -78,11 +90,20 @@ class JenisController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
+            $canCreateDaftarJenis = auth()->user()->can('daftar_jenis.create');
+            $canUpdateDaftarJenis = auth()->user()->can('daftar_jenis.update');
+            $canDeleteDaftarJenis = auth()->user()->can('daftar_jenis.delete');
+            $canExportDaftarJenis = auth()->user()->can('daftar_jenis.export');
+
             return view('pages/master_data/daftarjenis', [
                 'title' => 'Daftar Jenis',
                 'jenises' => $jenises,
-                'editJenis' => !empty($filters['edit']) ? Jenis::find($filters['edit']) : null,
-                'deleteJenis' => !empty($filters['delete']) ? Jenis::select('id', 'nama_jenis')->find($filters['delete']) : null,
+                'editJenis' => !empty($filters['edit']) && $canUpdateDaftarJenis ? Jenis::find($filters['edit']) : null,
+                'deleteJenis' => !empty($filters['delete']) && $canDeleteDaftarJenis ? Jenis::select('id', 'nama_jenis')->find($filters['delete']) : null,
+                'canCreateDaftarJenis' => $canCreateDaftarJenis,
+                'canUpdateDaftarJenis' => $canUpdateDaftarJenis,
+                'canDeleteDaftarJenis' => $canDeleteDaftarJenis,
+                'canExportDaftarJenis' => $canExportDaftarJenis
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Jenis pada halaman Daftar Jenis. ', 'home_page');

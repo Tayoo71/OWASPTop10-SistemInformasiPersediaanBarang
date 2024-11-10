@@ -2,24 +2,38 @@
 
 namespace App\Http\Controllers\Transaksi;
 
-use App\Http\Controllers\Controller;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Support\Facades\DB;
-use App\Models\Transaksi\TransaksiItemTransfer;
-use App\Http\Requests\Transaksi\ItemTransfer\StoreItemTransferRequest;
-use App\Exports\ExcelExport;
-use App\Http\Requests\Transaksi\ItemTransfer\DestroyItemTransferRequest;
-use App\Http\Requests\Transaksi\ItemTransfer\UpdateItemTransferRequest;
-use App\Http\Requests\Transaksi\ItemTransfer\ViewItemTransferRequest;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MasterData\KonversiSatuan;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use App\Models\Transaksi\TransaksiItemTransfer;
+use App\Http\Requests\Transaksi\ItemTransfer\ViewItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\StoreItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\UpdateItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\DestroyItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\ExportItemTransferRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class ItemTransferController extends Controller
+class ItemTransferController extends Controller implements HasMiddleware
 {
-    public function export(ViewItemTransferRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:item_transfer.read', only: ['index']),
+            new Middleware('permission:item_transfer.create', only: ['store']),
+            new Middleware('permission:item_transfer.update', only: ['update']),
+            new Middleware('permission:item_transfer.delete', only: ['destroy']),
+            new Middleware('permission:item_transfer.export', only: ['export']),
+        ];
+    }
+    public function export(ExportItemTransferRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -123,9 +137,14 @@ class ItemTransferController extends Controller
                 ];
             });
 
+            $canCreateItemTransfer = auth()->user()->can('item_transfer.create');
+            $canUpdateItemTransfer = auth()->user()->can('item_transfer.update');
+            $canDeleteItemTransfer = auth()->user()->can('item_transfer.delete');
+            $canExportItemTransfer = auth()->user()->can('item_transfer.export');
+
             $editTransaksi = null;
             $editTransaksiSatuan = null;
-            if (!empty($filters['edit'])) {
+            if (!empty($filters['edit']) && $canUpdateItemTransfer) {
                 $editTransaksi = TransaksiItemTransfer::select('id', 'gudang_asal', 'gudang_tujuan', 'barang_id', 'jumlah_stok_transfer', 'keterangan')
                     ->whereHas('barang', function ($query) {
                         $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
@@ -143,7 +162,7 @@ class ItemTransferController extends Controller
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
                 'editTransaksi' => $editTransaksi,
                 'editTransaksiSatuan' => $editTransaksiSatuan,
-                'deleteTransaksi' => !empty($filters['delete']) ?
+                'deleteTransaksi' => !empty($filters['delete']) && $canDeleteItemTransfer ?
                     TransaksiItemTransfer::where('id', $filters['delete'])
                     ->whereHas('barang', function ($query) {
                         $query->where('status', 'Aktif');  // Hanya ambil data jika barang memiliki status 'Aktif'
@@ -151,6 +170,10 @@ class ItemTransferController extends Controller
                     ->select('id', 'barang_id')
                     ->first()
                     : null,
+                'canCreateItemTransfer' => $canCreateItemTransfer,
+                'canUpdateItemTransfer' => $canUpdateItemTransfer,
+                'canDeleteItemTransfer' => $canDeleteItemTransfer,
+                'canExportItemTransfer' => $canExportItemTransfer
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data Transaksi Item Transfer pada halaman Item Transfer. ', 'home_page');
@@ -162,7 +185,7 @@ class ItemTransferController extends Controller
         try {
             $filteredData = $request->validated();
 
-            $this->processTransaction($filteredData, 'tambah_item_transfer', 'admin');
+            $this->processTransaction($filteredData, 'tambah_item_transfer', Auth::id());
 
             DB::commit();
             return redirect()->route('itemtransfer.index',  $this->buildQueryParams($request, "ItemTransferController"))
@@ -179,7 +202,7 @@ class ItemTransferController extends Controller
             $old_transaksi = TransaksiItemTransfer::where('id', $idTransaksi)->lockForUpdate()->firstOrFail();
             $filteredData = $request->validated();
 
-            $this->processTransaction($filteredData, 'update_item_transfer', 'antony', $old_transaksi);
+            $this->processTransaction($filteredData, 'update_item_transfer', Auth::id(), $old_transaksi);
 
             DB::commit();
             return redirect()->route('itemtransfer.index', $this->buildQueryParams($request, "ItemTransferController"))

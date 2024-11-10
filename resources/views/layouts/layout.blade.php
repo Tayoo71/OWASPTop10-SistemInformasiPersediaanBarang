@@ -1,18 +1,5 @@
-<!DOCTYPE html>
-<html lang="id" class="h-full bg-gray-100">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="robots" content="noindex,nofollow,noarchive">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/css/app.css', 'resources/css/inter.css', 'resources/js/app.js'])
-    <link rel="icon" href="{{ asset('images/logo/logo_perusahaan.svg') }}">
-    <title>{{ $title }} - Aplikasi Persediaan Toko X</title>
-</head>
-
-<body class="h-full">
+<x-header-layout>
+    <x-slot:title>{{ $title }}</x-slot:title>
     <div class="min-h-full">
         <x-navbar />
         <header class="bg-white shadow">
@@ -22,28 +9,9 @@
         </header>
         <main>
             <div class="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">
-                @if ($errors->any())
-                    <x-alert type="error">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </x-alert>
-                @elseif (session('success'))
-                    <x-alert type="success">
-                        {{ session('success') }}
-                    </x-alert>
-                @elseif (session('error'))
-                    <x-alert type="error">
-                        {{ session('error') }}
-                    </x-alert>
-                @endif
+                <x-display-error />
                 {{ $slot }}
             </div>
         </main>
     </div>
-    @stack('scripts')
-</body>
-
-</html>
+</x-header-layout>

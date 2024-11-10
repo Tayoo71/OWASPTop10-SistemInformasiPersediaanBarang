@@ -11,9 +11,15 @@
                         Data</label>
                     <select name="data_type" id="data_type" required
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
-                        <option value="lengkap">Daftar Barang Lengkap</option>
-                        <option value="harga_pokok">Daftar Barang Harga Pokok</option>
-                        <option value="harga_jual">Daftar Barang Harga Jual</option>
+                        @if ($canAccessHargaPokok && $canAccessHargaJual)
+                            <option value="lengkap">Daftar Barang Lengkap</option>
+                        @endif
+                        @if ($canAccessHargaPokok)
+                            <option value="harga_pokok">Daftar Barang Harga Pokok</option>
+                        @endif
+                        @if ($canAccessHargaJual)
+                            <option value="harga_jual">Daftar Barang Harga Jual</option>
+                        @endif
                         <option value="tanpa_harga">Daftar Barang Tanpa Harga</option>
                     </select>
                 </div>

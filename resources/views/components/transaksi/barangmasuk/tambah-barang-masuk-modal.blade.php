@@ -35,13 +35,16 @@
                 </div>
             </div>
             <input type="hidden" name="barang_id" x-model="selectedBarang.id" />
-            <div class="mb-4" x-show="selectedBarang.id !== '' && konversiSatuan.length > 0 && selectedGudang !== ''">
-                <label for="stokBarang" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
-                    Barang Saat Ini</label>
-                <input type="text" name="stokBarang" id="stokBarang" x-model="stokBarang"
-                    class="bg-gray-200 border border-gray-400 text-gray-900 cursor-not-allowed text-sm rounded-lg w-full p-2.5"
-                    placeholder="Loading..." disabled>
-            </div>
+            @if (auth()->user()->can('transaksi.tampil_stok.akses'))
+                <div class="mb-4"
+                    x-show="selectedBarang.id !== '' && konversiSatuan.length > 0 && selectedGudang !== ''">
+                    <label for="stokBarang" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Stok
+                        Barang Saat Ini</label>
+                    <input type="text" name="stokBarang" id="stokBarang" x-model="stokBarang"
+                        class="bg-gray-200 border border-gray-400 text-gray-900 cursor-not-allowed text-sm rounded-lg w-full p-2.5"
+                        placeholder="Loading..." disabled>
+                </div>
+            @endif
             <div class="mb-4" x-show="konversiSatuan.length > 0 && selectedGudang !== '' && selectedBarang.id !== ''">
                 <label for="satuan" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih Satuan
                     Stok</label>

@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Spatie\Permission\Models\Role;
+use App\Actions\Fortify\CreateNewUser;
+use Spatie\Permission\Models\Permission;
 
 class UserSeeder extends Seeder
 {
@@ -13,23 +15,16 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->insert([
-            [
-                'id' => 'admin',
-                'password' => 'admin',
-                'remember_token' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
-        DB::table('users')->insert([
-            [
-                'id' => 'antony',
-                'password' => 'antony',
-                'remember_token' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        $createNewUser = new CreateNewUser();
+        $userData = [
+            'id' => 'Admin',
+            'password' => 'Admin123!'
+        ];
+
+        $user = $createNewUser->create($userData);
+        $userRole = Role::firstOrCreate(['name' => 'admin-panel']);
+        $permissionRole = Permission::firstOrCreate(['name' => 'user_manajemen.akses']);
+        $userRole->syncPermissions($permissionRole);
+        $user->assignRole($userRole);
     }
 }

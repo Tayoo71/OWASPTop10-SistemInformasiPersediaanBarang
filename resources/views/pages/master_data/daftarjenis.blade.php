@@ -23,14 +23,15 @@
         </div>
     </form>
 
-    <!-- Tambah Barang Button -->
     <div class="flex justify-between items-center mb-4">
         <!-- Modal Trigger -->
-        <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
-            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-            Tambah Jenis
-        </button>
-        @if ($jenises->isNotEmpty())
+        @if ($canCreateDaftarJenis)
+            <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+                class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                Tambah Jenis
+            </button>
+        @endif
+        @if ($jenises->isNotEmpty() && $canExportDaftarJenis)
             <button data-modal-target="export-modal" data-modal-toggle="export-modal"
                 class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center">
                 <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -129,7 +130,9 @@
                             @endif
                         </a>
                     </th>
-                    <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @if ($canUpdateDaftarJenis || $canDeleteDaftarJenis)
+                        <th scope="col" class="px-6 py-3 bg-gray-50">AKSI</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -140,18 +143,24 @@
                         <td class="px-6 py-4 align-middle">
                             {{ $jenis['keterangan'] ? $jenis['keterangan'] : '-' }}
                         </td>
-                        <td class="px-6 py-4 align-middle">
-                            <div class="flex justify-center items-center">
-                                <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $jenis['id']])) }}"
-                                    class="font-medium text-yellow-300 hover:underline">
-                                    Ubah
-                                </a>
-                                <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['delete' => $jenis['id']])) }}"
-                                    class="font-medium text-red-600 hover:underline ml-3">
-                                    Hapus
-                                </a>
-                            </div>
-                        </td>
+                        @if ($canUpdateDaftarJenis || $canDeleteDaftarJenis)
+                            <td class="px-6 py-4 align-middle">
+                                <div class="flex justify-center items-center">
+                                    @if ($canUpdateDaftarJenis)
+                                        <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['edit' => $jenis['id']])) }}"
+                                            class="font-medium text-yellow-300 hover:underline">
+                                            Ubah
+                                        </a>
+                                    @endif
+                                    @if ($canDeleteDaftarJenis)
+                                        <a href="{{ route('daftarjenis.index', array_merge(request()->only(['search', 'sort_by', 'direction']), ['delete' => $jenis['id']])) }}"
+                                            class="font-medium text-red-600 hover:underline ml-3">
+                                            Hapus
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
@@ -168,16 +177,17 @@
         {{ $jenises->links() }}
     </div>
 
-    {{-- Modal Tambah Jenis --}}
-    <x-master_data.daftarjenis.tambah-jenis-modal />
-    @if ($jenises->isNotEmpty())
+    @if ($canCreateDaftarJenis)
+        <x-master_data.daftarjenis.tambah-jenis-modal />
+    @endif
+    @if ($jenises->isNotEmpty() && $canExportDaftarJenis)
         {{-- Modal Export --}}
         <x-master_data.daftarjenis.export-jenis-modal />
     @endif
-    @if ($editJenis && !$errors->any() && !session('error'))
+    @if ($editJenis && !$errors->any() && !session('error') && $canUpdateDaftarJenis)
         {{-- Modal Ubah Jenis --}}
         <x-master_data.daftarjenis.ubah-jenis-modal :jenis="$editJenis" />
-    @elseif ($deleteJenis && !$errors->any() && !session('error'))
+    @elseif ($deleteJenis && !$errors->any() && !session('error') && $canDeleteDaftarJenis)
         {{-- Modal Hapus Jenis --}}
         <x-modal.modal-delete :action="route(
             'daftarjenis.destroy',

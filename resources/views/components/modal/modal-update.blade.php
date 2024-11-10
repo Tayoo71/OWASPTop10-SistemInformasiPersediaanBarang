@@ -1,8 +1,7 @@
-<!-- Modal Overlay -->
 <div id="modal-overlay-ubah" class="bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40">
 </div>
 
-<!-- Modal for Ubah Barang -->
+
 <div id="crud-modal-ubah" tabindex="-1" class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto"
     x-data>
     <div class="relative p-4 w-full max-w-md md:max-w-2xl lg:max-w-4xl max-h-full">

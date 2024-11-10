@@ -11,7 +11,7 @@ class ViewGudangRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('daftar_gudang.read');
     }
 
     /**
@@ -27,7 +27,6 @@ class ViewGudangRequest extends FormRequest
             'search' => 'nullable|string|max:255',
             'edit' => 'nullable|exists:gudangs,kode_gudang',
             'delete' => 'nullable|exists:gudangs,kode_gudang',
-            'format' => 'nullable|in:pdf,xlsx,csv',
         ];
     }
 }

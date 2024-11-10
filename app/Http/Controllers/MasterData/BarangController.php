@@ -2,24 +2,37 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Jenis;
 use App\Models\MasterData\Merek;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\MasterData\DaftarBarang\StoreBarangRequest;
-use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\DaftarBarang\DestroyBarangRequest;
-use App\Http\Requests\MasterData\DaftarBarang\UpdateBarangRequest;
-use App\Http\Requests\MasterData\DaftarBarang\ViewBarangRequest;
+use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\DaftarBarang\ViewBarangRequest;
+use App\Http\Requests\MasterData\DaftarBarang\StoreBarangRequest;
+use App\Http\Requests\MasterData\DaftarBarang\ExportBarangRequest;
+use App\Http\Requests\MasterData\DaftarBarang\UpdateBarangRequest;
+use App\Http\Requests\MasterData\DaftarBarang\DestroyBarangRequest;
 
-class BarangController extends Controller
+class BarangController extends Controller implements HasMiddleware
 {
-    public function export(ViewBarangRequest $request)
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:daftar_barang.read', only: ['index']),
+            new Middleware('permission:daftar_barang.create', only: ['store']),
+            new Middleware('permission:daftar_barang.update', only: ['update']),
+            new Middleware('permission:daftar_barang.delete', only: ['destroy']),
+            new Middleware('permission:daftar_barang.export', only: ['export']),
+        ];
+    }
+    public function export(ExportBarangRequest $request)
     {
         try {
             $validatedData = $request->validated();
@@ -53,7 +66,7 @@ class BarangController extends Controller
             if ($filters['stok'] === "tidak_tampil_kosong") {
                 $datas = $this->filteredStokBarangTidakKosong($filters, $datas);
             }
-            if ($filters['data_type'] === "lengkap") {
+            if ($filters['data_type'] === "lengkap" && auth()->user()->can('daftar_barang.harga_pokok.akses') && auth()->user()->can('daftar_barang.harga_jual.akses')) {
                 $fileName = 'Daftar Barang Lengkap ';
                 $headers = ["Kode Item", "Nama Barang", "Stok", "Jenis", "Merek", "Harga Pokok", "Harga Jual", "Rak", "Keterangan", "Status"];
                 $datas->transform(function ($barang) {
@@ -71,7 +84,7 @@ class BarangController extends Controller
                         $barang->status,
                     ];
                 });
-            } else if ($filters['data_type'] === "harga_pokok") {
+            } else if ($filters['data_type'] === "harga_pokok" && auth()->user()->can('daftar_barang.harga_pokok.akses')) {
                 $fileName = 'Daftar Barang Harga Pokok ';
                 $headers = ["Kode Item", "Nama Barang", "Stok", "Jenis", "Merek", "Harga Pokok", "Rak", "Keterangan", "Status"];
                 $datas->transform(function ($barang) {
@@ -88,7 +101,7 @@ class BarangController extends Controller
                         $barang->status,
                     ];
                 });
-            } else if ($filters['data_type'] === "harga_jual") {
+            } else if ($filters['data_type'] === "harga_jual" && auth()->user()->can('daftar_barang.harga_jual.akses')) {
                 $fileName = 'Daftar Barang Harga Jual ';
                 $headers = ["Kode Item", "Nama Barang", "Stok", "Jenis", "Merek", "Harga Jual", "Rak", "Keterangan", "Status"];
                 $datas->transform(function ($barang) {
@@ -174,21 +187,33 @@ class BarangController extends Controller
                 ->paginate(20)
                 ->withQueryString();
 
-            $barangs->getCollection()->transform(function ($barang) {
+            $canAccessHargaPokok = auth()->user()->can('daftar_barang.harga_pokok.akses');
+            $canAccessHargaJual = auth()->user()->can('daftar_barang.harga_jual.akses');
+            $canCreateDaftarBarang = auth()->user()->can('daftar_barang.create');
+            $canUpdateDaftarBarang = auth()->user()->can('daftar_barang.update');
+            $canDeleteDaftarBarang = auth()->user()->can('daftar_barang.delete');
+            $canExportDaftarBarang = auth()->user()->can('daftar_barang.export');
+
+            $barangs->getCollection()->transform(function ($barang) use ($canAccessHargaPokok, $canAccessHargaJual) {
                 $formattedData = $barang->getFormattedStokAndPrices();
-                return [
+                $data = [
                     'id' => $barang->id,
                     'nama_item' => $barang->nama_item,
                     'jenis' => $barang->jenis->nama_jenis ?? '-',
                     'merek' => $barang->merek->nama_merek ?? '-',
                     'stok' => $formattedData['stok'],
-                    'harga_pokok' => $formattedData['harga_pokok'],
-                    'harga_jual' => $formattedData['harga_jual'],
                     'rak' => $barang->rak ?? '-',
                     'keterangan' => $barang->keterangan ?? '-',
                     'status' => $barang->status,
                     'statusTransaksi' => $this->getTransactionData($barang) ? true : false,
                 ];
+                if ($canAccessHargaPokok) {
+                    $data['harga_pokok'] = $formattedData['harga_pokok'];
+                }
+                if ($canAccessHargaJual) {
+                    $data['harga_jual'] = $formattedData['harga_jual'];
+                }
+                return $data;
             });
 
             return view('pages/master_data/daftarbarang', [
@@ -197,14 +222,20 @@ class BarangController extends Controller
                 'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
                 'jenises' => Jenis::select('id', 'nama_jenis')->get(),
                 'mereks' => Merek::select('id', 'nama_merek')->get(),
-                'editBarang' => !empty($filters['edit']) ? Barang::with(['konversiSatuans'])->find($filters['edit']) : null,
-                'deleteBarang' => !empty($filters['delete'])
+                'editBarang' => !empty($filters['edit']) && $canUpdateDaftarBarang ? Barang::with(['konversiSatuans'])->find($filters['edit']) : null,
+                'deleteBarang' => !empty($filters['delete']) && $canDeleteDaftarBarang
                     ? (
                         !$this->getTransactionData(Barang::find($filters['delete'])) // Check if getTransactionData returns false
                         ? Barang::select('id', 'nama_item')->find($filters['delete']) // Run the query if the condition is false
                         : null // If getTransactionData is true, return null
                     )
                     : null,
+                'canAccessHargaPokok' => $canAccessHargaPokok,
+                'canAccessHargaJual' => $canAccessHargaJual,
+                'canCreateDaftarBarang' => $canCreateDaftarBarang,
+                'canUpdateDaftarBarang' => $canUpdateDaftarBarang,
+                'canDeleteDaftarBarang' => $canDeleteDaftarBarang,
+                'canExportDaftarBarang' => $canExportDaftarBarang
             ]);
         } catch (\Exception $e) {
             return $this->handleException($e, $request, 'Terjadi kesalahan saat memuat data barang pada halaman Daftar Barang. ', 'home_page');

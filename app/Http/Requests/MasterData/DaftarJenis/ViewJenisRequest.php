@@ -11,7 +11,7 @@ class ViewJenisRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('daftar_jenis.read');
     }
 
     /**
@@ -27,7 +27,6 @@ class ViewJenisRequest extends FormRequest
             'search' => 'nullable|string|max:255',
             'edit' => 'nullable|exists:jenises,id',
             'delete' => 'nullable|exists:jenises,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
         ];
     }
 }

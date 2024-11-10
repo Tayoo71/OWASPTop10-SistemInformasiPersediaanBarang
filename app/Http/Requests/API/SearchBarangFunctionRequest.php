@@ -13,7 +13,7 @@ class SearchBarangFunctionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('kartu_stok.read') || $this->user()->can('kartu_stok.export');
     }
 
     /**

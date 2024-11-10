@@ -11,7 +11,7 @@ class ViewBarangRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->can('daftar_barang.read');
     }
 
     /**
@@ -28,10 +28,6 @@ class ViewBarangRequest extends FormRequest
             'search' => 'nullable|string|max:255',
             'edit' => 'nullable|exists:barangs,id',
             'delete' => 'nullable|exists:barangs,id',
-            'format' => 'nullable|in:pdf,xlsx,csv',
-            'data_type' => 'nullable|in:lengkap,harga_pokok,harga_jual,tanpa_harga',
-            'stok' => 'nullable|in:tampil_kosong,tidak_tampil_kosong',
-            'status' => 'nullable|in:semua,aktif,tidak_aktif',
         ];
     }
 }
