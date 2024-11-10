@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Middleware\CheckUserStatus;
 use Illuminate\Foundation\Application;
-use App\Http\Middleware\EnsureTwoFactorEnabled;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'twofactor' => EnsureTwoFactorEnabled::class,
+            'user_status' => CheckUserStatus::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,

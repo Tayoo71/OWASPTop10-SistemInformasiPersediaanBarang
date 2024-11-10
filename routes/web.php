@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
         return view('pages/auth/two-factor-activate');
     })->name('two_factor_activate');
 
-    Route::middleware('twofactor')->group(function () {
+    Route::middleware('user_status')->group(function () {
         // Halaman Utama
         Route::get('/', function () {
             return view('pages/home', [
