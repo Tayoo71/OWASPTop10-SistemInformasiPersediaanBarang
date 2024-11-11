@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Pengaturan;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Pengaturan\LogAktivitas\ViewLogAktivitasRequest;
+use Spatie\Activitylog\Models\Activity;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\Pengaturan\LogAktivitas\ViewLogAktivitasRequest;
 
 class LogAktivitasController extends Controller implements HasMiddleware
 {
