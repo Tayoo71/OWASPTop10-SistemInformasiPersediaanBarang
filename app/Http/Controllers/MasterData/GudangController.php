@@ -52,6 +52,13 @@ class GudangController extends Controller implements HasMiddleware
                 ->get()
                 ->toArray();
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Daftar Gudang dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
+
             $fileName = 'Daftar Gudang ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -111,6 +118,14 @@ class GudangController extends Controller implements HasMiddleware
             $canDeleteDaftarGudang = auth()->user()->can('daftar_gudang.delete');
             $canExportDaftarGudang = auth()->user()->can('daftar_gudang.export');
 
+            $this->logActivity(
+                'Melihat Daftar Gudang dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Edit: ' . ($filters['edit'] ?? '-')
+                    . ' | Delete: ' . ($filters['delete'] ?? '-')
+            );
+
             return view('pages/master_data/daftargudang', [
                 'title' => 'Daftar Gudang',
                 'gudangs' => $gudangs,
@@ -138,8 +153,14 @@ class GudangController extends Controller implements HasMiddleware
         try {
             $filteredData = $request->validated();
 
-            Gudang::create($filteredData);
+            $gudang = Gudang::create($filteredData);
             DB::commit();
+
+            $this->logActivity(
+                'Menambahkan Gudang dengan Kode Gudang: ' . $gudang->kode_gudang
+                    . ' | Nama Gudang: ' . $gudang->nama_gudang
+            );
+
             return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -156,6 +177,10 @@ class GudangController extends Controller implements HasMiddleware
 
             $gudang->update($filteredData);
             DB::commit();
+            $this->logActivity(
+                'Memperbarui Gudang dengan Kode Gudang: ' . $gudang->kode_gudang
+                    . ' | Nama Gudang: ' . $gudang->nama_gudang
+            );
             return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -173,6 +198,10 @@ class GudangController extends Controller implements HasMiddleware
                 // Force delete gudang
                 $gudang->delete();
                 DB::commit();
+                $this->logActivity(
+                    'Menghapus Gudang dengan Kode Gudang: ' . $gudang->kode_gudang
+                        . ' | Nama Gudang: ' . $gudang->nama_gudang
+                );
                 return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil dihapus.');
             } else {
                 throw new \Exception('Data Gudang tidak dapat dihapus dikarenakan terdapat Transaksi Terkait. ');

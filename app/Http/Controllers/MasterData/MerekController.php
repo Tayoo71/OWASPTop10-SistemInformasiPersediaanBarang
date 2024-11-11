@@ -52,6 +52,13 @@ class MerekController extends Controller implements HasMiddleware
                 ->get()
                 ->toArray();
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Daftar Merek dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
+
             $fileName = 'Daftar Merek ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -95,6 +102,14 @@ class MerekController extends Controller implements HasMiddleware
             $canDeleteDaftarMerek = auth()->user()->can('daftar_merek.delete');
             $canExportDaftarMerek = auth()->user()->can('daftar_merek.export');
 
+            $this->logActivity(
+                'Melihat Daftar Merek dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Edit: ' . ($filters['edit'] ?? '-')
+                    . ' | Delete: ' . ($filters['delete'] ?? '-')
+            );
+
             return view('pages/master_data/daftarmerek', [
                 'title' => 'Daftar Merek',
                 'mereks' => $mereks,
@@ -116,9 +131,13 @@ class MerekController extends Controller implements HasMiddleware
         try {
             $filteredData = $request->validated();
 
-            Merek::create($filteredData);
+            $merek = Merek::create($filteredData);
 
             DB::commit();
+            $this->logActivity(
+                'Menambahkan Merek dengan ID: ' . $merek->id
+                    . ' | Nama Merek: ' . $merek->nama_merek
+            );
             return redirect()->route('daftarmerek.index', $this->buildQueryParams($request, "MerekController"))->with('success', 'Data Merek berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -136,6 +155,12 @@ class MerekController extends Controller implements HasMiddleware
             $merek->update($filteredData);
 
             DB::commit();
+
+            $this->logActivity(
+                'Memperbarui Merek dengan ID: ' . $merek->id
+                    . ' | Nama Merek: ' . $merek->nama_merek
+            );
+
             return redirect()->route('daftarmerek.index', $this->buildQueryParams($request, "MerekController"))->with('success', 'Data Merek berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -147,8 +172,15 @@ class MerekController extends Controller implements HasMiddleware
     {
         DB::beginTransaction();
         try {
-            Merek::findOrFail($id)->delete();
+            $merek = Merek::findOrFail($id);
+            $merek->delete();
             DB::commit();
+
+            $this->logActivity(
+                'Menghapus Merek dengan ID: ' . $merek->id
+                    . ' | Nama Merek: ' . $merek->nama_merek
+            );
+
             return redirect()->route('daftarmerek.index', $this->buildQueryParams($request, "MerekController"))->with('success', 'Data Merek berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();

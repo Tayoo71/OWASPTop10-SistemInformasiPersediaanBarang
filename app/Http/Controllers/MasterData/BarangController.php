@@ -139,6 +139,19 @@ class BarangController extends Controller implements HasMiddleware
             $gudang = empty($filters['gudang']) ? "Semua Gudang" :
                 $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Data Barang pada Halaman Daftar Barang dalam format: '
+                    . ($filters['data_type'] ?? '-')
+                    . ' | Stok: ' . ($filters['stok'] ?? '-')
+                    . ' | Status: ' . ($filters['status'] ?? '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+                    . ' | Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+            );
+
+
             $fileName .= date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -216,6 +229,16 @@ class BarangController extends Controller implements HasMiddleware
                 return $data;
             });
 
+            $this->logActivity(
+                'Melihat daftar barang pada halaman Daftar Barang dengan format '
+                    . ($filters['sort_by'] ?? '-') . ' | '
+                    . ($filters['direction'] ?? '-') . ' | '
+                    . 'Gudang: ' . ($filters['gudang'] ?? 'Semua') . ' | '
+                    . (!empty($filters['search']) ? 'Pencarian: ' . $filters['search'] . ' | ' : '')
+                    . (!empty($filters['edit']) ? 'Edit Kode Item: ' . $filters['edit'] . ' | ' : '')
+                    . (!empty($filters['delete']) ? 'Delete Kode Item: ' . $filters['delete'] : '')
+            );
+
             return view('pages/master_data/daftarbarang', [
                 'title' => 'Daftar Barang',
                 'barangs' => $barangs,
@@ -259,6 +282,11 @@ class BarangController extends Controller implements HasMiddleware
             }
 
             DB::commit();
+
+            $this->logActivity(
+                'Menambahkan barang baru dengan Kode Item: ' . $barang->id
+            );
+
             return redirect()->route('daftarbarang.index', $this->buildQueryParams($request, "BarangController"))
                 ->with('success', 'Data Barang berhasil ditambahkan.');
         } catch (\Exception $e) {
@@ -282,8 +310,10 @@ class BarangController extends Controller implements HasMiddleware
                         'harga_jual' => $konversi['harga_jual'] ?? 0,
                     ]);
             }
-
             DB::commit();
+
+            $this->logActivity('Memperbarui data barang dengan Kode Item: ' . $barang->id);
+
             return redirect()->route('daftarbarang.index', $this->buildQueryParams($request, "BarangController"))
                 ->with('success', 'Data Barang berhasil diubah.');
         } catch (\Exception $e) {
@@ -303,11 +333,17 @@ class BarangController extends Controller implements HasMiddleware
                 // Force delete barang
                 $barang->delete();
                 DB::commit();
+
+                $this->logActivity('Menghapus data barang dengan Kode Item: ' . $barang->id . ' | Nama Barang: ' . $barang->nama_item);
+
                 return redirect()->route('daftarbarang.index', $this->buildQueryParams($request, "BarangController"))
                     ->with('success', 'Data Barang berhasil dihapus secara permanen.');
             } else {
                 DB::rollBack();
-                return redirect()->route("daftarbarang.index")->withErrors("Data Barang tidak dapat dihapus dikarenakan terdapat Transaksi Terkait. ");
+
+                $this->logActivity('Gagal menghapus data barang dengan Kode Item: ' . $barang->id . ' | Nama Barang: ' . $barang->nama_item . " karena terdapat Transaksi Terkait.");
+
+                throw new \Exception('Data Barang tidak dapat dihapus dikarenakan terdapat Transaksi Terkait. ');
             }
         } catch (\Exception $e) {
             DB::rollBack();

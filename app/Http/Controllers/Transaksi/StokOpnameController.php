@@ -76,6 +76,16 @@ class StokOpnameController extends Controller implements HasMiddleware
             $gudang = $filters['gudang'] === 'all' ? "Semua Gudang" :
                 $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Data Stok Opname dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
+
             $fileName = 'Stok Opname ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -146,6 +156,17 @@ class StokOpnameController extends Controller implements HasMiddleware
                 return $data;
             });
 
+            $this->logActivity(
+                'Melihat Daftar Stok Opname dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . (!empty($filters['edit']) ? ' | Edit Nomor Transaksi: ' . $filters['edit'] : '')
+                    . (!empty($filters['delete']) ? ' | Delete Nomor Transaksi: ' . $filters['delete'] : '')
+            );
+
             return view('pages/transaksi/stokopname', [
                 'title' => 'Stok Opname',
                 'transaksies' => $transaksies,
@@ -176,6 +197,9 @@ class StokOpnameController extends Controller implements HasMiddleware
             $this->processTransaction($filteredData, 'opname', Auth::id());
 
             DB::commit();
+
+            // Log dicatat pada Function Process Transaction
+
             return redirect()->route('stokopname.index', $this->buildQueryParams($request, "StokOpnameController"))
                 ->with('success', 'Data Stok Opname berhasil ditambahkan.');
         } catch (\Exception $e) {
@@ -191,6 +215,10 @@ class StokOpnameController extends Controller implements HasMiddleware
             StokBarang::updateStok($transaksi->barang_id, $transaksi->kode_gudang, $transaksi->stok_fisik, 'delete_opname', $transaksi->stok_buku);
             $transaksi->delete();
             DB::commit();
+            $this->logActivity(
+                'Menghapus Transaksi Stok Opname dengan Nomor Transaksi: ' . $transaksi->id
+                    . ' | Kode Item: ' . $transaksi->barang_id
+            );
             return redirect()->route('stokopname.index', $this->buildQueryParams($request, "StokOpnameController"))
                 ->with('success', 'Data Stok Opname berhasil dihapus.');
         } catch (\Exception $e) {
@@ -198,7 +226,7 @@ class StokOpnameController extends Controller implements HasMiddleware
             return $this->handleException($e, $request, 'Terjadi kesalahan saat menghapus Data Stok Opname. ', 'stokopname.index');
         }
     }
-    private function processTransaction($request, $operation, $userId, $old_transaksi = null)
+    private function processTransaction($request, $operation, $userId)
     {
         $barangId = $request['barang_id'];
         $selectedSatuanId = $request['satuan'];
@@ -211,24 +239,17 @@ class StokOpnameController extends Controller implements HasMiddleware
             ->value('stok') ?? 0; // Jika tidak ada data awal pada tabel maka stok bukunya adalah 0
         $stok_fisik = KonversiSatuan::convertToSatuanDasar($barangId, $selectedSatuanId, $stok_fisik);
         StokBarang::updateStok($barangId, $selectedGudang, $stok_fisik, $operation);
-        if ($old_transaksi) {
-            $old_transaksi->update([
-                'user_update_id' => $userId,
-                'kode_gudang' => $selectedGudang,
-                'barang_id' => $barangId,
-                'stok_buku' => $stok_buku,
-                'stok_fisik' => $stok_fisik,
-                'keterangan' => $keterangan,
-            ]);
-        } else {
-            TransaksiStokOpname::create([
-                'user_buat_id' => $userId,
-                'kode_gudang' => $selectedGudang,
-                'barang_id' => $barangId,
-                'stok_buku' => $stok_buku,
-                'stok_fisik' => $stok_fisik,
-                'keterangan' => $keterangan,
-            ]);
-        }
+        $transaksi = TransaksiStokOpname::create([
+            'user_buat_id' => $userId,
+            'kode_gudang' => $selectedGudang,
+            'barang_id' => $barangId,
+            'stok_buku' => $stok_buku,
+            'stok_fisik' => $stok_fisik,
+            'keterangan' => $keterangan,
+        ]);
+        $this->logActivity(
+            'Menambahkan Transaksi Stok Opname dengan Nomor Transaksi: ' . $transaksi->id
+                . ' | Kode Item: ' . $barangId
+        );
     }
 }

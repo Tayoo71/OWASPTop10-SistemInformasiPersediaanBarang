@@ -83,6 +83,13 @@ class UserController extends Controller implements HasMiddleware
                 ];
             }
 
+            $this->logActivity(
+                'Melihat Daftar User dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . (!empty($filters['edit']) ? ' | Edit User ID: ' . $filters['edit'] : '')
+            );
+
             return view('pages/pengaturan/daftaruser', [
                 'title' => 'Daftar User',
                 'users' => $paginatedUsers,
@@ -96,7 +103,11 @@ class UserController extends Controller implements HasMiddleware
     public function store(StoreUserRequest $request)
     {
         try {
-            app(CreateNewUser::class)->create($request->validated());
+            $data = $request->validated();
+            app(CreateNewUser::class)->create($data);
+            $this->logActivity(
+                'Menambahkan User baru dengan Username: ' . $data['id']
+            );
 
             return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil ditambahkan.');
         } catch (\Exception $e) {
@@ -106,7 +117,11 @@ class UserController extends Controller implements HasMiddleware
     public function update(UpdateUserRequest $request, $id)
     {
         try {
-            app(UpdateUserProfileInformation::class)->update($id, $request->validated());
+            $data = $request->validated();
+            app(UpdateUserProfileInformation::class)->update($id, $data);
+            $this->logActivity(
+                'Memperbarui Data User dengan Username Sebelumnya: ' . $id . ' | Username Baru: ' . $data['ubah_id']
+            );
 
             return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil diubah.');
         } catch (\Exception $e) {

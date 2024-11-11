@@ -44,6 +44,14 @@ class KartuStokController extends Controller implements HasMiddleware
             $gudang = $filters['gudang'] === 'all' ? "Semua Gudang" :
                 $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Kartu Stok dengan Pencarian Kode Item: ' . ($filters['search'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . ' | Format: ' . strtoupper($filters['format'])
+            );
+
             $fileName = 'Kartu Stok (' . $filters['search'] . ') ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -73,6 +81,7 @@ class KartuStokController extends Controller implements HasMiddleware
             $filters = $this->getValidatedFilters($validatedData);
 
             if (!$filters['search'] || !$filters['start'] || !$filters['end']) {
+                $this->logActivity('Membuka Halaman Kartu Stok');
                 return view('pages/master_data/kartustok', [
                     'title' => 'Kartu Stok',
                     'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
@@ -83,6 +92,13 @@ class KartuStokController extends Controller implements HasMiddleware
             $kartuStok = $this->getDataKartuStok($filters['search'], $filters['gudang'], $filters['start'], $filters['end']);
 
             $canExportKartuStok = auth()->user()->can('kartu_stok.export');
+
+            $this->logActivity(
+                'Melihat Kartu Stok dengan Pencarian Kode Item: ' . ($filters['search'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+            );
 
             return view('pages/master_data/kartustok', [
                 'title' => 'Kartu Stok',

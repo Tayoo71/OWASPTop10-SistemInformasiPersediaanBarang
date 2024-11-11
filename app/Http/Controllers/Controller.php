@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -15,17 +16,16 @@ abstract class Controller
             'request_data' => $request,
             'exception_trace' => $e->getTraceAsString(),
         ]);
+        $this->logActivity($customMessage . $e->getMessage());
         return redirect()->route($redirect)->withErrors($customMessage);
     }
     public function logAPIValidationErrors($validator, $request, $className = null)
     {
-        // Log validation errors
         Log::error('Validation failed in ' . $className, [
             'request_data' => $request->all(),
             'validation_errors' => $validator->errors(),
         ]);
-
-        // Abort and return a 404 page
+        $this->logActivity('Terjadi kesalahan validasi ketika melakukan pengambilan data Barang dan Stok Barang' . ($className ?? 'API Request'));
         abort(404);
     }
     // Helper Function untuk kembalikan isi validated data
@@ -69,5 +69,24 @@ abstract class Controller
                 'role_id' => $request->input('role_id'),
             ];
         }
+    }
+    // Function untuk mencatat Log Aktivitas
+    protected function logActivity(string $description)
+    {
+        $ipAddress = request()->ip();
+        $userAgent = request()->header('User-Agent');
+
+        $agent = new Agent();
+        $agent->setUserAgent($userAgent);
+        $browser = $agent->browser();
+        $browserVersion = $agent->version($browser);
+        $platform = $agent->platform();
+        $device = $agent->device();
+
+        activity()
+            ->withProperties([
+                'device' => 'IP Address: (' . $ipAddress . ') | Perangkat: (' . $platform . ' | ' . $device . ' | ' . $browser . ' ' . $browserVersion . ')'
+            ])
+            ->log($description);
     }
 }

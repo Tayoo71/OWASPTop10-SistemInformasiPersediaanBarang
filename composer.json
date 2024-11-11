@@ -13,6 +13,7 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
         "enlightn/enlightn": "^2.10",
+        "jenssegers/agent": "^2.6",
         "laravel/fortify": "^1.24",
         "laravel/framework": "^11.9",
         "maatwebsite/excel": "^3.1",

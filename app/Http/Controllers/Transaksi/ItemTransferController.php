@@ -76,6 +76,16 @@ class ItemTransferController extends Controller implements HasMiddleware
             $gudang = $filters['gudang'] === 'all' ? "Semua Gudang" :
                 $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Data Item Transfer dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
+
             $fileName = 'Item Transfer ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -156,6 +166,17 @@ class ItemTransferController extends Controller implements HasMiddleware
                 }
             }
 
+            $this->logActivity(
+                'Melihat Daftar Item Transfer dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . (!empty($filters['edit']) ? ' | Edit Nomor Transaksi: ' . $filters['edit'] : '')
+                    . (!empty($filters['delete']) ? ' | Delete Nomor Transaksi: ' . $filters['delete'] : '')
+            );
+
             return view('pages/transaksi/itemtransfer', [
                 'title' => 'Item Transfer',
                 'transaksies' => $transaksies,
@@ -188,6 +209,9 @@ class ItemTransferController extends Controller implements HasMiddleware
             $this->processTransaction($filteredData, 'tambah_item_transfer', Auth::id());
 
             DB::commit();
+
+            // Log dicatat pada Function Process Transaction
+
             return redirect()->route('itemtransfer.index',  $this->buildQueryParams($request, "ItemTransferController"))
                 ->with('success', 'Transaksi Item Transfer berhasil ditambahkan.');
         } catch (\Exception $e) {
@@ -205,6 +229,9 @@ class ItemTransferController extends Controller implements HasMiddleware
             $this->processTransaction($filteredData, 'update_item_transfer', Auth::id(), $old_transaksi);
 
             DB::commit();
+
+            // Log dicatat pada Function Process Transaction
+
             return redirect()->route('itemtransfer.index', $this->buildQueryParams($request, "ItemTransferController"))
                 ->with('success', 'Transaksi Item Transfer berhasil diubah.');
         } catch (\Exception $e) {
@@ -220,6 +247,10 @@ class ItemTransferController extends Controller implements HasMiddleware
             $this->processTransaction($transaksi, 'delete_item_transfer');
             $transaksi->delete();
             DB::commit();
+            $this->logActivity(
+                'Menghapus Transaksi Item Transfer dengan Nomor Transaksi: ' . $transaksi->id
+                    . ' | Kode Item: ' . $transaksi->barang_id
+            );
             return redirect()->route('itemtransfer.index', $this->buildQueryParams($request, "ItemTransferController"))
                 ->with('success', 'Transaksi Item Transfer berhasil dihapus.');
         } catch (\Exception $e) {
@@ -241,7 +272,7 @@ class ItemTransferController extends Controller implements HasMiddleware
             // Tambah Stok pada Transaksi Baru
             $this->operationStok($barangId, $selectedGudangAsal, $selectedGudangTujuan, $jumlahTransferSatuanDasar, 'tambah_item');
 
-            TransaksiItemTransfer::create([
+            $transaksi = TransaksiItemTransfer::create([
                 'user_buat_id' => $userId,
                 'gudang_asal' => $selectedGudangAsal,
                 'gudang_tujuan' => $selectedGudangTujuan,
@@ -249,6 +280,10 @@ class ItemTransferController extends Controller implements HasMiddleware
                 'jumlah_stok_transfer' => $jumlahTransferSatuanDasar,
                 'keterangan' => $keterangan,
             ]);
+            $this->logActivity(
+                'Menambahkan Transaksi Item Transfer dengan Nomor Transaksi: ' . $transaksi->id
+                    . ' | Kode Item: ' . $barangId
+            );
         } elseif ($operation === 'update_item_transfer') {
             // Kembalikan Stok pada Transaksi Lama
             $this->operationStok($old_transaksi->barang_id, $old_transaksi->gudang_asal, $old_transaksi->gudang_tujuan, $old_transaksi->jumlah_stok_transfer, 'delete_item');
@@ -265,6 +300,10 @@ class ItemTransferController extends Controller implements HasMiddleware
                 'jumlah_stok_transfer' => $jumlahTransferSatuanDasar,
                 'keterangan' => $keterangan,
             ]);
+            $this->logActivity(
+                'Memperbarui Transaksi Item Transfer dengan Nomor Transaksi: ' . $old_transaksi->id
+                    . ' | Kode Item: ' . $barangId
+            );
         } else if ($operation === 'delete_item_transfer') {
             $this->operationStok($barangId, $selectedGudangAsal, $selectedGudangTujuan, $jumlahStokTransfer, 'delete_item');
         };

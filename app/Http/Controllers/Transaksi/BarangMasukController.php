@@ -76,6 +76,16 @@ class BarangMasukController extends Controller implements HasMiddleware
             $gudang = $filters['gudang'] === 'all' ? "Semua Gudang" :
                 $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Data Barang Masuk dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
+
             $fileName = 'Barang Masuk ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -155,6 +165,17 @@ class BarangMasukController extends Controller implements HasMiddleware
                 }
             }
 
+            $this->logActivity(
+                'Melihat Daftar Barang Masuk dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . (!empty($filters['edit']) ? ' | Edit Nomor Transaksi: ' . $filters['edit'] : '')
+                    . (!empty($filters['delete']) ? ' | Delete Nomor Transaksi: ' . $filters['delete'] : '')
+            );
+
             return view('pages/transaksi/barangmasuk', [
                 'title' => 'Barang Masuk',
                 'transaksies' => $transaksies,
@@ -187,6 +208,9 @@ class BarangMasukController extends Controller implements HasMiddleware
             $this->processTransaction($filteredData, 'masuk', Auth::id());
 
             DB::commit();
+
+            // Log dicatat pada Function Process Transaction
+
             return redirect()->route('barangmasuk.index', $this->buildQueryParams($request, "BarangMasukController"))
                 ->with('success', 'Transaksi Barang Masuk berhasil ditambahkan.');
         } catch (\Exception $e) {
@@ -209,6 +233,9 @@ class BarangMasukController extends Controller implements HasMiddleware
             $this->processTransaction($filteredData, 'masuk', Auth::id(), $old_transaksi);
 
             DB::commit();
+
+            // Log dicatat pada Function Process Transaction
+
             return redirect()->route('barangmasuk.index',  $this->buildQueryParams($request, "BarangMasukController"))
                 ->with('success', 'Transaksi Barang Masuk berhasil diubah.');
         } catch (\Exception $e) {
@@ -225,6 +252,10 @@ class BarangMasukController extends Controller implements HasMiddleware
             $this->revertStok($transaksi, 'delete_masuk');
             $transaksi->delete();
             DB::commit();
+            $this->logActivity(
+                'Menghapus Transaksi Barang Masuk dengan Nomor Transaksi: ' . $transaksi->id
+                    . ' | Kode Item: ' . $transaksi->barang_id
+            );
             return redirect()->route('barangmasuk.index',  $this->buildQueryParams($request, "BarangMasukController"))
                 ->with('success', 'Transaksi Barang Masuk berhasil dihapus.');
         } catch (\Exception $e) {
@@ -258,14 +289,22 @@ class BarangMasukController extends Controller implements HasMiddleware
                 'jumlah_stok_masuk' => $jumlahMasukSatuanDasar,
                 'keterangan' => $keterangan,
             ]);
+            $this->logActivity(
+                'Memperbarui Transaksi Barang Masuk dengan Nomor Transaksi: ' . $old_transaksi->id
+                    . ' | Kode Item: ' . $barangId
+            );
         } else {
-            TransaksiBarangMasuk::create([
+            $transaksi = TransaksiBarangMasuk::create([
                 'user_buat_id' => $userId,
                 'kode_gudang' => $selectedGudang,
                 'barang_id' => $barangId,
                 'jumlah_stok_masuk' => $jumlahMasukSatuanDasar,
                 'keterangan' => $keterangan,
             ]);
+            $this->logActivity(
+                'Menambahkan Transaksi Barang Masuk dengan Nomor Transaksi: ' . $transaksi->id
+                    . ' | Kode Item: ' . $barangId
+            );
         }
     }
 }

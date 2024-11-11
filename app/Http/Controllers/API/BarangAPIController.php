@@ -61,6 +61,11 @@ class BarangAPIController extends Controller implements HasMiddleware
             return $data;
         });
 
+        $this->logActivity(
+            'Mencari Stok Barang untuk Transaksi dengan Pencarian: ' . ($search ?? '-')
+                . ' | Gudang: ' . ($gudang ?? 'Semua Gudang')
+        );
+
         return response()->json($barangs);
     }
     public function searchBarang(SearchBarangFunctionRequest $request)
@@ -92,6 +97,11 @@ class BarangAPIController extends Controller implements HasMiddleware
                 'nama_item' => $barang->nama_item,
             ];
         });
+
+        $this->logActivity(
+            'Mencari Barang pada Fitur Kartu Stok dengan Pencarian: ' . ($search ?? '-')
+                . ' | Mode: ' . ($mode ?? '-')
+        );
 
         return response()->json($barangs);
     }

@@ -67,6 +67,14 @@ class StokMinimumController extends Controller implements HasMiddleware
             $gudang = is_null($filters['gudang']) ? "Semua Gudang" :
                 $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
 
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Informasi Stok Minimum dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
+
             $fileName = 'Informasi Stok Minimum ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
                 return Excel::download(new ExcelExport($headers, $datas), $fileName . '.xlsx', ExcelExcel::XLSX);
@@ -136,6 +144,13 @@ class StokMinimumController extends Controller implements HasMiddleware
             });
 
             $canExportStokMinimum = auth()->user()->can('stok_minimum.export');
+
+            $this->logActivity(
+                'Melihat Informasi Stok Minimum dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+            );
 
             return view('pages/master_data/stokminimum', [
                 'title' => 'Informasi Stok Minimum',
