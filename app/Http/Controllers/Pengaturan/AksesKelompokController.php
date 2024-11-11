@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Pengaturan;
 
+use App\Traits\LogActivity;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Permission;
-use App\Http\Requests\Pengaturan\AksesKelompok\ViewAksesKelompokRequest;
-use App\Http\Requests\Pengaturan\AksesKelompok\UpdateAksesKelompokRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\Pengaturan\AksesKelompok\ViewAksesKelompokRequest;
+use App\Http\Requests\Pengaturan\AksesKelompok\UpdateAksesKelompokRequest;
 
 class AksesKelompokController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

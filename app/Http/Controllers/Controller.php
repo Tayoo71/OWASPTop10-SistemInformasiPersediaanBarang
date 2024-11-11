@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Traits\LogActivity;
 use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 abstract class Controller
 {
+    use LogActivity;
     // Function Handling and Logging Error
     protected function handleException(Exception $e, $request, $customMessage, $redirect)
     {
@@ -69,24 +71,5 @@ abstract class Controller
                 'role_id' => $request->input('role_id'),
             ];
         }
-    }
-    // Function untuk mencatat Log Aktivitas
-    protected function logActivity(string $description)
-    {
-        $ipAddress = request()->ip();
-        $userAgent = request()->header('User-Agent');
-
-        $agent = new Agent();
-        $agent->setUserAgent($userAgent);
-        $browser = $agent->browser();
-        $browserVersion = $agent->version($browser);
-        $platform = $agent->platform();
-        $device = $agent->device();
-
-        activity()
-            ->withProperties([
-                'device' => 'IP Address: (' . $ipAddress . ') | Perangkat: (' . $platform . ' | ' . $device . ' | ' . $browser . ' ' . $browserVersion . ')'
-            ])
-            ->log($description);
     }
 }

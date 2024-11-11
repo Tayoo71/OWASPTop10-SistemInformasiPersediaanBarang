@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
-use App\Models\MasterData\Jenis;
+use App\Traits\LogActivity;
 use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\DaftarJenis\DestroyJenisRequest;
-use App\Http\Requests\MasterData\DaftarJenis\ExportJenisRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MasterData\Jenis;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Requests\MasterData\DaftarJenis\StoreJenisRequest;
-use App\Http\Requests\MasterData\DaftarJenis\UpdateJenisRequest;
-use App\Http\Requests\MasterData\DaftarJenis\ViewJenisRequest;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\DaftarJenis\ViewJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\StoreJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\ExportJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\UpdateJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\DestroyJenisRequest;
 
 class JenisController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

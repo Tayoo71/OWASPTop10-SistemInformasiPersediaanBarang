@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaksi;
 
+use App\Traits\LogActivity;
 use App\Exports\ExcelExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
@@ -13,16 +14,17 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\MasterData\KonversiSatuan;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 use App\Models\Transaksi\TransaksiBarangMasuk;
-use App\Http\Requests\Transaksi\BarangMasuk\ViewBarangMasukRequest;
-use App\Http\Requests\Transaksi\BarangMasuk\StoreBarangMasukRequest;
-use App\Http\Requests\Transaksi\BarangMasuk\UpdateBarangMasukRequest;
-use App\Http\Requests\Transaksi\BarangMasuk\DestroyBarangMasukRequest;
-use App\Http\Requests\Transaksi\BarangMasuk\ExportBarangMasukRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\Transaksi\BarangMasuk\ViewBarangMasukRequest;
+use App\Http\Requests\Transaksi\BarangMasuk\StoreBarangMasukRequest;
+use App\Http\Requests\Transaksi\BarangMasuk\ExportBarangMasukRequest;
+use App\Http\Requests\Transaksi\BarangMasuk\UpdateBarangMasukRequest;
+use App\Http\Requests\Transaksi\BarangMasuk\DestroyBarangMasukRequest;
 
 class BarangMasukController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

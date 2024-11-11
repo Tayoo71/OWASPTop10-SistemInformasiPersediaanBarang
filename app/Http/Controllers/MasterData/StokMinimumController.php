@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
+use App\Traits\LogActivity;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
-use App\Models\MasterData\KonversiSatuan;
-use Illuminate\Pagination\LengthAwarePaginator;
-use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\StokMinimum\ExportStokMinimumRequest;
-use App\Http\Requests\MasterData\StokMinimum\ViewStokMinimumRequest;
+use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MasterData\KonversiSatuan;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\StokMinimum\ViewStokMinimumRequest;
+use App\Http\Requests\MasterData\StokMinimum\ExportStokMinimumRequest;
 
 class StokMinimumController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

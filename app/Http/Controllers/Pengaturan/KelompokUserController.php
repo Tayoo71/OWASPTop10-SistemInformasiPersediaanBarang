@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers\Pengaturan;
 
+use App\Traits\LogActivity;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Requests\Pengaturan\KelompokUser\ViewKelompokUSerRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\StoreKelompokUserRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\UpdateKelompokUserRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\DestroyKelompokUserRequest;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Routing\Controllers\HasMiddleware;
 
 class KelompokUserController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

@@ -2,26 +2,28 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use App\Traits\LogActivity;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\KartuStok\ExportKartuStokRequest;
-use App\Http\Requests\MasterData\KartuStok\ViewKartuStokRequest;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Excel as ExcelExcel;
 use App\Models\Transaksi\TransaksiStokOpname;
 use App\Models\Transaksi\TransaksiBarangMasuk;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Models\Transaksi\TransaksiBarangKeluar;
 use App\Models\Transaksi\TransaksiItemTransfer;
-use Maatwebsite\Excel\Excel as ExcelExcel;
-use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\KartuStok\ViewKartuStokRequest;
+use App\Http\Requests\MasterData\KartuStok\ExportKartuStokRequest;
 
 class KartuStokController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

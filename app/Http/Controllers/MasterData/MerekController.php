@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
+use App\Traits\LogActivity;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Merek;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\MasterData\DaftarMerek\StoreMerekRequest;
-use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\DaftarMerek\DestroyMerekRequest;
-use App\Http\Requests\MasterData\DaftarMerek\ExportMerekRequest;
-use App\Http\Requests\MasterData\DaftarMerek\UpdateMerekRequest;
-use App\Http\Requests\MasterData\DaftarMerek\ViewMerekRequest;
+use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\DaftarMerek\ViewMerekRequest;
+use App\Http\Requests\MasterData\DaftarMerek\StoreMerekRequest;
+use App\Http\Requests\MasterData\DaftarMerek\ExportMerekRequest;
+use App\Http\Requests\MasterData\DaftarMerek\UpdateMerekRequest;
+use App\Http\Requests\MasterData\DaftarMerek\DestroyMerekRequest;
 
 class MerekController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

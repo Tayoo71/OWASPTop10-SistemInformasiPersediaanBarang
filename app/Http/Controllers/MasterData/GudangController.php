@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Traits\LogActivity;
 use App\Exports\ExcelExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
@@ -9,16 +10,17 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Excel as ExcelExcel;
-use App\Http\Requests\MasterData\DaftarGudang\ViewGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\StoreGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\UpdateGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\DestroyGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\ExportGudangRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\DaftarGudang\ViewGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\StoreGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\ExportGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\UpdateGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\DestroyGudangRequest;
 
 class GudangController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

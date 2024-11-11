@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaksi;
 
+use App\Traits\LogActivity;
 use App\Exports\ExcelExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
@@ -12,17 +13,18 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\MasterData\KonversiSatuan;
 use Maatwebsite\Excel\Excel as ExcelExcel;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Models\Transaksi\TransaksiItemTransfer;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Requests\Transaksi\ItemTransfer\ViewItemTransferRequest;
 use App\Http\Requests\Transaksi\ItemTransfer\StoreItemTransferRequest;
+use App\Http\Requests\Transaksi\ItemTransfer\ExportItemTransferRequest;
 use App\Http\Requests\Transaksi\ItemTransfer\UpdateItemTransferRequest;
 use App\Http\Requests\Transaksi\ItemTransfer\DestroyItemTransferRequest;
-use App\Http\Requests\Transaksi\ItemTransfer\ExportItemTransferRequest;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Routing\Controllers\HasMiddleware;
 
 class ItemTransferController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Traits\LogActivity;
 use App\Models\MasterData\Barang;
-use App\Models\MasterData\KonversiSatuan;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\API\SearchBarangFunctionRequest;
-use App\Http\Requests\API\SearchFunctionRequest;
+use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Http\Requests\API\SearchFunctionRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\API\SearchBarangFunctionRequest;
 
 class BarangAPIController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

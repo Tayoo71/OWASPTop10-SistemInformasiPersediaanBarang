@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pengaturan;
 
+use App\Traits\LogActivity;
 use App\Http\Controllers\Controller;
 use Spatie\Activitylog\Models\Activity;
 use Illuminate\Routing\Controllers\Middleware;
@@ -10,6 +11,7 @@ use App\Http\Requests\Pengaturan\LogAktivitas\ViewLogAktivitasRequest;
 
 class LogAktivitasController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [

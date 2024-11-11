@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaksi;
 
+use App\Traits\LogActivity;
 use App\Exports\ExcelExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
@@ -13,15 +14,16 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\MasterData\KonversiSatuan;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 use App\Models\Transaksi\TransaksiStokOpname;
-use App\Http\Requests\Transaksi\StokOpname\StoreOpnameRequest;
-use App\Http\Requests\Transaksi\StokOpname\ViewStokOpnameRequest;
-use App\Http\Requests\Transaksi\StokOpname\DestroyStokOpnameRequest;
-use App\Http\Requests\Transaksi\StokOpname\ExportStokOpnameRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\Transaksi\StokOpname\StoreOpnameRequest;
+use App\Http\Requests\Transaksi\StokOpname\ViewStokOpnameRequest;
+use App\Http\Requests\Transaksi\StokOpname\ExportStokOpnameRequest;
+use App\Http\Requests\Transaksi\StokOpname\DestroyStokOpnameRequest;
 
 class StokOpnameController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [
