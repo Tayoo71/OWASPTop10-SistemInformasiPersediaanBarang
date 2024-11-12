@@ -22,7 +22,7 @@ class ExportStokOpnameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,stok_buku,stok_fisik,selisih,keterangan,user_buat_id,user_update_id',
+            'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,selisih,keterangan,user_buat_id,user_update_id',
             'direction' => 'nullable|in:asc,desc',
             'gudang' => 'nullable|exists:gudangs,kode_gudang',
             'search' => 'nullable|string|max:255',

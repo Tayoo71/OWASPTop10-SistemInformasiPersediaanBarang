@@ -3,15 +3,28 @@
 namespace App\Models\Transaksi;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Shared\User;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
-use App\Models\Shared\User;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Database\Eloquent\Model;
 
 class TransaksiBarangMasuk extends Model
 {
     protected $fillable = ['kode_gudang', 'user_buat_id', 'user_update_id', 'barang_id', 'jumlah_stok_masuk', 'keterangan'];
     public $timestamps = true;
+
+    // Mutator untuk mengenkripsi 'jumlah_stok_masuk' sebelum disimpan
+    public function setJumlahStokMasukAttribute($value)
+    {
+        $this->attributes['jumlah_stok_masuk'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi 'jumlah_stok_masuk' saat diambil
+    public function getJumlahStokMasukAttribute($value)
+    {
+        return Crypt::decrypt($value);
+    }
 
     public function gudang()
     {

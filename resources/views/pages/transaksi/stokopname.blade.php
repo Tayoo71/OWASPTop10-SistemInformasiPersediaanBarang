@@ -255,61 +255,9 @@
                         </a>
                     </th>
                     @if ($canAccessStok)
-                        <th scope="col" class="px-6 py-3 bg-gray-50">
-                            <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'stok_buku', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                                class="flex justify-center items-center">
-                                STOK BUKU
-                                @if (request('sort_by') === 'stok_buku')
-                                    @if (request('direction') === 'asc')
-                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 9l4-4 4 4" />
-                                        </svg>
-                                    @else
-                                        <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 15l-4 4-4-4" />
-                                        </svg>
-                                    @endif
-                                @else
-                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-                                    </svg>
-                                @endif
-                            </a>
-                        </th>
+                        <th scope="col" class="px-6 py-3 bg-gray-50">STOK BUKU</th>
                     @endif
-                    <th scope="col" class="px-6 py-3 bg-gray-50">
-                        <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'stok_fisik', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                            class="flex justify-center items-center">
-                            STOK FISIK
-                            @if (request('sort_by') === 'stok_fisik')
-                                @if (request('direction') === 'asc')
-                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 9l4-4 4 4" />
-                                    </svg>
-                                @else
-                                    <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 15l-4 4-4-4" />
-                                    </svg>
-                                @endif
-                            @else
-                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-                                </svg>
-                            @endif
-                        </a>
-                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50">STOK FISIK</th>
                     @if ($canAccessStok)
                         <th scope="col" class="px-6 py-3 bg-gray-50">
                             <a href="{{ route('stokopname.index', array_merge(request()->query(), ['sort_by' => 'selisih', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"

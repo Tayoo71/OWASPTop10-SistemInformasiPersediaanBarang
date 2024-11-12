@@ -22,7 +22,7 @@ class ViewBarangKeluarRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,jumlah_stok_keluar,keterangan,user_buat_id,user_update_id',
+            'sort_by' => 'nullable|in:id,created_at,updated_at,kode_gudang,nama_item,keterangan,user_buat_id,user_update_id',
             'direction' => 'nullable|in:asc,desc',
             'gudang' => 'nullable|exists:gudangs,kode_gudang',
             'search' => 'nullable|string|max:255',
