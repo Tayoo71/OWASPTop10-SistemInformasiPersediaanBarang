@@ -9,10 +9,7 @@ class LogSuccessfulLogin
 {
     use LogActivity;
     /**
-     * Menangani event login berhasil.
-     *
-     * @param  \Illuminate\Auth\Events\Login  $event
-     * @return void
+     * Menangani Log login berhasil.
      */
     public function handle(Login $event)
     {
