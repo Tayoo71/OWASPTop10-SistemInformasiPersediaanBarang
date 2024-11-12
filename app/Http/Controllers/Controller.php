@@ -46,29 +46,29 @@ abstract class Controller
     {
         if ($page === "BarangController") {
             return [
-                'search' => $request->input('search'),
-                'gudang' => $request->input('gudang'),
-                'sort_by' => $request->input('sort_by'),
-                'direction' => $request->input('direction'),
+                'search' => escapeshellcmd($request->input('search')),
+                'gudang' =>  escapeshellcmd($request->input('gudang')),
+                'sort_by' =>  escapeshellcmd($request->input('sort_by')),
+                'direction' =>  escapeshellcmd($request->input('direction')),
             ];
         } else if ($page === "GudangController" || $page === "JenisController" || $page === "MerekController" || $page === "KelompokUserController" || $page === "UserController") {
             return [
-                'search' => $request->input('search'),
-                'sort_by' => $request->input('sort_by'),
-                'direction' => $request->input('direction'),
+                'search' =>  escapeshellcmd($request->input('search')),
+                'sort_by' =>  escapeshellcmd($request->input('sort_by')),
+                'direction' =>  escapeshellcmd($request->input('direction')),
             ];
         } else if ($page === "BarangKeluarController" || $page === "BarangMasukController" || $page === "ItemTransfersController" || $page === "ItemTransferController" || $page === "StokOpnameController") {
             return [
-                'search' => $request->input('search'),
-                'gudang' => $request->input('gudang'),
-                'start' => $request->input('start'),
-                'end' => $request->input('end'),
-                'sort_by' => $request->input('sort_by'),
-                'direction' => $request->input('direction'),
+                'search' =>  escapeshellcmd($request->input('search')),
+                'gudang' =>  escapeshellcmd($request->input('gudang')),
+                'start' =>  escapeshellcmd($request->input('start')),
+                'end' =>  escapeshellcmd($request->input('end')),
+                'sort_by' =>  escapeshellcmd($request->input('sort_by')),
+                'direction' =>  escapeshellcmd($request->input('direction')),
             ];
         } else if ($page === "AksesKelompokController") {
             return [
-                'role_id' => $request->input('role_id'),
+                'role_id' =>  escapeshellcmd($request->input('role_id')),
             ];
         }
     }

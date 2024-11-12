@@ -40,7 +40,7 @@ class UserController extends Controller implements HasMiddleware
 
             $users = User::with('roles')
                 ->where('id', '!=', "admin")
-                ->where('id', 'like', '%' . $request->input('search', '') . '%')
+                ->where('id', 'like', '%' . $filters['search'] . '%')
                 ->get();
 
             // Lakukan sorting pada koleksi setelah pengambilan data

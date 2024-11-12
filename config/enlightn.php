@@ -74,7 +74,7 @@ return [
     | Example: '/login'.
     |
     */
-    'guest_url' => null,
+    'guest_url' => '/login',
 
     /*
     |--------------------------------------------------------------------------
@@ -114,9 +114,22 @@ return [
     |
     */
     'license_whitelist' => [
-        'Apache-2.0', 'Apache2', 'BSD-2-Clause', 'BSD-3-Clause', 'LGPL-2.1-only', 'LGPL-2.1',
-        'LGPL-2.1-or-later', 'LGPL-3.0', 'LGPL-3.0-only', 'LGPL-3.0-or-later', 'MIT', 'ISC',
-        'CC0-1.0', 'Unlicense', 'WTFPL',
+        'Apache-2.0',
+        'Apache2',
+        'BSD-2-Clause',
+        'BSD-3-Clause',
+        'LGPL-2.1-only',
+        'LGPL-2.1',
+        'LGPL-2.1-or-later',
+        'LGPL-3.0',
+        'LGPL-3.0-only',
+        'LGPL-3.0-or-later',
+        'MIT',
+        'ISC',
+        'CC0-1.0',
+        'Unlicense',
+        'WTFPL',
+        'GPL-2.0'
     ],
 
     /*
