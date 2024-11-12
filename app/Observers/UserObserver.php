@@ -27,9 +27,9 @@ class UserObserver
             $currentConfirmedAt = $user->two_factor_confirmed_at;
 
             if (is_null($originalConfirmedAt) && !is_null($currentConfirmedAt)) {
-                $this->logActivity(('Autentikasi dua faktor (2FA) diaktifkan untuk Username:.' . $user->id));
+                $this->logActivity(('Autentikasi dua faktor (2FA) diaktifkan untuk Username:' . $user->id));
             } elseif (!is_null($originalConfirmedAt) && is_null($currentConfirmedAt)) {
-                $this->logActivity(('Autentikasi dua faktor (2FA) dinonaktifkan untuk Username:.' . $user->id));
+                $this->logActivity(('Autentikasi dua faktor (2FA) dinonaktifkan untuk Username:' . $user->id));
             }
         }
     }

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->string('satuan');
             $table->integer('jumlah');
-            $table->bigInteger('harga_pokok');
-            $table->bigInteger('harga_jual');
+            $table->text('harga_pokok');
+            $table->text('harga_jual');
         });
     }
 

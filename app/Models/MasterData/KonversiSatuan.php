@@ -8,6 +8,20 @@ class KonversiSatuan extends Model
 {
     protected $fillable = ['barang_id', 'satuan', 'jumlah', 'harga_pokok', 'harga_jual'];
     public $timestamps = false;
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'harga_pokok' => 'encrypted',
+            'harga_jual' => 'encrypted',
+        ];
+    }
+
     public function barang()
     {
         return $this->belongsTo(Barang::class);
