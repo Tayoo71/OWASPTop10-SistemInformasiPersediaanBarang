@@ -83,8 +83,8 @@ class StokOpnameController extends Controller implements HasMiddleware
                     . ' | Arah: ' . ($filters['direction'] ?? '-')
                     . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
                     . ' | Pencarian: ' . ($filters['search'] ?? '-')
-                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
-                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ?? '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ?? '-')
                     . ' | Format: ' . strtoupper($filters['format'] ?? '-')
             );
 
@@ -163,8 +163,8 @@ class StokOpnameController extends Controller implements HasMiddleware
                     . ' | Arah: ' . ($filters['direction'] ?? '-')
                     . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
                     . ' | Pencarian: ' . ($filters['search'] ?? '-')
-                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
-                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ?? '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ?? '-')
                     . (!empty($filters['edit']) ? ' | Edit Nomor Transaksi: ' . $filters['edit'] : '')
                     . (!empty($filters['delete']) ? ' | Delete Nomor Transaksi: ' . $filters['delete'] : '')
             );
