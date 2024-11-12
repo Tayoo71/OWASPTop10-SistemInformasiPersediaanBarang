@@ -22,7 +22,7 @@ class ExportBarangRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort_by' => 'nullable|in:id,nama_item,stok,jenis,merek,harga_pokok,harga_jual,keterangan,rak,status',
+            'sort_by' => 'nullable|in:id,nama_item,jenis,merek,keterangan,rak,status',
             'direction' => 'nullable|in:asc,desc',
             'gudang' => 'nullable|exists:gudangs,kode_gudang',
             'search' => 'nullable|string|max:255',

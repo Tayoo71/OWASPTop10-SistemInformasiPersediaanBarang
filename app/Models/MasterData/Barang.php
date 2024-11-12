@@ -2,12 +2,13 @@
 
 namespace App\Models\MasterData;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Shared\StokBarang;
-use App\Models\Transaksi\TransaksiBarangKeluar;
-use App\Models\Transaksi\TransaksiBarangMasuk;
-use App\Models\Transaksi\TransaksiItemTransfer;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Database\Eloquent\Model;
 use App\Models\Transaksi\TransaksiStokOpname;
+use App\Models\Transaksi\TransaksiBarangMasuk;
+use App\Models\Transaksi\TransaksiBarangKeluar;
+use App\Models\Transaksi\TransaksiItemTransfer;
 
 class Barang extends Model
 {
@@ -21,6 +22,17 @@ class Barang extends Model
         'status'
     ];
     public $timestamps = false;
+    // Mutator untuk mengenkripsi 'stok_minimum' sebelum disimpan
+    public function setStokMinimumAttribute($value)
+    {
+        $this->attributes['stok_minimum'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi 'stok_minimum' saat diambil
+    public function getStokMinimumAttribute($value)
+    {
+        return Crypt::decrypt($value);
+    }
     public function jenis()
     {
         return $this->belongsTo(Jenis::class, 'jenis_id');
@@ -71,15 +83,6 @@ class Barang extends Model
                 });
         });
 
-        // Filter berdasarkan gudang dan menghitung stok menggunakan subquery
-        $query->addSelect(['total_stok' => StokBarang::selectRaw('SUM(stok)')
-            ->whereColumn('stok_barangs.barang_id', 'barangs.id')
-            ->when($filters['gudang'], function ($q) use ($filters) {
-                // Jika ada filter gudang, hanya hitung stok untuk gudang tertentu
-                $q->where('kode_gudang', $filters['gudang']);
-            })
-            ->groupBy('stok_barangs.barang_id')]); // Mengelompokkan stok berdasarkan barang_id
-
         // Sorting
         $sortBy = $filters['sort_by'];
         $direction = $filters['direction'];
@@ -98,35 +101,14 @@ class Barang extends Model
                 ->whereColumn('mereks.id', 'barangs.merek_id')
                 ->limit(1)])
                 ->orderBy('nama_merek', $direction);
-        } else if ($sortBy === "stok") {
-            $query->addSelect(['total_stok' => StokBarang::selectRaw('SUM(stok)')
-                ->whereColumn('stok_barangs.barang_id', 'barangs.id')
-                ->when($filters['gudang'], function ($q) use ($filters) {
-                    $q->where('kode_gudang', $filters['gudang']);
-                })
-                ->groupBy('stok_barangs.barang_id')])
-                ->orderBy('total_stok', $direction);
-        } else if ($sortBy === "harga_pokok") {
-            $query->addSelect(['harga_pokok' => KonversiSatuan::select('harga_pokok')
-                ->whereColumn('konversi_satuans.barang_id', 'barangs.id')
-                ->orderBy('jumlah', 'desc')  // Mengambil satuan tertinggi
-                ->limit(1)])
-                ->orderBy('harga_pokok', $direction);
-        } else if ($sortBy === "harga_jual") {
-            $query->addSelect(['harga_jual' => KonversiSatuan::select('harga_jual')
-                ->whereColumn('konversi_satuans.barang_id', 'barangs.id')
-                ->orderBy('jumlah', 'desc')  // Mengambil satuan tertinggi
-                ->limit(1)])
-                ->orderBy('harga_jual', $direction);
         } else if ($sortBy === "status") {
             $query->orderBy('status', $filters['direction'] ?? 'asc');
         } else {
             $query->orderBy($sortBy, $direction);
         }
     }
-    public function getFormattedStokAndPrices()
+    public function getFormattedStokAndPrices($totalStok)
     {
-        $totalStok = $this->total_stok;
         $stokDisplay = KonversiSatuan::getFormattedConvertedStok($this, $totalStok);
 
         $hargaPokokDisplay = [];

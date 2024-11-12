@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('rak')->nullable();
             $table->foreignId('jenis_id')->nullable()->constrained('jenises')->nullOnDelete();
             $table->foreignId('merek_id')->nullable()->constrained('mereks')->nullOnDelete();
-            $table->integer('stok_minimum');
+            $table->text('stok_minimum');
             $table->enum('status', ['Aktif', 'Tidak Aktif'])->default('Aktif');
         });
     }

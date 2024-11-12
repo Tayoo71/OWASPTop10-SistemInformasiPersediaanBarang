@@ -22,7 +22,7 @@ class ExportStokMinimumRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sort_by' => 'nullable|in:id,nama_item,stok,jenis,merek,stok_minimum,keterangan,rak',
+            'sort_by' => 'nullable|in:id,nama_item,jenis,merek,keterangan,rak',
             'direction' => 'nullable|in:asc,desc',
             'gudang' => 'nullable|exists:gudangs,kode_gudang',
             'search' => 'nullable|string|max:255',

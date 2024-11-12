@@ -46,14 +46,24 @@ class StokMinimumController extends Controller implements HasMiddleware
             }
 
             $headers = ["Kode Item", "Nama Barang", "Stok", "Stok Minimum", "Jenis", "Merek", "Rak", "Keterangan"];
-            $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
+            $barangs = Barang::with([
+                'jenis',
+                'merek',
+                'konversiSatuans',
+                'stokBarangs' => function ($query) use ($filters) {
+                    if (!empty($filters['gudang'])) {
+                        $query->where('kode_gudang', $filters['gudang']);
+                    }
+                },
+            ])
                 ->search($filters)
                 ->where('status', 'Aktif')
                 ->get();
             // Filter barang yang stoknya di bawah atau sama dengan stok minimum
             $datas = $this->filteredStokBarang($filters, $barangs);
             $datas->transform(function ($barang) {
-                $formattedStokData = $barang->getFormattedStokAndPrices();
+                $totalStok = $barang->stokBarangs->sum('stok');
+                $formattedStokData = $barang->getFormattedStokAndPrices($totalStok);
                 $formattedStokMinimumData = KonversiSatuan::getFormattedConvertedStok($barang, $barang->stok_minimum);
                 return [
                     'id' => $barang->id,
@@ -111,7 +121,16 @@ class StokMinimumController extends Controller implements HasMiddleware
             $filters['sort_by'] = $validatedData['sort_by'] ?? 'nama_item';
             $filters['direction'] = $validatedData['direction'] ?? 'asc';
 
-            $barangs = Barang::with(['jenis', 'merek', 'stokBarangs', 'konversiSatuans'])
+            $barangs = Barang::with([
+                'jenis',
+                'merek',
+                'konversiSatuans',
+                'stokBarangs' => function ($query) use ($filters) {
+                    if (!empty($filters['gudang'])) {
+                        $query->where('kode_gudang', $filters['gudang']);
+                    }
+                },
+            ])
                 ->search($filters)
                 ->where('status', 'Aktif')
                 ->get();
@@ -131,7 +150,8 @@ class StokMinimumController extends Controller implements HasMiddleware
             );
 
             $paginatedBarangs->getCollection()->transform(function ($barang) {
-                $formattedStokData = $barang->getFormattedStokAndPrices();
+                $totalStok = $barang->stokBarangs->sum('stok');
+                $formattedStokData = $barang->getFormattedStokAndPrices($totalStok);
                 $formattedStokMinimumData = KonversiSatuan::getFormattedConvertedStok($barang, $barang->stok_minimum);
                 return [
                     'id' => $barang->id,
