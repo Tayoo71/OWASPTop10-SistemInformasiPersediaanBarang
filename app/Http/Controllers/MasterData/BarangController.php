@@ -12,7 +12,6 @@ use App\Models\MasterData\Gudang;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Crypt;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
