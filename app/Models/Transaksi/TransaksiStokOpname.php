@@ -22,24 +22,24 @@ class TransaksiStokOpname extends Model
     ];
 
     // Mutator untuk mengenkripsi 'stok_buku' sebelum disimpan
-    public function setJumlahStokBukukAttribute($value)
+    public function setStokBukuAttribute($value)
     {
         $this->attributes['stok_buku'] = Crypt::encrypt($value);
     }
 
     // Accessor untuk mendekripsi 'stok_buku' saat diambil
-    public function getJumlahStokBukukAttribute($value)
+    public function getStokBukuAttribute($value)
     {
         return Crypt::decrypt($value);
     }
     // Mutator untuk mengenkripsi 'stok_fisik' sebelum disimpan
-    public function setJumlahStokFisikAttribute($value)
+    public function setStokFisikAttribute($value)
     {
         $this->attributes['stok_fisik'] = Crypt::encrypt($value);
     }
 
     // Accessor untuk mendekripsi 'stok_fisik' saat diambil
-    public function getJumlahStokFisikAttribute($value)
+    public function getStokFisikAttribute($value)
     {
         return Crypt::decrypt($value);
     }
