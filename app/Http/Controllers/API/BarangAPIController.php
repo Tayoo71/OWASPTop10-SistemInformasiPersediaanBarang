@@ -21,6 +21,8 @@ class BarangAPIController extends Controller implements HasMiddleware
             new Middleware('permission:kartu_stok.read|kartu_stok.export', only: ['searchBarang']),
         ];
     }
+
+    // Used on Fitur Transaksi Create, Update
     public function search(SearchFunctionRequest $request)
     {
         $validatedData = $request->validated();
@@ -70,6 +72,8 @@ class BarangAPIController extends Controller implements HasMiddleware
 
         return response()->json($barangs);
     }
+
+    // Used on Kartu Stok
     public function searchBarang(SearchBarangFunctionRequest $request)
     {
         $validatedData = $request->validated();
