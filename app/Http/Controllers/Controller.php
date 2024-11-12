@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Traits\LogActivity;
+use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 abstract class Controller
 {
+    use LogActivity;
     // Function Handling and Logging Error
     protected function handleException(Exception $e, $request, $customMessage, $redirect)
     {
@@ -15,17 +18,16 @@ abstract class Controller
             'request_data' => $request,
             'exception_trace' => $e->getTraceAsString(),
         ]);
+        $this->logActivity($customMessage . $e->getMessage());
         return redirect()->route($redirect)->withErrors($customMessage);
     }
     public function logAPIValidationErrors($validator, $request, $className = null)
     {
-        // Log validation errors
         Log::error('Validation failed in ' . $className, [
             'request_data' => $request->all(),
             'validation_errors' => $validator->errors(),
         ]);
-
-        // Abort and return a 404 page
+        $this->logActivity('Terjadi kesalahan validasi ketika melakukan pengambilan data Barang dan Stok Barang' . ($className ?? 'API Request'));
         abort(404);
     }
     // Helper Function untuk kembalikan isi validated data

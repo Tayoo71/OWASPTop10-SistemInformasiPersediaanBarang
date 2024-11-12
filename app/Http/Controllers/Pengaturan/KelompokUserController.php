@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers\Pengaturan;
 
+use App\Traits\LogActivity;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Requests\Pengaturan\KelompokUser\ViewKelompokUSerRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\StoreKelompokUserRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\UpdateKelompokUserRequest;
 use App\Http\Requests\Pengaturan\KelompokUser\DestroyKelompokUserRequest;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Routing\Controllers\HasMiddleware;
 
 class KelompokUserController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:user_manajemen.akses', only: ['index', 'store', 'update']),
+            new Middleware('permission:user_manajemen.akses', only: ['index', 'store', 'update', 'destroy']),
         ];
     }
     public function index(ViewKelompokUSerRequest $request)
@@ -41,6 +43,14 @@ class KelompokUserController extends Controller implements HasMiddleware
                 ->paginate(20)
                 ->withQueryString();
 
+            $this->logActivity(
+                'Melihat Daftar Kelompok User dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . (!empty($filters['edit']) ? ' | Edit ID Kelompok: ' . $filters['edit'] : '')
+                    . (!empty($filters['delete']) ? ' | Delete ID Kelompok: ' . $filters['delete'] : '')
+            );
+
             return view('pages/pengaturan/kelompokuser', [
                 'title' => 'Kelompok User',
                 'roles' => $roles,
@@ -57,9 +67,12 @@ class KelompokUserController extends Controller implements HasMiddleware
         try {
             $filteredData = $request->validated();
 
-            Role::create(['name' => $filteredData['nama']]);
+            $role = Role::create(['name' => $filteredData['nama']]);
 
             DB::commit();
+
+            $this->logActivity('Menambahkan Kelompok User dengan ID: ' . $role->id . ' | Nama Kelompok: ' . $role->name);
+
             return redirect()->route('kelompokuser.index', $this->buildQueryParams($request, "KelompokUserController"))->with('success', 'Data Kelompok User berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -77,6 +90,8 @@ class KelompokUserController extends Controller implements HasMiddleware
             $role->update(['name' => $filteredData['nama']]);
 
             DB::commit();
+
+            $this->logActivity('Memperbarui Kelompok User dengan ID: ' . $role->id . ' | Nama Kelompok: ' . $role->name);
             return redirect()->route('kelompokuser.index', $this->buildQueryParams($request, "KelompokUserController"))->with('success', 'Data Kelompok User berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -92,11 +107,13 @@ class KelompokUserController extends Controller implements HasMiddleware
 
             if ($role->users()->exists()) {
                 DB::rollBack();
+                $this->logActivity('Gagal Menghapus Kelompok User dengan ID: ' . $role->id . ' | Nama Kelompok: ' . $role->name . ' karena masih terdapat User yang terhubung dengan Kelompok ini.');
                 return redirect()->route("kelompokuser.index")->withErrors("Data Kelompok User tidak dapat dihapus dikarenakan terdapat User yang masih terhubung dengan Kelompok ini. ");
             } else {
                 $role->delete();
 
                 DB::commit();
+                $this->logActivity('Menghapus Kelompok User dengan ID: ' . $role->id . ' | Nama Kelompok: ' . $role->name);
                 return redirect()->route('kelompokuser.index', $this->buildQueryParams($request, "KelompokUserController"))->with('success', 'Data Kelompok User berhasil dihapus.');
             }
         } catch (\Exception $e) {

@@ -62,23 +62,21 @@
                         <thead class="text-sm text-gray-700 bg-gray-50 sticky top-0 shadow-md">
                             <tr>
                                 <th scope="col" class="px-6 py-3 bg-gray-50">
-                                    <a href="{{ route('logaktivitas.index', array_merge(request()->query(), ['sort_by' => 'tanggal', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
+                                    <a href="{{ route('logaktivitas.index', array_merge(request()->query(), ['direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
                                         class="flex justify-center items-center">
                                         TANGGAL
-                                        @if (request('sort_by') === 'tanggal')
-                                            @if (request('direction') === 'asc')
-                                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M8 9l4-4 4 4" />
-                                                </svg>
-                                            @else
-                                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M16 15l-4 4-4-4" />
-                                                </svg>
-                                            @endif
+                                        @if (request('direction') === 'asc')
+                                            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M8 9l4-4 4 4" />
+                                            </svg>
+                                        @elseif (request('direction') === 'desc')
+                                            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 15l-4 4-4-4" />
+                                            </svg>
                                         @else
                                             <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -88,40 +86,18 @@
                                         @endif
                                     </a>
                                 </th>
-                                <th scope="col" class="px-6 py-3 bg-gray-50">
-                                    <a href="{{ route('logaktivitas.index', array_merge(request()->query(), ['sort_by' => 'keterangan', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}"
-                                        class="flex justify-center items-center">
-                                        KETERANGAN
-                                        @if (request('sort_by') === 'keterangan')
-                                            @if (request('direction') === 'asc')
-                                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M8 9l4-4 4 4" />
-                                                </svg>
-                                            @else
-                                                <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M16 15l-4 4-4-4" />
-                                                </svg>
-                                            @endif
-                                        @else
-                                            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-                                            </svg>
-                                        @endif
-                                    </a>
-                                </th>
+                                <th scope="col" class="px-6 py-3 bg-gray-50">AKTIVITAS</th>
+                                <th scope="col" class="px-6 py-3 bg-gray-50">USERNAME</th>
+                                <th scope="col" class="px-6 py-3 bg-gray-50">PERANGKAT</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($logs as $log)
                                 <tr class="odd:bg-white even:bg-gray-50 border-b">
                                     <td class="px-6 py-4 align-middle">{{ $log['tanggal'] }}</td>
-                                    <td class="px-6 py-4 align-middle">{{ $log['keterangan'] }}</td>
+                                    <td class="px-6 py-4 align-middle">{{ $log['deskripsi'] }}</td>
+                                    <td class="px-6 py-4 align-middle">{{ $log['user'] }}</td>
+                                    <td class="px-6 py-4 align-middle">{{ $log['device'] }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -132,6 +108,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="py-4 px-4 mt-4">
+                    {{ $logs->links() }}
                 </div>
             </main>
         </div>

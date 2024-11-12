@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Traits\LogActivity;
 use App\Exports\ExcelExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Gudang;
@@ -9,16 +10,17 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Excel as ExcelExcel;
-use App\Http\Requests\MasterData\DaftarGudang\ViewGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\StoreGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\UpdateGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\DestroyGudangRequest;
-use App\Http\Requests\MasterData\DaftarGudang\ExportGudangRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\DaftarGudang\ViewGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\StoreGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\ExportGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\UpdateGudangRequest;
+use App\Http\Requests\MasterData\DaftarGudang\DestroyGudangRequest;
 
 class GudangController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [
@@ -51,6 +53,13 @@ class GudangController extends Controller implements HasMiddleware
                 ->orderBy($filters['sort_by'], $filters['direction'])
                 ->get()
                 ->toArray();
+
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Daftar Gudang dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
 
             $fileName = 'Daftar Gudang ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
@@ -111,6 +120,14 @@ class GudangController extends Controller implements HasMiddleware
             $canDeleteDaftarGudang = auth()->user()->can('daftar_gudang.delete');
             $canExportDaftarGudang = auth()->user()->can('daftar_gudang.export');
 
+            $this->logActivity(
+                'Melihat Daftar Gudang dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Edit: ' . ($filters['edit'] ?? '-')
+                    . ' | Delete: ' . ($filters['delete'] ?? '-')
+            );
+
             return view('pages/master_data/daftargudang', [
                 'title' => 'Daftar Gudang',
                 'gudangs' => $gudangs,
@@ -138,8 +155,14 @@ class GudangController extends Controller implements HasMiddleware
         try {
             $filteredData = $request->validated();
 
-            Gudang::create($filteredData);
+            $gudang = Gudang::create($filteredData);
             DB::commit();
+
+            $this->logActivity(
+                'Menambahkan Gudang dengan Kode Gudang: ' . $gudang->kode_gudang
+                    . ' | Nama Gudang: ' . $gudang->nama_gudang
+            );
+
             return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -156,6 +179,10 @@ class GudangController extends Controller implements HasMiddleware
 
             $gudang->update($filteredData);
             DB::commit();
+            $this->logActivity(
+                'Memperbarui Gudang dengan Kode Gudang: ' . $gudang->kode_gudang
+                    . ' | Nama Gudang: ' . $gudang->nama_gudang
+            );
             return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -173,6 +200,10 @@ class GudangController extends Controller implements HasMiddleware
                 // Force delete gudang
                 $gudang->delete();
                 DB::commit();
+                $this->logActivity(
+                    'Menghapus Gudang dengan Kode Gudang: ' . $gudang->kode_gudang
+                        . ' | Nama Gudang: ' . $gudang->nama_gudang
+                );
                 return redirect()->route('daftargudang.index', $this->buildQueryParams($request, "GudangController"))->with('success', 'Data Gudang berhasil dihapus.');
             } else {
                 throw new \Exception('Data Gudang tidak dapat dihapus dikarenakan terdapat Transaksi Terkait. ');

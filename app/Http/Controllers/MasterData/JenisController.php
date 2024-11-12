@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
-use App\Models\MasterData\Jenis;
+use App\Traits\LogActivity;
 use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\DaftarJenis\DestroyJenisRequest;
-use App\Http\Requests\MasterData\DaftarJenis\ExportJenisRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MasterData\Jenis;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Requests\MasterData\DaftarJenis\StoreJenisRequest;
-use App\Http\Requests\MasterData\DaftarJenis\UpdateJenisRequest;
-use App\Http\Requests\MasterData\DaftarJenis\ViewJenisRequest;
 use Maatwebsite\Excel\Excel as ExcelExcel;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\DaftarJenis\ViewJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\StoreJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\ExportJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\UpdateJenisRequest;
+use App\Http\Requests\MasterData\DaftarJenis\DestroyJenisRequest;
 
 class JenisController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [
@@ -51,6 +53,14 @@ class JenisController extends Controller implements HasMiddleware
                 ->orderBy($filters['sort_by'], $filters['direction'])
                 ->get()
                 ->toArray();
+
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Daftar Jenis dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Format: ' . strtoupper($filters['format'] ?? '-')
+            );
+
 
             $fileName = 'Daftar Jenis ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
@@ -95,6 +105,14 @@ class JenisController extends Controller implements HasMiddleware
             $canDeleteDaftarJenis = auth()->user()->can('daftar_jenis.delete');
             $canExportDaftarJenis = auth()->user()->can('daftar_jenis.export');
 
+            $this->logActivity(
+                'Melihat Daftar Jenis dengan Sort By: ' . ($filters['sort_by'] ?? '-')
+                    . ' | Arah: ' . ($filters['direction'] ?? '-')
+                    . ' | Pencarian: ' . ($filters['search'] ?? '-')
+                    . ' | Edit: ' . ($filters['edit'] ?? '-')
+                    . ' | Delete: ' . ($filters['delete'] ?? '-')
+            );
+
             return view('pages/master_data/daftarjenis', [
                 'title' => 'Daftar Jenis',
                 'jenises' => $jenises,
@@ -116,9 +134,13 @@ class JenisController extends Controller implements HasMiddleware
         try {
             $filteredData = $request->validated();
 
-            Jenis::create($filteredData);
+            $jenis = Jenis::create($filteredData);
 
             DB::commit();
+            $this->logActivity(
+                'Menambahkan Jenis dengan ID: ' . $jenis->id
+                    . ' | Nama Jenis: ' . $jenis->nama_jenis
+            );
             return redirect()->route('daftarjenis.index', $this->buildQueryParams($request, "JenisController"))->with('success', 'Data Jenis berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -135,6 +157,10 @@ class JenisController extends Controller implements HasMiddleware
 
             $jenis->update($filteredData);
             DB::commit();
+            $this->logActivity(
+                'Memperbarui Jenis dengan ID: ' . $jenis->id
+                    . ' | Nama Jenis: ' . $jenis->nama_jenis
+            );
             return redirect()->route('daftarjenis.index', $this->buildQueryParams($request, "JenisController"))->with('success', 'Data Jenis berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -146,8 +172,14 @@ class JenisController extends Controller implements HasMiddleware
     {
         DB::beginTransaction();
         try {
-            Jenis::findOrFail($id)->delete();
+            $jenis = Jenis::findOrFail($id);
+            $jenis->delete();
             DB::commit();
+            $this->logActivity(
+                'Menghapus Jenis dengan ID: ' . $jenis->id
+                    . ' | Nama Jenis: ' . $jenis->nama_jenis
+            );
+
             return redirect()->route('daftarjenis.index', $this->buildQueryParams($request, "JenisController"))->with('success', 'Data Jenis berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();

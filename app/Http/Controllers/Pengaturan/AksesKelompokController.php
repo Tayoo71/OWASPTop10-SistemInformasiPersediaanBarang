@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers\Pengaturan;
 
-use Illuminate\Http\Request;
+use App\Traits\LogActivity;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Permission;
-use App\Http\Requests\Pengaturan\AksesKelompok\ViewAksesKelompokRequest;
-use App\Http\Requests\Pengaturan\AksesKelompok\UpdateAksesKelompokRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\Pengaturan\AksesKelompok\ViewAksesKelompokRequest;
+use App\Http\Requests\Pengaturan\AksesKelompok\UpdateAksesKelompokRequest;
 
 class AksesKelompokController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:user_manajemen.akses', only: ['index', 'store', 'update']),
+            new Middleware('permission:user_manajemen.akses', only: ['index', 'update']),
         ];
     }
     // Fitur Aplikasi yang akan diatur aksesnya
@@ -52,6 +53,11 @@ class AksesKelompokController extends Controller implements HasMiddleware
                 $permissions = $role->permissions->pluck('name')->toArray();
             }
 
+            $this->logActivity(
+                'Melihat Halaman Akses Kelompok'
+                    . (!empty($validatedData['role_id']) ? ' | Role ID: ' . $validatedData['role_id'] : '')
+            );
+
             return view('pages/pengaturan/akseskelompok', [
                 'title' => 'Akses Kelompok',
                 'roles' => $roles,
@@ -83,6 +89,11 @@ class AksesKelompokController extends Controller implements HasMiddleware
             $role->syncPermissions($permissions);
 
             DB::commit();
+
+            $this->logActivity(
+                'Mengubah Akses Kelompok untuk Role ID: ' . $role->id
+            );
+
             return redirect()->route('akseskelompok.index', $this->buildQueryParams($request, "AksesKelompokController"))->with('success', 'Data Akses Kelompok berhasil diubah.');
         } catch (\Exception $e) {
             DB::rollBack();

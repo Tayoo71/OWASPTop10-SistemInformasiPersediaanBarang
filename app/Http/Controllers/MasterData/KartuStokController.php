@@ -2,26 +2,28 @@
 
 namespace App\Http\Controllers\MasterData;
 
-use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use App\Traits\LogActivity;
+use App\Exports\ExcelExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
 use App\Models\Shared\StokBarang;
-use App\Exports\ExcelExport;
-use App\Http\Requests\MasterData\KartuStok\ExportKartuStokRequest;
-use App\Http\Requests\MasterData\KartuStok\ViewKartuStokRequest;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Excel as ExcelExcel;
 use App\Models\Transaksi\TransaksiStokOpname;
 use App\Models\Transaksi\TransaksiBarangMasuk;
-use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Routing\Controllers\Middleware;
 use App\Models\Transaksi\TransaksiBarangKeluar;
 use App\Models\Transaksi\TransaksiItemTransfer;
-use Maatwebsite\Excel\Excel as ExcelExcel;
-use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\MasterData\KartuStok\ViewKartuStokRequest;
+use App\Http\Requests\MasterData\KartuStok\ExportKartuStokRequest;
 
 class KartuStokController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [
@@ -43,6 +45,14 @@ class KartuStokController extends Controller implements HasMiddleware
             $barang = $filters['search'] . ' - ' . Barang::where('id', $filters['search'])->value('nama_item');
             $gudang = $filters['gudang'] === 'all' ? "Semua Gudang" :
                 $filters['gudang'] . " - " . Gudang::where('kode_gudang', $filters['gudang'])->value('nama_gudang');
+
+            $this->logActivity(
+                'Melakukan Cetak & Konversi Kartu Stok dengan Pencarian Kode Item: ' . ($filters['search'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+                    . ' | Format: ' . strtoupper($filters['format'])
+            );
 
             $fileName = 'Kartu Stok (' . $filters['search'] . ') ' . date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
@@ -73,6 +83,7 @@ class KartuStokController extends Controller implements HasMiddleware
             $filters = $this->getValidatedFilters($validatedData);
 
             if (!$filters['search'] || !$filters['start'] || !$filters['end']) {
+                $this->logActivity('Membuka Halaman Kartu Stok');
                 return view('pages/master_data/kartustok', [
                     'title' => 'Kartu Stok',
                     'gudangs' => Gudang::select('kode_gudang', 'nama_gudang')->get(),
@@ -83,6 +94,13 @@ class KartuStokController extends Controller implements HasMiddleware
             $kartuStok = $this->getDataKartuStok($filters['search'], $filters['gudang'], $filters['start'], $filters['end']);
 
             $canExportKartuStok = auth()->user()->can('kartu_stok.export');
+
+            $this->logActivity(
+                'Melihat Kartu Stok dengan Pencarian Kode Item: ' . ($filters['search'] ?? '-')
+                    . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
+                    . ' | Tanggal Mulai: ' . ($filters['start'] ? $filters['start']->format('d/m/Y') : '-')
+                    . ' | Tanggal Akhir: ' . ($filters['end'] ? $filters['end']->format('d/m/Y') : '-')
+            );
 
             return view('pages/master_data/kartustok', [
                 'title' => 'Kartu Stok',

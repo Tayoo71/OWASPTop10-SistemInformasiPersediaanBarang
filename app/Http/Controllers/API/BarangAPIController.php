@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Traits\LogActivity;
 use App\Models\MasterData\Barang;
-use App\Models\MasterData\KonversiSatuan;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\API\SearchBarangFunctionRequest;
-use App\Http\Requests\API\SearchFunctionRequest;
+use App\Models\MasterData\KonversiSatuan;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Http\Requests\API\SearchFunctionRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Requests\API\SearchBarangFunctionRequest;
 
 class BarangAPIController extends Controller implements HasMiddleware
 {
+    use LogActivity;
     public static function middleware(): array
     {
         return [
@@ -19,6 +21,8 @@ class BarangAPIController extends Controller implements HasMiddleware
             new Middleware('permission:kartu_stok.read|kartu_stok.export', only: ['searchBarang']),
         ];
     }
+
+    // Used on Fitur Transaksi Create, Update
     public function search(SearchFunctionRequest $request)
     {
         $validatedData = $request->validated();
@@ -61,8 +65,15 @@ class BarangAPIController extends Controller implements HasMiddleware
             return $data;
         });
 
+        $this->logActivity(
+            'Mencari Stok Barang untuk Transaksi dengan Pencarian: ' . ($search ?? '-')
+                . ' | Gudang: ' . ($gudang ?? 'Semua Gudang')
+        );
+
         return response()->json($barangs);
     }
+
+    // Used on Kartu Stok
     public function searchBarang(SearchBarangFunctionRequest $request)
     {
         $validatedData = $request->validated();
@@ -92,6 +103,11 @@ class BarangAPIController extends Controller implements HasMiddleware
                 'nama_item' => $barang->nama_item,
             ];
         });
+
+        $this->logActivity(
+            'Mencari Barang pada Fitur Kartu Stok dengan Pencarian: ' . ($search ?? '-')
+                . ' | Mode: ' . ($mode ?? '-')
+        );
 
         return response()->json($barangs);
     }
