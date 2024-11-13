@@ -1,8 +1,22 @@
-Options +SymLinksIfOwnerMatch
 RewriteEngine On
+Options +SymLinksIfOwnerMatch
 
-# Allow Installatron requests
-RewriteCond %{REQUEST_FILENAME} deleteme\.\w+\.php
-RewriteRule (.*) - [L]
+# Blokir akses ke file sensitif
 
-RewriteRule ^ index.php [L]
+<FilesMatch "^(\.env|artisan|composer\.(json|lock))$">
+Order allow,deny
+Deny from all
+</FilesMatch>
+
+# Blokir akses ke folder inti Laravel
+
+RewriteRule ^(app|bootstrap|config|database|resources|routes|storage|tests|vendor)/(.\*)$ - [F,L]
+
+# Serve existing files in the /public folder as if they were in /
+
+RewriteCond %{DOCUMENT_ROOT}/laravel-app/public%{REQUEST_URI} -f
+RewriteRule (.+) /laravel-app/public/$1 [L]
+
+# Route everything else to /public/index.php
+
+RewriteRule ^ /laravel-app/public/index.php [L]
