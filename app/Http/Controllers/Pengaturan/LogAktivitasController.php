@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pengaturan;
 
+use Carbon\Carbon;
 use App\Traits\LogActivity;
 use App\Http\Controllers\Controller;
 use Spatie\Activitylog\Models\Activity;
@@ -31,22 +32,17 @@ class LogAktivitasController extends Controller implements HasMiddleware
             $filters = $this->getFiltersWithDefaults($validatedData, $keys);
             $filters['direction'] = $validatedData['direction'] ?? 'desc';
 
-            $this->logActivity(
-                'Melihat halaman Log Aktivitas dengan Filter - '
-                    . 'Urutan: ' . ($filters['direction'] ?? '-') . ' | '
-                    . 'Tanggal Mulai: ' . ($filters['start'] ?? '-') . ' | '
-                    . 'Tanggal Akhir: ' . ($filters['end'] ?? '-') . ' | '
-                    . 'Pencarian: ' . ($filters['search'] ?? '-')
-            );
+            $startDate = isset($filters['start']) ? Carbon::createFromFormat('d/m/Y', $filters['start'])->startOfDay() : null;
+            $endDate = isset($filters['end']) ? Carbon::createFromFormat('d/m/Y', $filters['end'])->endOfDay() : null;
 
             $query = Activity::with('causer')
-                ->when($request->start, function ($query, $start) {
-                    return $query->whereDate('created_at', '>=', $start);
+                ->when($startDate, function ($query, $startDate) {
+                    return $query->whereDate('created_at', '>=', $startDate);
                 })
-                ->when($request->end, function ($query, $end) {
-                    return $query->whereDate('created_at', '<=', $end);
+                ->when($endDate, function ($query, $endDate) {
+                    return $query->whereDate('created_at', '<=', $endDate);
                 })
-                ->when($request->search, function ($query, $search) {
+                ->when($filters['search'], function ($query, $search) {
                     return $query->where(function ($query) use ($search) {
                         $query->where('description', 'LIKE', "%{$search}%")
                             ->orWhere('properties->device', 'LIKE', "%{$search}%")
@@ -63,6 +59,14 @@ class LogAktivitasController extends Controller implements HasMiddleware
                 'device' => $log->properties['device'] ?? 'Tidak ada data perangkat',
                 'user' => $log->causer->id ?? 'Tidak diketahui'
             ]);
+
+            $this->logActivity(
+                'Melihat halaman Log Aktivitas dengan Filter - '
+                    . 'Urutan: ' . ($filters['direction'] ?? '-') . ' | '
+                    . 'Tanggal Mulai: ' . ($filters['start'] ?? '-') . ' | '
+                    . 'Tanggal Akhir: ' . ($filters['end'] ?? '-') . ' | '
+                    . 'Pencarian: ' . ($filters['search'] ?? '-')
+            );
 
             return view('pages/pengaturan/logaktivitas', [
                 'title' => 'Log Aktivitas',
