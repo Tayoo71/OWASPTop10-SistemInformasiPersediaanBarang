@@ -14,7 +14,7 @@
             <form id="twoFactorForm" class="space-y-6" action="{{ url('two-factor-challenge') }}" method="POST">
                 @csrf
                 <div>
-                    <label id="codeLabel" for="code" class="block text-sm/6 font-medium text-gray-900">Kode
+                    <label id="codeLabel" for="codeInput" class="block text-sm/6 font-medium text-gray-900">Kode
                         Autentikasi</label>
                     <div class="mt-2">
                         <input id="codeInput" name="code" type="text" autofocus required

@@ -32,4 +32,5 @@
 
 <IfModule mod_headers.c>
     Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
