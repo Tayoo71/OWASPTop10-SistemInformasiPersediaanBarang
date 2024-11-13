@@ -2,12 +2,38 @@
 
 namespace App\Models\MasterData;
 
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Database\Eloquent\Model;
 
 class KonversiSatuan extends Model
 {
     protected $fillable = ['barang_id', 'satuan', 'jumlah', 'harga_pokok', 'harga_jual'];
     public $timestamps = false;
+
+    // Mutator untuk mengenkripsi 'harga_pokok' sebelum disimpan
+    public function setHargaPokokAttribute($value)
+    {
+        $this->attributes['harga_pokok'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi 'harga_pokok' saat diambil
+    public function getHargaPokokAttribute($value)
+    {
+        return Crypt::decrypt($value);
+    }
+
+    // Mutator untuk mengenkripsi 'harga_jual' sebelum disimpan
+    public function setHargaJualAttribute($value)
+    {
+        $this->attributes['harga_jual'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi 'harga_jual' saat diambil
+    public function getHargaJualAttribute($value)
+    {
+        return Crypt::decrypt($value);
+    }
+
     public function barang()
     {
         return $this->belongsTo(Barang::class);

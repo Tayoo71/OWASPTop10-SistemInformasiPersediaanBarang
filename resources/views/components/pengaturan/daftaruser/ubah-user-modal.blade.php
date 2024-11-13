@@ -6,11 +6,13 @@
         @method('PUT')
         <div class="grid gap-4 mb-4">
             <div class="col-span-2">
-                <label for="ubah_id"
-                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                <label for="ubah_id" class="block text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                <p class="mb-3 text-xs text-red-600 dark:text-red-400">
+                    Tidak dapat melakukan perubahan pada data "Username"
+                </p>
                 <input type="text" name="ubah_id" id="ubah_id" value="{{ $editUser['id'] }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    placeholder="Ubah Username" required>
+                    class="bg-gray-200 border border-gray-400 text-gray-800 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    placeholder="Ubah Username" disabled>
             </div>
         </div>
         <div class="grid gap-4 mb-4 relative">
@@ -55,7 +57,7 @@
                     {{ $editUser['is_2fa_active'] ? 'Aktif' : 'Tidak Aktif' }}
                 </p>
                 @if ($editUser['is_2fa_active'])
-                    <label class="flex items-center space-x-2 text-red-500 font-medium text-sm">
+                    <label class="flex items-center space-x-2 font-medium text-sm">
                         <input type="checkbox" name="reset_2fa" id="reset_2fa"
                             class="rounded focus:ring-primary-500 focus:border-primary-500">
                         <span>Reset 2FA</span>

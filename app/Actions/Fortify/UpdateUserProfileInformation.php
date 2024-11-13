@@ -24,13 +24,6 @@ class UpdateUserProfileInformation
         $user = User::where('id', $id)->lockForUpdate()->firstOrFail();
         $role = Role::where('id', $input['ubah_role_id'])->lockForUpdate()->firstOrFail();
         Validator::make($input, [
-            'ubah_id' => [
-                'required',
-                'string',
-                'min:3',
-                'max:255',
-                Rule::unique('users', 'id')->ignore($user->id),
-            ],
             'ubah_password' => [
                 'nullable',
                 Password::min(12)
@@ -50,7 +43,6 @@ class UpdateUserProfileInformation
 
         try {
             $dataToUpdate = [
-                'id' => $input['ubah_id'],
                 'status' => $input['ubah_status'],
             ];
 

@@ -3,11 +3,12 @@
 namespace App\Models\Transaksi;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use App\Models\Shared\User;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
-use App\Models\Shared\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Database\Eloquent\Model;
 
 class TransaksiStokOpname extends Model
 {
@@ -19,6 +20,29 @@ class TransaksiStokOpname extends Model
         'keterangan',
         'user_buat_id',
     ];
+
+    // Mutator untuk mengenkripsi 'stok_buku' sebelum disimpan
+    public function setStokBukuAttribute($value)
+    {
+        $this->attributes['stok_buku'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi 'stok_buku' saat diambil
+    public function getStokBukuAttribute($value)
+    {
+        return Crypt::decrypt($value);
+    }
+    // Mutator untuk mengenkripsi 'stok_fisik' sebelum disimpan
+    public function setStokFisikAttribute($value)
+    {
+        $this->attributes['stok_fisik'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi 'stok_fisik' saat diambil
+    public function getStokFisikAttribute($value)
+    {
+        return Crypt::decrypt($value);
+    }
 
     public function gudang()
     {

@@ -1,10 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Log;
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('activitylog:clean', function () {
-    $this->comment('Cleaning up old activity logs...');
-    Artisan::call('activitylog:clean');
-})->purpose('Clean up old activity logs')->daily();
+Schedule::command('activitylog:clean --force')->daily()
+    ->onFailure(function () {
+        Log::error('Failed to Clean Up Activity Logs');
+    });
+
+Schedule::command('enlightn --report')->runInBackground()->daily()
+    ->onFailure(function () {
+        Log::error('Failed to Run Enlightn');
+    });

@@ -84,10 +84,10 @@
                 </select>
             </div>
             <div class="col-span-2">
-                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <label class="block text-sm font-medium text-gray-900 dark:text-white">
                     Konversi Satuan
                 </label>
-                <span class="block mb-2 text-xs text-gray-500 dark:text-gray-400">Tidak dapat melakukan
+                <span class="block mb-2 text-xs text-red-600 dark:text-gray-400">Tidak dapat melakukan
                     perubahan pada Nama Satuan dan Jumlah Konversi Satuan</span>
                 <template x-for="(satuan, index) in konversiSatuan" :key="index">
                     <div class="flex space-x-2 mb-2">

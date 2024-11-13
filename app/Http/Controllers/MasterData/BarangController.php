@@ -56,8 +56,13 @@ class BarangController extends Controller implements HasMiddleware
             $datas = Barang::with([
                 'jenis',
                 'merek',
-                'stokBarangs',
-                'konversiSatuans'
+                'konversiSatuans',
+                // Apply the 'gudang' filter to 'stokBarangs'
+                'stokBarangs' => function ($query) use ($filters) {
+                    if (!empty($filters['gudang'])) {
+                        $query->where('kode_gudang', $filters['gudang']);
+                    }
+                }
             ])->search($filters);
             if ($filters['status'] === "aktif") {
                 $datas = $datas->where('barangs.status', 'Aktif');
@@ -72,7 +77,8 @@ class BarangController extends Controller implements HasMiddleware
                 $fileName = 'Daftar Barang Lengkap ';
                 $headers = ["Kode Item", "Nama Barang", "Stok", "Jenis", "Merek", "Harga Pokok", "Harga Jual", "Rak", "Keterangan", "Status"];
                 $datas->transform(function ($barang) {
-                    $formattedData = $barang->getFormattedStokAndPrices();
+                    $totalStok = $barang->stokBarangs->sum('stok');
+                    $formattedData = $barang->getFormattedStokAndPrices($totalStok);
                     return [
                         $barang->id,
                         $barang->nama_item,
@@ -90,7 +96,8 @@ class BarangController extends Controller implements HasMiddleware
                 $fileName = 'Daftar Barang Harga Pokok ';
                 $headers = ["Kode Item", "Nama Barang", "Stok", "Jenis", "Merek", "Harga Pokok", "Rak", "Keterangan", "Status"];
                 $datas->transform(function ($barang) {
-                    $formattedData = $barang->getFormattedStokAndPrices();
+                    $totalStok = $barang->stokBarangs->sum('stok');
+                    $formattedData = $barang->getFormattedStokAndPrices($totalStok);
                     return [
                         $barang->id,
                         $barang->nama_item,
@@ -107,7 +114,8 @@ class BarangController extends Controller implements HasMiddleware
                 $fileName = 'Daftar Barang Harga Jual ';
                 $headers = ["Kode Item", "Nama Barang", "Stok", "Jenis", "Merek", "Harga Jual", "Rak", "Keterangan", "Status"];
                 $datas->transform(function ($barang) {
-                    $formattedData = $barang->getFormattedStokAndPrices();
+                    $totalStok = $barang->stokBarangs->sum('stok');
+                    $formattedData = $barang->getFormattedStokAndPrices($totalStok);
                     return [
                         $barang->id,
                         $barang->nama_item,
@@ -124,7 +132,8 @@ class BarangController extends Controller implements HasMiddleware
                 $fileName = 'Daftar Barang Tanpa Harga ';
                 $headers = ["Kode Item", "Nama Barang", "Stok", "Jenis", "Merek", "Rak", "Keterangan", "Status"];
                 $datas->transform(function ($barang) {
-                    $formattedData = $barang->getFormattedStokAndPrices();
+                    $totalStok = $barang->stokBarangs->sum('stok');
+                    $formattedData = $barang->getFormattedStokAndPrices($totalStok);
                     return [
                         $barang->id,
                         $barang->nama_item,
@@ -152,7 +161,6 @@ class BarangController extends Controller implements HasMiddleware
                     . ' | Gudang: ' . ($filters['gudang'] ?? 'Semua Gudang')
                     . ' | Pencarian: ' . ($filters['search'] ?? '-')
             );
-
 
             $fileName .= date('d-m-Y His');
             if ($filters['format'] === "xlsx") {
@@ -187,16 +195,20 @@ class BarangController extends Controller implements HasMiddleware
             ];
             $filters = $this->getFiltersWithDefaults($validatedData, $keys);
 
-            // Query Barang dengan scopeSearch
             $barangs = Barang::with([
                 'jenis',
                 'merek',
-                'stokBarangs',
                 'konversiSatuans',
                 'transaksiBarangMasuks',
                 'transaksiBarangKeluars',
                 'transaksiStokOpnames',
-                'transaksiItemTransfers'
+                'transaksiItemTransfers',
+                // Apply the 'gudang' filter to 'stokBarangs'
+                'stokBarangs' => function ($query) use ($filters) {
+                    if (!empty($filters['gudang'])) {
+                        $query->where('kode_gudang', $filters['gudang']);
+                    }
+                },
             ])
                 ->search($filters)
                 ->paginate(20)
@@ -210,7 +222,8 @@ class BarangController extends Controller implements HasMiddleware
             $canExportDaftarBarang = auth()->user()->can('daftar_barang.export');
 
             $barangs->getCollection()->transform(function ($barang) use ($canAccessHargaPokok, $canAccessHargaJual) {
-                $formattedData = $barang->getFormattedStokAndPrices();
+                $totalStok = $barang->stokBarangs->sum('stok');
+                $formattedData = $barang->getFormattedStokAndPrices($totalStok);
                 $data = [
                     'id' => $barang->id,
                     'nama_item' => $barang->nama_item,
@@ -305,12 +318,11 @@ class BarangController extends Controller implements HasMiddleware
 
             $barang->update($filteredData);
             foreach ($filteredData['konversiSatuan'] as $konversi) {
-                $barang->konversiSatuans()
-                    ->where('id', $konversi['id'])
-                    ->update([
-                        'harga_pokok' => $konversi['harga_pokok'] ?? 0,
-                        'harga_jual' => $konversi['harga_jual'] ?? 0,
-                    ]);
+                $konversiSatuan = $barang->konversiSatuans()->findOrFail($konversi['id']);
+                $konversiSatuan->update([
+                    'harga_pokok' => $konversi['harga_pokok'] ?? 0,
+                    'harga_jual' => $konversi['harga_jual'] ?? 0,
+                ]);
             }
             DB::commit();
 

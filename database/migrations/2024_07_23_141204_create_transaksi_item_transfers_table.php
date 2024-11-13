@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('gudang_asal');
             $table->string('gudang_tujuan');
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('restrict');
-            $table->bigInteger('jumlah_stok_transfer');
+            $table->text('jumlah_stok_transfer');
             $table->text('keterangan')->nullable();
             $table->timestamps();
 

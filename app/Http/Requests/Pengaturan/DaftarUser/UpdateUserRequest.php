@@ -23,7 +23,6 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ubah_id' => 'required|string|min:3|max:255|unique:users,id,' . $this->route('daftaruser') . ',id',
             'ubah_password' => [
                 'nullable',
                 Password::min(12)
@@ -47,7 +46,6 @@ class UpdateUserRequest extends FormRequest
     public function attributes()
     {
         return [
-            'ubah_id' => 'username',
             'ubah_password' => 'password',
             'ubah_role_id' => 'kelompok',
             'ubah_status' => 'status',

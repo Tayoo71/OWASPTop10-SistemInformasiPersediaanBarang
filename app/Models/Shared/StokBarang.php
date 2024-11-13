@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
+use Illuminate\Support\Facades\Crypt;
 
 class StokBarang extends Model
 {
@@ -13,6 +14,19 @@ class StokBarang extends Model
     public $incrementing = false;
     public $timestamps = false;
     protected $fillable = ['barang_id', 'kode_gudang', 'stok'];
+
+    // Mutator untuk mengenkripsi 'stok' sebelum disimpan
+    public function setStokAttribute($value)
+    {
+        $this->attributes['stok'] = Crypt::encrypt($value);
+    }
+
+    // Accessor untuk mendekripsi 'stok' saat diambil
+    public function getStokAttribute($value)
+    {
+        return Crypt::decrypt($value);
+    }
+
     public function barang()
     {
         return $this->belongsTo(Barang::class);
@@ -44,6 +58,7 @@ class StokBarang extends Model
                 ->first();
 
             if ($stokBarang) {
+                $stokBarang->stok = Crypt::decrypt($stokBarang->stok);
                 if ($proses == 'masuk') {
                     // Tambahkan stok saat proses 'masuk'
                     $newStok = $stokBarang->stok + $stokFisik;
@@ -75,7 +90,7 @@ class StokBarang extends Model
                     ->where('barang_id', $barangId)
                     ->where('kode_gudang', $kodeGudang)
                     ->update([
-                        'stok' => $newStok,
+                        'stok' => Crypt::encrypt($newStok),
                         'updated_at' => now(),
                     ]);
             } else {
@@ -84,7 +99,7 @@ class StokBarang extends Model
                     DB::table('stok_barangs')->insert([
                         'barang_id' => $barangId,
                         'kode_gudang' => $kodeGudang,
-                        'stok' => $stokFisik,
+                        'stok' => Crypt::encrypt($stokFisik),
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);

@@ -19,7 +19,7 @@ use App\Http\Controllers\Pengaturan\LogAktivitasController;
 use App\Http\Controllers\Pengaturan\AksesKelompokController;
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['device_login', 'auth', 'auth.session'])->group(function () {
     Route::get('/two-factor-activate', function () {
         return view('pages/auth/two-factor-activate');
     })->name('two_factor_activate');

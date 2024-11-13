@@ -124,73 +124,74 @@ class KartuStokController extends Controller implements HasMiddleware
     }
     private function getDataKartuStok($barangId, $gudang, $start, $end)
     {
-        // Get saldo akhir and transactions
-        list($saldoAkhir, $transaksiDalamPeriode) = $this->getSaldoAndTransactions($barangId, $gudang, $start, $end);
+        // Get transactions before the start date and within the period
+        list($transaksiSebelumPeriode, $transaksiDalamPeriode) = $this->getTransactions($barangId, $gudang, $start, $end);
 
         // Calculate saldo awal
-        $saldoAwal = $this->calculateSaldoAwal($saldoAkhir, $transaksiDalamPeriode, $gudang);
+        $saldoAwal = $this->calculateSaldoAwal($transaksiSebelumPeriode, $gudang);
 
         // Generate Kartu Stok
         return $this->generateKartuStok($saldoAwal, $gudang, $start, $end, $transaksiDalamPeriode);
     }
-    /**
-     * Get saldo akhir and all transactions within the specified period.
-     */
-    private function getSaldoAndTransactions($barangId, $gudang, $start, $end)
+
+    private function getTransactions($barangId, $gudang, $start, $end)
     {
+        // Get all transactions up to the end date
         if ($gudang === 'all') {
-            $saldoAkhir = StokBarang::where('barang_id', $barangId)->sum('stok');
-            $transaksiDalamPeriode = collect()
-                ->merge(TransaksiBarangMasuk::where('barang_id', $barangId)->whereBetween('updated_at', [$start, $end])->get())
-                ->merge(TransaksiBarangKeluar::where('barang_id', $barangId)->whereBetween('updated_at', [$start, $end])->get())
-                ->merge(TransaksiStokOpname::where('barang_id', $barangId)->whereBetween('updated_at', [$start, $end])->get())
-                ->merge(TransaksiItemTransfer::where('barang_id', $barangId)->whereBetween('updated_at', [$start, $end])->get())
-                ->sortByDesc('updated_at');
+            $allTransactions = collect()
+                ->merge(TransaksiBarangMasuk::where('barang_id', $barangId)->where('updated_at', '<=', $end)->get())
+                ->merge(TransaksiBarangKeluar::where('barang_id', $barangId)->where('updated_at', '<=', $end)->get())
+                ->merge(TransaksiStokOpname::where('barang_id', $barangId)->where('updated_at', '<=', $end)->get())
+                ->merge(TransaksiItemTransfer::where('barang_id', $barangId)->where('updated_at', '<=', $end)->get())
+                ->sortBy('updated_at');
         } else {
-            $saldoAkhir = StokBarang::where('barang_id', $barangId)->where('kode_gudang', $gudang)->sum('stok');
-            $transaksiDalamPeriode = collect()
-                ->merge(TransaksiBarangMasuk::where('barang_id', $barangId)->where('kode_gudang', $gudang)->whereBetween('updated_at', [$start, $end])->get())
-                ->merge(TransaksiBarangKeluar::where('barang_id', $barangId)->where('kode_gudang', $gudang)->whereBetween('updated_at', [$start, $end])->get())
-                ->merge(TransaksiStokOpname::where('barang_id', $barangId)->where('kode_gudang', $gudang)->whereBetween('updated_at', [$start, $end])->get())
+            $allTransactions = collect()
+                ->merge(TransaksiBarangMasuk::where('barang_id', $barangId)->where('kode_gudang', $gudang)->where('updated_at', '<=', $end)->get())
+                ->merge(TransaksiBarangKeluar::where('barang_id', $barangId)->where('kode_gudang', $gudang)->where('updated_at', '<=', $end)->get())
+                ->merge(TransaksiStokOpname::where('barang_id', $barangId)->where('kode_gudang', $gudang)->where('updated_at', '<=', $end)->get())
                 ->merge(TransaksiItemTransfer::where('barang_id', $barangId)->where(function ($query) use ($gudang) {
                     $query->where('gudang_asal', $gudang)->orWhere('gudang_tujuan', $gudang);
-                })->whereBetween('updated_at', [$start, $end])->get())
-                ->sortByDesc('updated_at');
+                })->where('updated_at', '<=', $end)->get())
+                ->sortBy('updated_at');
         }
 
-        return [$saldoAkhir, $transaksiDalamPeriode];
+        // Separate transactions before the start date and within the period
+        $transaksiSebelumPeriode = $allTransactions->filter(function ($trx) use ($start) {
+            return $trx->updated_at < $start;
+        });
+
+        $transaksiDalamPeriode = $allTransactions->filter(function ($trx) use ($start, $end) {
+            return $trx->updated_at >= $start && $trx->updated_at <= $end;
+        });
+
+        return [$transaksiSebelumPeriode, $transaksiDalamPeriode];
     }
 
-    /**
-     * Calculate saldo awal (starting balance).
-     */
-    private function calculateSaldoAwal($saldoAkhir, $transaksiDalamPeriode, $gudang)
+    private function calculateSaldoAwal($transaksiSebelumPeriode, $gudang)
     {
-        $saldoAwal = $saldoAkhir;
+        $saldoAwal = 0;
 
-        foreach ($transaksiDalamPeriode as $trx) {
+        foreach ($transaksiSebelumPeriode as $trx) {
             if (isset($trx->jumlah_stok_masuk)) {
-                $saldoAwal -= $trx->jumlah_stok_masuk;
+                $saldoAwal += $trx->jumlah_stok_masuk;
             } elseif (isset($trx->jumlah_stok_keluar)) {
-                $saldoAwal += $trx->jumlah_stok_keluar;
+                $saldoAwal -= $trx->jumlah_stok_keluar;
             } elseif (isset($trx->stok_fisik)) {
                 $selisih = $trx->stok_fisik - $trx->stok_buku;
-                $saldoAwal -= $selisih;
+                $saldoAwal += $selisih;
             } elseif (isset($trx->jumlah_stok_transfer) && $gudang !== 'all') {
                 if ($trx->gudang_asal == $gudang) {
-                    $saldoAwal += $trx->jumlah_stok_transfer;
-                } elseif ($trx->gudang_tujuan == $gudang) {
                     $saldoAwal -= $trx->jumlah_stok_transfer;
+                } elseif ($trx->gudang_tujuan == $gudang) {
+                    $saldoAwal += $trx->jumlah_stok_transfer;
                 }
             }
+            // For 'all' warehouses, internal transfers do not affect total stock
         }
 
         return $saldoAwal;
     }
 
-    /**
-     * Generate the Kartu Stok array.
-     */
     private function generateKartuStok($saldoAwal, $gudang, $start, $end, $transaksiDalamPeriode)
     {
         $saldoStok = $saldoAwal;
@@ -228,11 +229,12 @@ class KartuStokController extends Controller implements HasMiddleware
                 $jumlah = $selisih;
             } elseif (isset($trx->jumlah_stok_transfer)) {
                 if ($gudang === 'all') {
+                    // For 'all' warehouses, transfers net to zero
                     $saldoStok -= $trx->jumlah_stok_transfer;
-                    $kartuStok[] = $this->buildTransferEntry($trx, $saldoStok, 'Item Transfer', '-' . $trx->jumlah_stok_transfer, $trx->gudang_asal);
+                    $kartuStok[] = $this->buildTransferEntry($trx, $saldoStok, 'Item Transfer Keluar', '-' . $trx->jumlah_stok_transfer, $trx->gudang_asal);
                     $saldoStok += $trx->jumlah_stok_transfer;
-                    $kartuStok[] = $this->buildTransferEntry($trx, $saldoStok, 'Item Transfer', $trx->jumlah_stok_transfer, $trx->gudang_tujuan);
-                    continue; // Skip adding to general Kartu Stok for 'all' transfers
+                    $kartuStok[] = $this->buildTransferEntry($trx, $saldoStok, 'Item Transfer Masuk', $trx->jumlah_stok_transfer, $trx->gudang_tujuan);
+                    continue;
                 } else {
                     if ($trx->gudang_asal == $gudang) {
                         $saldoStok -= $trx->jumlah_stok_transfer;
@@ -252,7 +254,7 @@ class KartuStokController extends Controller implements HasMiddleware
             $kartuStok[] = [
                 'nomor_transaksi' => $trx->id ?? '-',
                 'gudang' => $kodeGudang,
-                'tanggal' => $trx->updated_at->format('d/m/Y H:i:s') ?? '-',
+                'tanggal' => $trx->updated_at->format('d/m/Y H:i:s T') ?? '-',
                 'tipe_transaksi' => $tipe,
                 'jumlah' => $jumlah,
                 'saldo_stok' => $saldoStok,
@@ -282,7 +284,7 @@ class KartuStokController extends Controller implements HasMiddleware
         return [
             'nomor_transaksi' => $trx->id ?? '-',
             'gudang' => $gudang,
-            'tanggal' => $trx->updated_at->format('d/m/Y H:i:s') ?? '-',
+            'tanggal' => $trx->updated_at->format('d/m/Y H:i:s T') ?? '-',
             'tipe_transaksi' => $tipeTransaksi,
             'jumlah' => $jumlah,
             'saldo_stok' => $saldoStok,

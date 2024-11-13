@@ -40,7 +40,7 @@ class UserController extends Controller implements HasMiddleware
 
             $users = User::with('roles')
                 ->where('id', '!=', "admin")
-                ->where('id', 'like', '%' . $request->input('search', '') . '%')
+                ->where('id', 'like', '%' . $filters['search'] . '%')
                 ->get();
 
             // Lakukan sorting pada koleksi setelah pengambilan data
@@ -122,7 +122,7 @@ class UserController extends Controller implements HasMiddleware
             $data = $request->validated();
             app(UpdateUserProfileInformation::class)->update($id, $data);
             $this->logActivity(
-                'Memperbarui Data User dengan Username Sebelumnya: ' . $id . ' | Username Baru: ' . $data['ubah_id']
+                'Memperbarui Data User dengan Username: ' . $id
             );
 
             return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil diubah.');

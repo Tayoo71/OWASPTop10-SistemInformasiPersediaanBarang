@@ -7,6 +7,9 @@
                 <h3 class="text-3xl font-bold text-gray-900">{{ $title }}</h3>
             </header>
             <main class="flex-1 p-6 bg-gray-100 overflow-auto">
+                <div class="text-center text-yellow-300 mb-4">
+                    <p>Log Yang Disimpan Hanya 6 Bulan Terakhir.</p>
+                </div>
                 <form class="w-full max-w-lg lg:max-w-3xl xl:max-w-4xl mx-auto mb-4" method="GET" action="">
                     <div class="flex justify-center mb-4">
                         <div id="date-range-picker" date-rangepicker datepicker-buttons datepicker-format="dd/mm/yyyy"
