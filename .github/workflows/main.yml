@@ -18,7 +18,7 @@ jobs:
 
       - name: Cache Composer packages
         id: composer-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: vendor
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -40,7 +40,7 @@ jobs:
           composer update --prefer-stable --optimize-autoloader --no-dev --no-suggest
 
       - name: Compile assets
-        run: npm run production
+        run: npm run build
 
       - name: Run Laravel optimization commands
         run: |
