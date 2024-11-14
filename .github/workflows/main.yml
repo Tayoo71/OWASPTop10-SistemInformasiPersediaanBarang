@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.2
+          php-version: 8.3
 
       - name: Cache Composer packages
         id: composer-cache
@@ -26,12 +26,43 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader --no-dev
 
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      - name: Install Node dependencies
+        run: |
+          npm install
+          npm update
+          npm audit fix
+
+      - name: Run additional Composer commands
+        run: |
+          composer dump-autoload
+          composer update --prefer-stable --optimize-autoloader --no-dev
+
+      - name: Run migrations
+        run: php artisan migrate --force --no-interaction
+
+      - name: Compile assets
+        run: npm run production
+
+      - name: Run Laravel optimization commands
+        run: |
+          php artisan optimize
+          php artisan optimize:clear
+          php artisan cache:clear
+          php artisan optimize
+          php artisan config:cache
+          php artisan event:cache
+          php artisan route:cache
+          php artisan view:cache
+
+      - name: 📂 Sync Files
+        uses: SamKirkland/web-deploy@v1
         with:
-          server: ${{ secrets.ftp_server }}
-          username: ${{ secrets.ftp_username }}
-          password: ${{ secrets.ftp_password }}
-          server-dir: /public_html/
+          target-server: ${{ secrets.SSH_SERVER }}
+          ssh-port: ${{ secrets.SSH_PORT }}
+          remote-user: ${{ secrets.SSH_USER }}
+          private-ssh-key: ${{ secrets.SSH_KEY }}
+          destination-path: ${{ secrets.SSH_PATH }}
+          rsync-options: --delete-after --exclude=.env --exclude=.git* --exclude=.git/ --exclude=README.md --exclude=readme.md --exclude=.gitignore
+          
