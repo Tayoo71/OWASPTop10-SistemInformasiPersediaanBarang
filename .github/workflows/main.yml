@@ -40,7 +40,7 @@ jobs:
           remote-user: ${{ secrets.SSH_USER }}
           private-ssh-key: ${{ secrets.SSH_KEY }}
           destination-path: ${{ secrets.SSH_PATH }}
-          rsync-options: --delete-after --recursive --exclude '.env' --exclude '.git*' --exclude '.git/' --exclude 'README.md' --exclude 'readme.md' --exclude '.gitignore'
+          rsync-options: --delete-after --recursive --exclude '.env' --exclude '.git*' --exclude '.git/' --exclude 'README.md' --exclude 'readme.md' --exclude '.gitignore' --exclude 'storage/app' --exclude 'storage/framework' --exclude 'storage/logs'
 
       - name: Run Composer and Laravel commands on server via Remote SSH
         uses: appleboy/ssh-action@master
