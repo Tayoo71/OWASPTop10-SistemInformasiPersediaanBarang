@@ -25,34 +25,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-php-
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction --optimize-autoloader --no-dev
-
-      - name: Install Node dependencies
+      - name: Install Node dependencies and build assets
         run: |
           npm install
           npm update
           npm audit fix
-
-      - name: Run additional Composer commands
-        run: |
-          composer dump-autoload
-          composer update --prefer-stable --optimize-autoloader --no-dev --no-suggest
-
-      - name: Compile assets
-        run: npm run build
-
-      - name: Run Laravel optimization commands
-        run: |
-          php artisan optimize
-          php artisan optimize:clear
-          php artisan cache:clear
-          php artisan optimize
-          php artisan config:cache
-          php artisan event:cache
-          php artisan route:cache
-          php artisan view:cache
-
+          npm run build
+          
       - name: 📂 Sync Files
         uses: SamKirkland/web-deploy@v1
         with:
@@ -63,7 +42,7 @@ jobs:
           destination-path: ${{ secrets.SSH_PATH }}
           rsync-options: --delete-after --exclude=.env --exclude=.git* --exclude=.git/ --exclude=README.md --exclude=readme.md --exclude=.gitignore
 
-      - name: Run migrations on server via SSH
+      - name: Run Composer and Laravel commands on server via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_SERVER }}
@@ -72,4 +51,15 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ${{ secrets.SSH_PATH }}
+            composer install --prefer-dist --no-progress --no-suggest --no-interaction --optimize-autoloader --no-dev
+            composer dump-autoload
+            composer update --prefer-stable --optimize-autoloader --no-dev --no-suggest
             php artisan migrate --force --no-interaction
+            php artisan optimize
+            php artisan optimize:clear
+            php artisan cache:clear
+            php artisan optimize
+            php artisan config:cache
+            php artisan event:cache
+            php artisan route:cache
+            php artisan view:cache
