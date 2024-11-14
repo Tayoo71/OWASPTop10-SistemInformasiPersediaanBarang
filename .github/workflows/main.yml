@@ -26,7 +26,7 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader --no-dev
+        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction --optimize-autoloader --no-dev
 
       - name: Install Node dependencies
         run: |
@@ -37,10 +37,7 @@ jobs:
       - name: Run additional Composer commands
         run: |
           composer dump-autoload
-          composer update --prefer-stable --optimize-autoloader --no-dev
-
-      - name: Run migrations
-        run: php artisan migrate --force --no-interaction
+          composer update --prefer-stable --optimize-autoloader --no-dev --no-suggest
 
       - name: Compile assets
         run: npm run production
@@ -65,4 +62,14 @@ jobs:
           private-ssh-key: ${{ secrets.SSH_KEY }}
           destination-path: ${{ secrets.SSH_PATH }}
           rsync-options: --delete-after --exclude=.env --exclude=.git* --exclude=.git/ --exclude=README.md --exclude=readme.md --exclude=.gitignore
-          
+
+      - name: Run migrations on server via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_SERVER }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ secrets.SSH_PATH }}
+            php artisan migrate --force --no-interaction
