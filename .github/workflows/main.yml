@@ -40,6 +40,7 @@ jobs:
           remote-user: ${{ secrets.SSH_USER }}
           private-ssh-key: ${{ secrets.SSH_KEY }}
           destination-path: ${{ secrets.SSH_PATH }}
+          rsync-options: --exclude='.env'
 
       - name: Run Composer and Laravel commands on server via-SSH
         uses: appleboy/ssh-action@master
@@ -50,9 +51,9 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ${{ secrets.SSH_PATH }}
-            composer install --prefer-dist --no-progress --no-suggest --no-interaction --optimize-autoloader --no-dev
-            composer dump-autoload
-            composer update --prefer-stable --optimize-autoloader --no-dev --no-suggest
+            composer2 install --prefer-dist --no-progress --no-suggest --no-interaction --optimize-autoloader --no-dev
+            composer2 dump-autoload
+            composer2 update --prefer-stable --optimize-autoloader --no-dev --no-suggest
             php artisan migrate --force --no-interaction
             php artisan optimize
             php artisan optimize:clear
