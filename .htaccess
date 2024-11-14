@@ -1,8 +1,15 @@
 Options +SymLinksIfOwnerMatch
 RewriteEngine On
 
+# Mengarahkan semua permintaan ke folder /public untuk keamanan
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/$1 [L,NC]
+
 # Allow Installatron requests
 RewriteCond %{REQUEST_FILENAME} deleteme\.\w+\.php
 RewriteRule (.*) - [L]
 
-RewriteRule ^ index.php [L]
+# Mengarahkan semua permintaan ke index.php di dalam /public
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ /public/index.php [L]
