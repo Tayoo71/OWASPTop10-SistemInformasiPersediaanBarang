@@ -63,7 +63,6 @@
                                 </div>
                             @endif
                         </div>
-
                         <div class="relative">
                             @if (auth()->user()->can('barang_masuk.read') ||
                                     auth()->user()->can('barang_keluar.read') ||
@@ -122,7 +121,6 @@
                                 </div>
                             </button>
                         </div>
-
                         <div x-show="isOpen" @click.away="isOpen = false"
                             x-transition:enter="transition ease-out duration-100 transform"
                             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
@@ -130,14 +128,31 @@
                             x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                             class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                             role="menu" tabindex="-1">
-                            @if (auth()->user()->can('user_manajemen.akses'))
-                                <a href="{{ route('daftaruser.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem"
-                                    tabindex="-1" id="user-menu-item-1">Pengaturan</a>
-                            @elseif (auth()->user()->can('log_aktivitas.akses'))
-                                <a href="{{ route('logaktivitas.index') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem"
-                                    tabindex="-1" id="user-menu-item-1">Pengaturan</a>
+                            @if (auth()->user()->can('user_manajemen.akses') || auth()->user()->can('log_aktivitas.akses'))
+                                <div class="relative group">
+                                    <p class="block px-4 py-2 text-sm text-gray-700 {{ request()->is(['daftaruser', 'kelompokuser', 'akseskelompok', 'logaktivitas']) ? 'bg-gray-300' : 'hover:bg-gray-100' }}"
+                                        role="menuitem" tabindex="-1" id="user-menu-item-1">
+                                        Pengaturan
+                                    </p>
+                                    <div class="hidden group-hover:block mt-0 ml-4 pl-4 border-l border-gray-300">
+                                        @if (auth()->user()->can('user_manajemen.akses'))
+                                            <a href="{{ route('daftaruser.index') }}"
+                                                class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('daftaruser') ? 'bg-gray-300' : 'hover:bg-gray-100' }}"
+                                                role="menuitem" tabindex="-1">Daftar User</a>
+                                            <a href="{{ route('kelompokuser.index') }}"
+                                                class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('kelompokuser') ? 'bg-gray-300' : 'hover:bg-gray-100' }}"
+                                                role="menuitem" tabindex="-1">Kelompok User</a>
+                                            <a href="{{ route('akseskelompok.index') }}"
+                                                class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('akseskelompok') ? 'bg-gray-300' : 'hover:bg-gray-100' }}"
+                                                role="menuitem" tabindex="-1">Akses Kelompok</a>
+                                        @endif
+                                        @if (auth()->user()->can('log_aktivitas.akses'))
+                                            <a href="{{ route('logaktivitas.index') }}"
+                                                class="block px-4 py-2 text-sm text-gray-700 {{ request()->is('logaktivitas') ? 'bg-gray-300' : 'hover:bg-gray-100' }}"
+                                                role="menuitem" tabindex="-1">Log Aktivitas</a>
+                                        @endif
+                                    </div>
+                                </div>
                             @endif
                             <a href="#logout-form" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -246,16 +261,32 @@
                 </div>
             </div>
             <div class="mt-3 space-y-1 px-2">
+                @if (auth()->user()->can('user_manajemen.akses') || auth()->user()->can('log_aktivitas.akses'))
+                    <p
+                        class="block rounded-md px-8 py-2 text-base font-medium {{ request()->is(['daftaruser', 'kelompokuser', 'akseskelompok', 'logaktivitas']) ? 'bg-gray-900 text-white' : 'text-gray-400' }}">
+                        Pengaturan</p>
+                @endif
                 @if (auth()->user()->can('user_manajemen.akses'))
                     <a href="{{ route('daftaruser.index') }}"
-                        class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pengaturan</a>
-                @elseif (auth()->user()->can('log_aktivitas.akses'))
+                        class="block rounded-md px-14 py-1 text-base font-medium {{ request()->is('daftaruser') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Daftar
+                        User</a>
+                    <a href="{{ route('kelompokuser.index') }}"
+                        class="block rounded-md px-14 py-1 text-base font-medium {{ request()->is('kelompokuser') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Kelompok
+                        User</a>
+                    <a href="{{ route('akseskelompok.index') }}"
+                        class="block rounded-md px-14 py-1 text-base font-medium {{ request()->is('akseskelompok') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Akses
+                        Kelompok
+                    </a>
+                @endif
+                @if (auth()->user()->can('log_aktivitas.akses'))
                     <a href="{{ route('logaktivitas.index') }}"
-                        class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Pengaturan</a>
+                        class="block rounded-md px-14 py-1 text-base font-medium {{ request()->is('logaktivitas') ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">Log
+                        Aktivitas
+                    </a>
                 @endif
                 <a href="#logout-form"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                    class="block rounded-md px-8 py-1 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</a>
+                    class="block rounded-md px-8 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout</a>
             </div>
         </div>
     </div>

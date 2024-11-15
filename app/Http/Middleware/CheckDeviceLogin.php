@@ -51,13 +51,13 @@ class CheckDeviceLogin
             $currentSessionData &&
             ($currentSessionData->ip_address !== $request->ip() || $currentSessionData->user_agent !== $request->header('User-Agent'))
         ) {
-            $this->logActivity('Sistem Logout Akun Otomatis Dikarenakan menggunakan Device yang berbeda Pada Username: ' . $currentUserID);
+            $this->logActivity('Sistem Logout Akun Otomatis, terdeteksi menggunakan Device atau Jaringan yang berbeda Pada Username: ' . $currentUserID);
 
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->with('error', 'Device atau Lokasi Anda Berubah, Silahkan Login Kembali. ');
+            return redirect()->route('login')->with('error', 'Device atau Jaringan Anda Berubah, Silahkan Login Kembali. ');
         }
 
         return $next($request);
