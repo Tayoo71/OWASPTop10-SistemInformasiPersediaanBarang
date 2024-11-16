@@ -39,8 +39,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
-          composer require --dev vimeo/psalm
+          composer install --no-progress --no-suggest
 
       - name: Psalm Security Scan
         uses: psalm/psalm-github-security-scan@f3e6fd9432bc3e44aec078572677ce9d2ef9c287
