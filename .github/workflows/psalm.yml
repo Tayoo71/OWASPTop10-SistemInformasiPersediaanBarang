@@ -23,24 +23,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          extensions: mbstring, pdo, pdo_mysql, gd, bcmath # Ensure required extensions are listed
-          ini-values: memory_limit=-1
-          coverage: none
-
-      - name: Install additional dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
-
-      - name: Install dependencies
-        run: |
-          composer install --no-progress --no-suggest
-          composer update --prefer-stable --no-suggest
-
       - name: Psalm Security Scan
         uses: psalm/psalm-github-security-scan@f3e6fd9432bc3e44aec078572677ce9d2ef9c287
 
