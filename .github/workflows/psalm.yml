@@ -1,15 +1,9 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Psalm Security Scan
 
 on:
   push:
     branches: [ "master" ]
   pull_request:
-    # The branches below must be a subset of the branches above
     branches: [ "master" ]
   schedule:
     - cron: '0 16 * * 6' # Every Saturday at 16:00 UTC, which is Sunday 00:00 GMT+8
@@ -33,9 +27,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
-          extensions: mbstring, pdo, pdo_mysql, gd, bcmath
+          extensions: mbstring, pdo, pdo_mysql, gd, bcmath # Ensure required extensions are listed
           ini-values: memory_limit=-1
           coverage: none
+
+      - name: Install additional dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
 
       - name: Install dependencies
         run: |
