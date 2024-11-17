@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Transaksi\BarangMasuk;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateBarangMasukRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,5 +31,14 @@ class UpdateBarangMasukRequest extends FormRequest
             'jumlah_stok_masuk' => 'required|integer|min:1',
             'keterangan' => 'nullable|string|max:1000',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Ubah Data Transaksi Barang Masuk. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

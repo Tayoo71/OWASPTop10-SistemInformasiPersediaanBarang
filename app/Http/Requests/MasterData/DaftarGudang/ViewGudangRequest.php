@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\MasterData\DaftarGudang;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ViewGudangRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,5 +31,14 @@ class ViewGudangRequest extends FormRequest
             'edit' => 'nullable|exists:gudangs,kode_gudang',
             'delete' => 'nullable|exists:gudangs,kode_gudang',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Halaman Daftar Gudang. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

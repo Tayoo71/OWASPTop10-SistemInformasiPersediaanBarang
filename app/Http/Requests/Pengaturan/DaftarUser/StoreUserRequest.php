@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\Pengaturan\DaftarUser;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUserRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -37,5 +40,14 @@ class StoreUserRequest extends FormRequest
             'role_id' => 'required|exists:roles,id',
             'status' => 'required|in:Aktif,Tidak Aktif',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Simpan Data User. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\MasterData\DaftarBarang;
 
+use App\Traits\LogActivity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdateBarangRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -45,5 +48,14 @@ class UpdateBarangRequest extends FormRequest
                 Rule::unique('barangs', 'nama_item')->ignore($this->route('daftarbarang')),
             ],
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Ubah Data Barang. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

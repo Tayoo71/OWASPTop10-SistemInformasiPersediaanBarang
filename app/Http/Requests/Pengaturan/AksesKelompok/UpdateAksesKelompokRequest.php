@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Pengaturan\AksesKelompok;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAksesKelompokRequest extends FormRequest
 {
+    use LogActivity;
     private $features = [];
 
     /**
@@ -52,5 +55,14 @@ class UpdateAksesKelompokRequest extends FormRequest
         return [
             'role_id' => 'kelompok',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Ubah Akses Kelompok. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

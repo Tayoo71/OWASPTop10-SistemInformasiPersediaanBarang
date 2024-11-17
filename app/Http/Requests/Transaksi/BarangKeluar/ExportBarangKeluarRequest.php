@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Transaksi\BarangKeluar;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ExportBarangKeluarRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -30,5 +33,14 @@ class ExportBarangKeluarRequest extends FormRequest
             'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
             'format' => 'nullable|in:pdf,xlsx,csv',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Cetak & Konversi Transaksi Barang Keluar. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

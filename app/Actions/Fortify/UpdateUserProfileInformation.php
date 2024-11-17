@@ -4,7 +4,6 @@ namespace App\Actions\Fortify;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 use App\Models\Shared\User;

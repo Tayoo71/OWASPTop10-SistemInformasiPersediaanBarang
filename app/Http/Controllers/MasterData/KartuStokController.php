@@ -8,7 +8,6 @@ use App\Exports\ExcelExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\MasterData\Barang;
 use App\Models\MasterData\Gudang;
-use App\Models\Shared\StokBarang;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Excel as ExcelExcel;

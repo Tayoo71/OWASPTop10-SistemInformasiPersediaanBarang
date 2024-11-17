@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Transaksi\StokOpname;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreOpnameRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -28,5 +31,14 @@ class StoreOpnameRequest extends FormRequest
             'stok_fisik' => 'required|integer|min:0',
             'keterangan' => 'nullable|string|max:1000',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Simpan Data Transaksi Stok Opname. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

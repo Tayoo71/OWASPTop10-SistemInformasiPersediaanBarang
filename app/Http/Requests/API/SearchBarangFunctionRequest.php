@@ -30,7 +30,11 @@ class SearchBarangFunctionRequest extends FormRequest
     }
     protected function failedValidation(Validator $validator)
     {
-        // Call the logAPIValidationErrors function from the BarangAPIController
-        app(BarangAPIController::class)->logAPIValidationErrors($validator, $this, __CLASS__);
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Pada API Request untuk melakukan Pencarian Barang Kartu Stok. Errors: ' . $errorDetails;
+        app(BarangAPIController::class)->logAPIValidationErrors($validator, $this, $logMessage);
+        // Optionally, throw the default validation exception to halt further execution
+        parent::failedValidation($validator);
     }
 }

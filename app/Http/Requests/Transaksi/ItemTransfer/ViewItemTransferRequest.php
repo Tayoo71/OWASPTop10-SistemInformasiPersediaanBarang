@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Transaksi\ItemTransfer;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ViewItemTransferRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -31,5 +34,14 @@ class ViewItemTransferRequest extends FormRequest
             'edit' => 'nullable|exists:transaksi_item_transfers,id',
             'delete' => 'nullable|exists:transaksi_item_transfers,id',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Halaman Item Transfer. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

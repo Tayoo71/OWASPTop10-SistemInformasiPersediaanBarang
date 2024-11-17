@@ -36,7 +36,11 @@ class SearchFunctionRequest extends FormRequest
     }
     protected function failedValidation(Validator $validator)
     {
-        // Call the logAPIValidationErrors function from the BarangAPIController
-        app(BarangAPIController::class)->logAPIValidationErrors($validator, $this, __CLASS__);
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Pada API Request untuk melakukan Transaksi. Errors: ' . $errorDetails;
+        app(BarangAPIController::class)->logAPIValidationErrors($validator, $this, $logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

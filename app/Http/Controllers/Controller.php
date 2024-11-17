@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Traits\LogActivity;
-use Jenssegers\Agent\Agent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -27,7 +26,7 @@ abstract class Controller
             'request_data' => $request->all(),
             'validation_errors' => $validator->errors(),
         ]);
-        $this->logActivity('Terjadi kesalahan validasi ketika melakukan pengambilan data Barang dan Stok Barang' . ($className ?? 'API Request'));
+        $this->logActivity('Terjadi kesalahan validasi ketika melakukan pengambilan data Barang dan Stok Barang ' . ($className ?? 'API Request'));
         abort(404);
     }
     // Helper Function untuk kembalikan isi validated data

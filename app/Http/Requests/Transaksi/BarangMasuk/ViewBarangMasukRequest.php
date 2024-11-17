@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Transaksi\BarangMasuk;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ViewBarangMasukRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -31,5 +34,14 @@ class ViewBarangMasukRequest extends FormRequest
             'edit' => 'nullable|exists:transaksi_barang_masuks,id',
             'delete' => 'nullable|exists:transaksi_barang_masuks,id',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Halaman Barang Masuk. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests\MasterData\DaftarBarang;
 
-
+use App\Traits\LogActivity;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 
 class StoreBarangRequest extends FormRequest
 {
+    use LogActivity;
     public function authorize(): bool
     {
         return $this->user()->can('daftar_barang.create');
@@ -48,5 +49,14 @@ class StoreBarangRequest extends FormRequest
                 $validator->errors()->add('konversiSatuan', 'Setidaknya satu dari Jumlah dalam Konversi Satuan harus memiliki nilai 1');
             }
         });
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Simpan Data Barang. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\MasterData\StokMinimum;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ViewStokMinimumRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,5 +30,14 @@ class ViewStokMinimumRequest extends FormRequest
             'gudang' => 'nullable|exists:gudangs,kode_gudang',
             'search' => 'nullable|string|max:255',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Halaman Stok Minimum. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }

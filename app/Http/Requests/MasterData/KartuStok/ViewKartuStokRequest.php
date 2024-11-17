@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\MasterData\KartuStok;
 
+use App\Traits\LogActivity;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ViewKartuStokRequest extends FormRequest
 {
+    use LogActivity;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,5 +30,14 @@ class ViewKartuStokRequest extends FormRequest
             'start' => 'nullable|date_format:d/m/Y|before_or_equal:end',
             'end' => 'nullable|date_format:d/m/Y|after_or_equal:start',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        $errorMessages = $validator->errors()->all();
+        $errorDetails = json_encode($errorMessages);
+        $logMessage = 'Terjadi Kesalahan Validasi pada Halaman Kartu Stok. Errors: ' . $errorDetails;
+        $this->logActivity($logMessage);
+        // Optionally, throw the default Laravel validation exception
+        parent::failedValidation($validator);
     }
 }
