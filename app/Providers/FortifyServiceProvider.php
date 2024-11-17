@@ -35,12 +35,12 @@ class FortifyServiceProvider extends ServiceProvider
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
-            $this->logActivity('Percobaan Login Pada Username: ' . $request->input(Fortify::username()), $request->input(Fortify::username()));
+            $this->logActivity('Percobaan Login Pada Username: ' . $request->input(Fortify::username()), true);
             return Limit::perMinute(5)->by($throttleKey);
         });
 
         RateLimiter::for('two-factor', function (Request $request) {
-            $this->logActivity('Percobaan Kode Autentikasi 2 Faktor (2FA) Login Pada Username: ' . $request->session()->get('login.id'), $request->session()->get('login.id'));
+            $this->logActivity('Percobaan Kode Autentikasi 2 Faktor (2FA) Login Pada Username: ' . $request->session()->get('login.id'), true);
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
     }

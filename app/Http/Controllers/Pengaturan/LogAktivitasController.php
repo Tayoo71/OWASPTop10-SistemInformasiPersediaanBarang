@@ -56,8 +56,8 @@ class LogAktivitasController extends Controller implements HasMiddleware
             $logs = $query->through(fn($log) => [
                 'tanggal' => $log->created_at->format('d/m/Y H:i:s T'),
                 'deskripsi' => $log->description,
-                'device' => $log->properties['device'] ?? 'Tidak ada data perangkat',
-                'user' => $log->causer->id ?? 'Tidak diketahui'
+                'device' => $log->properties['device'] ?? '-',
+                'user' => $log->causer->id ?? '-'
             ]);
 
             $this->logActivity(
