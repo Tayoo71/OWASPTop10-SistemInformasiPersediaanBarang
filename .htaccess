@@ -13,3 +13,9 @@ RewriteRule (.*) - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ /public/index.php [L]
+
+# DO NOT REMOVE THIS LINE AND THE LINES BELOW HOTLINKID:2NASXidPgK
+RewriteEngine on
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?aplikasipersediaantokox.com/.*$      [NC]
+RewriteRule .*\.(.*|jpg|jpeg|gif|png|bmp|tiff|avi|mpeg|mpg|wma|mov|zip|rar|exe|mp3|pdf|swf|psd|txt|html|htm|php)$ https://aplikasipersediaantokox.com [R,NC]
+# DO NOT REMOVE THIS LINE AND THE LINES ABOVE 2NASXidPgK:HOTLINKID

@@ -108,7 +108,9 @@ class UserController extends Controller implements HasMiddleware
             $data = $request->validated();
             app(CreateNewUser::class)->create($data);
             $this->logActivity(
-                'Menambahkan User baru dengan Username: ' . $data['id']
+                'Menambahkan User baru dengan Username: ' . ($data['id'] ?? '-') .
+                    ' | Role: ' . ($data['role_id'] ?? '-') .
+                    ' | Status: ' . ($data['status'] ?? '-')
             );
 
             return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil ditambahkan.');
@@ -122,8 +124,21 @@ class UserController extends Controller implements HasMiddleware
             $data = $request->validated();
             app(UpdateUserProfileInformation::class)->update($id, $data);
             $this->logActivity(
-                'Memperbarui Data User dengan Username: ' . $id
+                'Memperbarui Data User dengan Username: ' . $id .
+                    ' | Role: ' . ($data['ubah_role_id'] ?? '-') .
+                    ' | Status: ' . ($data['ubah_status'] ?? '-')
             );
+
+            if (!empty($data['ubah_password'])) {
+                $this->logActivity(
+                    'Terdeteksi pengubahan Password Pada Username: ' . $id
+                );
+            }
+            if (!empty($data['reset_2fa'])) {
+                $this->logActivity(
+                    'Terdeteksi pengaturan ulang Autentikasi Dua Faktor (2FA) Pada Username: ' . $id
+                );
+            }
 
             return redirect()->route('daftaruser.index', $this->buildQueryParams($request, "UserController"))->with('success', 'Data User berhasil diubah.');
         } catch (\Exception $e) {

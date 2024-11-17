@@ -11,7 +11,7 @@ trait LogActivity
      *
      * @param string $description
      */
-    public function logActivity(string $description)
+    public function logActivity(string $description, $customCauser = null)
     {
         $ipAddress = request()->ip();
         $userAgent = request()->header('User-Agent');
@@ -23,10 +23,19 @@ trait LogActivity
         $platform = $agent->platform();
         $device = $agent->device();
 
-        activity()
-            ->withProperties([
-                'device' => 'IP Address: (' . $ipAddress . ') | Perangkat: (' . $platform . ' | ' . $device . ' | ' . $browser . ' ' . $browserVersion . ')'
-            ])
-            ->log($description);
+        if ($customCauser) {
+            activity()
+                ->causedBy($customCauser)
+                ->withProperties([
+                    'device' => 'IP Address: (' . $ipAddress . ') | Perangkat: (' . $platform . ' | ' . $device . ' | ' . $browser . ' ' . $browserVersion . ')'
+                ])
+                ->log($description);
+        } else {
+            activity()
+                ->withProperties([
+                    'device' => 'IP Address: (' . $ipAddress . ') | Perangkat: (' . $platform . ' | ' . $device . ' | ' . $browser . ' ' . $browserVersion . ')'
+                ])
+                ->log($description);
+        }
     }
 }

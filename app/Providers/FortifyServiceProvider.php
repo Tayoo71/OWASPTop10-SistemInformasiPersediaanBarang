@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Traits\LogActivity;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 
 class FortifyServiceProvider extends ServiceProvider
 {
+    use LogActivity;
     /**
      * Register any application services.
      */
@@ -33,11 +35,12 @@ class FortifyServiceProvider extends ServiceProvider
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())) . '|' . $request->ip());
-
+            $this->logActivity('Percobaan Login Pada Username: ' . $request->input(Fortify::username()), $request->input(Fortify::username()));
             return Limit::perMinute(5)->by($throttleKey);
         });
 
         RateLimiter::for('two-factor', function (Request $request) {
+            $this->logActivity('Percobaan Kode Autentikasi 2 Faktor (2FA) Login Pada Username: ' . $request->session()->get('login.id'), $request->session()->get('login.id'));
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
     }
