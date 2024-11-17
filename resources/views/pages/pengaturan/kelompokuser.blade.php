@@ -102,7 +102,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">
                             Data Kelompok tidak ditemukan.
                         </td>
                     </tr>

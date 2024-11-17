@@ -379,7 +379,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data Transaksi Barang Masuk
+                        <td colspan="10" class="px-6 py-4 text-center text-gray-500">Data Transaksi Barang Masuk
                             tidak ditemukan.
                         </td>
                     </tr>

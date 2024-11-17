@@ -382,7 +382,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">Data Stok Opname
+                        <td colspan="11" class="px-6 py-4 text-center text-gray-500">Data Stok Opname
                             tidak ditemukan.
                         </td>
                     </tr>
