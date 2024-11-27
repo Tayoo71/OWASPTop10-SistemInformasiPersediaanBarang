@@ -116,5 +116,4 @@
     <div class="py-4 px-4 mt-4">
         {{ $logs->links() }}
     </div>
-    <x-auth.logout-form />
 </x-layout>

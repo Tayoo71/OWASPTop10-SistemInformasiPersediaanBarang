@@ -87,5 +87,4 @@
             </table>
         </div>
     </form>
-    <x-auth.logout-form />
 </x-layout>

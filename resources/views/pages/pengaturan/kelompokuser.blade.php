@@ -127,5 +127,4 @@
             message='Tindakan ini tidak dapat dibatalkan dan akan menghapus seluruh data terkait. Apakah Anda yakin ingin menghapus Kelompok "{{ $deleteRole->name }}"?' />
     @endif
 
-    <x-auth.logout-form />
 </x-layout>

@@ -290,5 +290,7 @@
             </div>
         </div>
     </div>
-    <x-auth.logout-form />
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+        @csrf
+    </form>
 </nav>

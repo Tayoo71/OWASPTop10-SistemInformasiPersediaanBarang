@@ -149,7 +149,6 @@
         <x-pengaturan.daftaruser.ubah-user-modal :roles="$roles" :editUser="$editUser" />
     @endif
 
-    <x-auth.logout-form />
 
     @push('scripts')
         <script>
