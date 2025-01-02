@@ -54,7 +54,10 @@ class CheckDeviceLogin
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->with('error', 'Device atau Jaringan Anda Berubah, Silahkan Login Kembali. ');
+            return redirect()->route('login')
+                ->with('error', 'Device atau Jaringan Anda Berubah, Silahkan Login Kembali. ')
+                ->header('Content-Length', 0)
+                ->header('Content-Type', 'text/plain');
         }
 
         return $next($request);

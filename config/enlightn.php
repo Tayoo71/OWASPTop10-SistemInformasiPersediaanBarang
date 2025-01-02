@@ -16,14 +16,12 @@ return [
 
     // If you wish to skip running some analyzers, list the classes in the array below.
     'exclude_analyzers' => [
-        \Enlightn\Enlightn\Analyzers\Security\XSSAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Security\LicenseAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Security\FrontendVulnerableDependencyAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Performance\QueueDriverAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Performance\MysqlSingleServerAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Performance\MinificationAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Performance\CacheDriverAnalyzer::class,
-        \Enlightn\Enlightn\Analyzers\Security\UpToDateDependencyAnalyzer::class,
     ],
 
     // If you wish to skip running some analyzers in CI mode, list the classes below.

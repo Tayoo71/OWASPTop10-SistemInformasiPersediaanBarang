@@ -32,9 +32,13 @@ class CheckUserStatus
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect()->route('login')->withErrors([
-                'status' => 'Status Akun Anda Tidak Aktif. Silakan Hubungi Administrator. ',
-            ]);
+
+            return redirect()->route('login')
+                ->withErrors([
+                    'status' => 'Status Akun Anda Tidak Aktif. Silakan Hubungi Administrator. ',
+                ])
+                ->header('Content-Length', 0)
+                ->header('Content-Type', 'text/plain');
         }
 
         return $next($request);
