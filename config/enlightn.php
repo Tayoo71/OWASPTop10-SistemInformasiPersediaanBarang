@@ -22,6 +22,8 @@ return [
         \Enlightn\Enlightn\Analyzers\Performance\MysqlSingleServerAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Performance\MinificationAnalyzer::class,
         \Enlightn\Enlightn\Analyzers\Performance\CacheDriverAnalyzer::class,
+        \Enlightn\Enlightn\Analyzers\Security\UpToDateDependencyAnalyzer::class,
+        \Enlightn\Enlightn\Analyzers\Security\XSSAnalyzer::class
     ],
 
     // If you wish to skip running some analyzers in CI mode, list the classes below.
