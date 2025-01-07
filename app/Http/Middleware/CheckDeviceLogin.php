@@ -46,7 +46,8 @@ class CheckDeviceLogin
         // Lakukan pengecekan IP dan User Agent untuk sesi saat ini
         if (
             $currentSessionData &&
-            ($currentSessionData->ip_address !== $request->ip() || $currentSessionData->user_agent !== $request->header('User-Agent'))
+            (inet_pton($currentSessionData->ip_address) !== inet_pton($request->ip()) ||
+                $currentSessionData->user_agent !== $request->header('User-Agent'))
         ) {
             $this->logActivity('Sistem Logout Akun Otomatis, terdeteksi menggunakan Device atau Jaringan yang berbeda Pada Username: ' . $currentUserID);
 
