@@ -44,21 +44,28 @@ class CheckDeviceLogin
         }
 
         // Lakukan pengecekan IP dan User Agent untuk sesi saat ini
-        if (
-            $currentSessionData &&
-            (inet_pton($currentSessionData->ip_address) !== inet_pton($request->ip()) ||
-                $currentSessionData->user_agent !== $request->header('User-Agent'))
-        ) {
-            $this->logActivity('Sistem Logout Akun Otomatis, terdeteksi menggunakan Device atau Jaringan yang berbeda Pada Username: ' . $currentUserID);
+        if ($currentSessionData) {
+            $ipChanged = inet_pton($currentSessionData->ip_address) != inet_pton($request->ip());
+            $uaChanged = $currentSessionData->user_agent != $request->header('User-Agent');
+            if ($ipChanged || $uaChanged) {
+                if ($ipChanged && $uaChanged) {
+                    $msg = 'Sistem Logout Otomatis, terdeteksi Device dan Network (IP) berbeda untuk Username: ';
+                } elseif ($ipChanged) {
+                    $msg = 'Sistem Logout Otomatis, terdeteksi Network (IP) berbeda untuk Username: ';
+                } else {
+                    $msg = 'Sistem Logout Otomatis, terdeteksi Device (User-Agent) berbeda untuk Username: ';
+                }
+                $this->logActivity($msg . $currentUserID);
 
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
 
-            return redirect()->route('login')
-                ->with('error', 'Device atau Jaringan Anda Berubah, Silahkan Login Kembali. ')
-                ->header('Content-Length', 0)
-                ->header('Content-Type', 'text/plain');
+                return redirect()->route('login')
+                    ->with('error', 'Untuk melanjutkan, silakan login kembali.')
+                    ->header('Content-Length', 0)
+                    ->header('Content-Type', 'text/plain');
+            }
         }
 
         return $next($request);

@@ -7,8 +7,3 @@ Schedule::command('activitylog:clean --force')->daily()
     ->onFailure(function () {
         Log::error('Failed to Clean Up Activity Logs');
     });
-
-Schedule::command('enlightn --report')->runInBackground()->weekly()
-    ->onFailure(function () {
-        Log::error('Failed to Run Enlightn');
-    });
