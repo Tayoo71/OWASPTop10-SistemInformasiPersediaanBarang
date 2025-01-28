@@ -35,7 +35,7 @@ class CheckUserStatus
 
             return redirect()->route('login')
                 ->withErrors([
-                    'status' => 'Status Akun Anda Tidak Aktif. Silakan Hubungi Administrator. ',
+                    'status' => 'Status Akun Anda Tidak Aktif. Silakan Hubungi Administrator atau Pemilik Toko. ',
                 ])
                 ->header('Content-Length', 0)
                 ->header('Content-Type', 'text/plain');
