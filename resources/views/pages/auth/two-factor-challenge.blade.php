@@ -17,7 +17,7 @@
                     <label id="codeLabel" for="codeInput" class="block text-sm/6 font-medium text-gray-900">Kode
                         Autentikasi</label>
                     <div class="mt-2">
-                        <input id="codeInput" name="code" type="text" autofocus required
+                        <input id="codeInput" name="code" type="number" autofocus required
                             class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-700 sm:text-sm/6">
                     </div>
                 </div>
@@ -51,12 +51,14 @@
                 titlePageLabel.textContent = 'Masukkan Kode Pemulihan Autentikasi 2 Langkah Anda';
                 codeLabel.textContent = 'Kode Pemulihan';
                 codeInput.name = 'recovery_code';
+                codeInput.type = 'text';
                 toggleText.innerHTML =
                     'Memiliki Akses Autentikasi? <a href="javascript:void(0);" onclick="toggleRecoveryMode()" class="font-semibold text-blue-700 hover:text-blue-800">Masukkan Kode Autentikasi</a>';
             } else {
                 titlePageLabel.textContent = 'Masukkan Kode Autentikasi 2 Langkah Anda';
                 codeLabel.textContent = 'Kode Autentikasi';
                 codeInput.name = 'code';
+                codeInput.type = 'number';
                 toggleText.innerHTML =
                     'Kehilangan Akses Autentikasi? <a href="javascript:void(0);" onclick="toggleRecoveryMode()" class="font-semibold text-blue-700 hover:text-blue-800">Masukkan Kode Pemulihan</a>';
             }

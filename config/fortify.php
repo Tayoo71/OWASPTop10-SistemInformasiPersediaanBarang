@@ -145,7 +145,7 @@ return [
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => false,
-            'window' => 10,
+            'window' => 10, //Selisih Waktu 10 Detik
         ]),
     ],
 
