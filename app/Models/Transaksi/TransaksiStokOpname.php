@@ -65,7 +65,6 @@ class TransaksiStokOpname extends Model
             return $query->where(function ($query) use ($search) {
                 $query->where('id', 'like', '%' . $search . '%')
                     ->orWhere('user_buat_id', 'like', '%' . $search . '%')
-                    ->orWhere('user_update_id', 'like', '%' . $search . '%')
                     ->orWhere('keterangan', 'like', '%' . $search . '%')
                     ->orWhereHas('barang', function ($query) use ($search) {
                         $query->where('nama_item', 'like', '%' . $search . '%');
