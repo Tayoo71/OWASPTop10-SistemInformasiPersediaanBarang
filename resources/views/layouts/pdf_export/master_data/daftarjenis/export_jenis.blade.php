@@ -73,6 +73,17 @@
                 color: #000;
                 margin-bottom: 10px;
             }
+
+
+            table {
+                table-layout: fixed;
+                /* Menetapkan lebar kolom secara statis */
+            }
+
+            td {
+                overflow-wrap: break-word;
+                /* Membungkus teks jika melebihi lebar kolom */
+            }
         </style>
     </head>
 

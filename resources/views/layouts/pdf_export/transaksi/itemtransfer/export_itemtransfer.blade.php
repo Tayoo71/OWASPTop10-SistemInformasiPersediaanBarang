@@ -8,9 +8,9 @@
         <style>
             body {
                 font-family: Arial, sans-serif;
-                font-size: 12px;
+                font-size: 10px;
                 /* Mengurangi ukuran font agar lebih pas di A4 */
-                margin: 20px;
+                margin: 10px;
             }
 
             h1 {
@@ -19,9 +19,9 @@
             }
 
             table {
+                table-layout: fixed;
                 width: 100%;
                 border-collapse: collapse;
-                margin-bottom: 20px;
             }
 
             table,
@@ -32,7 +32,7 @@
 
             th,
             td {
-                padding: 6px;
+                padding: 4px;
                 /* Mengurangi padding untuk lebih banyak ruang */
                 text-align: center;
                 vertical-align: middle;
@@ -45,27 +45,28 @@
 
             td {
                 word-wrap: break-word;
+                overflow-wrap: break-word;
             }
 
             /* Mengatur proporsi kolom */
             td:nth-child(1) {
-                width: 7%;
+                width: 8%;
                 /* Lebih kecil untuk Nomor Transaksi */
             }
 
             td:nth-child(2),
             td:nth-child(3) {
-                width: 15%;
+                width: 9%;
                 /* Lebar sedang untuk Tanggal Buat dan Ubah */
             }
 
             td:nth-child(4) {
-                width: 10%;
+                width: 8%;
                 /* Gudang lebih kecil */
             }
 
             td:nth-child(5) {
-                width: 25%;
+                width: 8%;
                 /* Lebar normal untuk Nama Barang */
             }
 
@@ -75,14 +76,14 @@
             }
 
             td:nth-child(7) {
-                width: 20%;
+                width: 14%;
                 /* Lebih besar untuk Keterangan */
             }
 
             td:nth-child(8),
             td:nth-child(9),
             td:nth-child(10) {
-                width: 7%;
+                width: 9%;
                 /* Lebih kecil untuk User Buat, User Ubah, dan Status Barang */
             }
 

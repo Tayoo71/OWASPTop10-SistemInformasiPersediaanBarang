@@ -50,7 +50,8 @@ class LogAktivitasController extends Controller implements HasMiddleware
                     });
                 })
                 ->orderBy('created_at', $filters['direction'])
-                ->paginate(50);
+                ->paginate(50)
+                ->withQueryString();
 
             // Transformasi data yang diperlukan
             $logs = $query->through(fn($log) => [

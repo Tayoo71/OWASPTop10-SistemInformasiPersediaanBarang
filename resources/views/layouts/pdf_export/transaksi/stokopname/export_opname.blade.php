@@ -8,9 +8,9 @@
         <style>
             body {
                 font-family: Arial, sans-serif;
-                font-size: 12px;
+                font-size: 10px;
                 /* Mengurangi ukuran font agar lebih pas di A4 */
-                margin: 20px;
+                margin: 10px;
             }
 
             h1 {
@@ -19,6 +19,7 @@
             }
 
             table {
+                table-layout: fixed;
                 width: 100%;
                 border-collapse: collapse;
                 margin-bottom: 20px;
@@ -32,7 +33,7 @@
 
             th,
             td {
-                padding: 6px;
+                padding: 4px;
                 /* Mengurangi padding untuk lebih banyak ruang */
                 text-align: center;
                 vertical-align: middle;
@@ -48,34 +49,48 @@
             }
 
             td:nth-child(1) {
-                width: 5%;
+                width: 8%;
             }
 
             td:nth-child(2),
             td:nth-child(3) {
-                width: 15%;
+                width: 10%;
             }
 
             td:nth-child(4) {
-                width: 10%;
+                width: 8%;
             }
 
             td:nth-child(5) {
-                width: 25%;
+                width: 18%;
             }
 
             td:nth-child(6) {
-                width: 10%;
+                width: 8%;
             }
 
             td:nth-child(7) {
-                width: 20%;
+                width: 8%;
             }
 
-            td:nth-child(8),
-            td:nth-child(9),
+            td:nth-child(8) {
+                width: 8%;
+                /* Lebar lebih kecil untuk Selisih */
+            }
+
+            td:nth-child(9) {
+                width: 15%;
+                /* Lebar sedikit lebih besar untuk Keterangan */
+            }
+
             td:nth-child(10) {
-                width: 7%;
+                width: 8%;
+                /* Lebar lebih kecil untuk User Buat */
+            }
+
+            td:nth-child(11) {
+                width: 8%;
+                /* Lebar lebih kecil untuk Status Barang */
             }
 
             .date {
@@ -89,6 +104,16 @@
                 text-align: left;
                 color: #000;
                 margin-bottom: 10px;
+            }
+
+            table {
+                table-layout: fixed;
+                /* Menetapkan lebar kolom secara statis */
+            }
+
+            td {
+                overflow-wrap: break-word;
+                /* Membungkus teks jika melebihi lebar kolom */
             }
         </style>
     </head>

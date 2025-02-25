@@ -98,6 +98,54 @@
                 color: #000;
                 margin-bottom: 10px;
             }
+
+            table {
+                table-layout: fixed;
+                /* Menetapkan lebar kolom secara statis */
+            }
+
+            td:nth-child(1) {
+                width: 8%;
+                /* Lebar lebih kecil untuk ID */
+            }
+
+            td:nth-child(2),
+            td:nth-child(3) {
+                width: 12%;
+                /* Lebar sedang untuk Tanggal Buat dan Ubah */
+            }
+
+            td:nth-child(4) {
+                width: 10%;
+                /* Lebar lebih kecil untuk Kode Gudang */
+            }
+
+            td:nth-child(5) {
+                width: 20%;
+                /* Lebar sedang untuk Nama Barang */
+            }
+
+            td:nth-child(6) {
+                width: 12%;
+                /* Lebar lebih kecil untuk Jumlah Stok Masuk */
+            }
+
+            td:nth-child(7) {
+                width: 18%;
+                /* Lebar lebih besar untuk Keterangan */
+            }
+
+            td:nth-child(8),
+            td:nth-child(9),
+            td:nth-child(10) {
+                width: 8%;
+                /* Lebar lebih kecil untuk User Buat, User Ubah, dan Status Barang */
+            }
+
+            td {
+                overflow-wrap: break-word;
+                /* Membungkus teks jika melebihi lebar kolom */
+            }
         </style>
     </head>
 

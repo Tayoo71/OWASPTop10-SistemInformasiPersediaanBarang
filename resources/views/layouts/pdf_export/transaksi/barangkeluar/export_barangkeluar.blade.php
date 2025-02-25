@@ -49,7 +49,7 @@
 
             /* Mengatur proporsi kolom */
             td:nth-child(1) {
-                width: 7%;
+                width: 12%;
                 /* Lebih kecil untuk Nomor Transaksi */
             }
 
@@ -82,7 +82,7 @@
             td:nth-child(8),
             td:nth-child(9),
             td:nth-child(10) {
-                width: 7%;
+                width: 9%;
                 /* Lebih kecil untuk User Buat, User Ubah, dan Status Barang */
             }
 
@@ -97,6 +97,16 @@
                 text-align: left;
                 color: #000;
                 margin-bottom: 10px;
+            }
+
+            table {
+                table-layout: fixed;
+                /* Menetapkan lebar kolom secara statis */
+            }
+
+            td {
+                overflow-wrap: break-word;
+                /* Membungkus teks jika melebihi lebar kolom */
             }
         </style>
     </head>
