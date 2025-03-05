@@ -3,8 +3,9 @@
 namespace App\Http\Requests\MasterData\DaftarMerek;
 
 use App\Traits\LogActivity;
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdateMerekRequest extends FormRequest
 {
@@ -25,7 +26,12 @@ class UpdateMerekRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_merek' => 'required|string|max:255|unique:mereks,nama_merek,' . $this->route('daftarmerek') . ',id',
+            'nama_merek' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('mereks', 'nama_merek')->ignore($this->route('daftarmerek'), 'id'),
+            ],
             'keterangan' => 'nullable|string|max:1000',
         ];
     }

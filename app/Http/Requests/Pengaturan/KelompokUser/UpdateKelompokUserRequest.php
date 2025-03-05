@@ -3,8 +3,9 @@
 namespace App\Http\Requests\Pengaturan\KelompokUser;
 
 use App\Traits\LogActivity;
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdateKelompokUserRequest extends FormRequest
 {
@@ -25,7 +26,12 @@ class UpdateKelompokUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama' => 'required|string|max:255|unique:roles,name,' . $this->route('kelompokuser') . ',id',
+            'nama' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('roles', 'name')->ignore($this->route('kelompokuser'), 'id'),
+            ],
         ];
     }
     protected function failedValidation(Validator $validator)

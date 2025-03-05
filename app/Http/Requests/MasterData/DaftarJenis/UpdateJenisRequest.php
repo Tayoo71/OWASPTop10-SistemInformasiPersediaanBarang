@@ -3,8 +3,9 @@
 namespace App\Http\Requests\MasterData\DaftarJenis;
 
 use App\Traits\LogActivity;
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 
 class UpdateJenisRequest extends FormRequest
 {
@@ -25,7 +26,12 @@ class UpdateJenisRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_jenis' => 'required|string|max:255|unique:jenises,nama_jenis,' . $this->route('daftarjenis') . ',id',
+            'nama_jenis' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('jenises', 'nama_jenis')->ignore($this->route('daftarjenis'), 'id'),
+            ],
             'keterangan' => 'nullable|string|max:1000',
         ];
     }

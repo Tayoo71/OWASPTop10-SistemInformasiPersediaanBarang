@@ -3,6 +3,7 @@
 namespace App\Http\Requests\MasterData\DaftarGudang;
 
 use App\Traits\LogActivity;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 
@@ -25,7 +26,12 @@ class UpdateGudangRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'kode_gudang' => 'required|string|max:255|unique:gudangs,kode_gudang,' . $this->route('daftargudang') . ',kode_gudang',
+            'kode_gudang' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('gudangs', 'kode_gudang')->ignore($this->route('daftargudang'), 'kode_gudang'),
+            ],
             'nama_gudang' => 'required|string|max:255',
             'keterangan' => 'nullable|string|max:1000',
         ];
