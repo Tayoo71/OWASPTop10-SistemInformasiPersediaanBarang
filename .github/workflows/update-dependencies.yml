@@ -1,7 +1,10 @@
 name: Manual Dependency Update
 
 on:
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:
+
+env:
+  BRANCH_NAME: update-dependencies-$(date +%Y%m%d%H%M%S)
 
 jobs:
   update-dependencies:
@@ -43,7 +46,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b update-dependencies-$(date +%Y%m%d%H%M%S)
+          git checkout -b $BRANCH_NAME
 
       - name: Commit Dependency Updates
         run: |
@@ -51,14 +54,18 @@ jobs:
           git commit -m "chore: manual dependency update"
 
       - name: Push Changes to New Branch
-        run: git push origin HEAD
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          git push origin HEAD
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: update-dependencies-${{ github.run_id }}
+          branch: ${{ env.BRANCH_NAME }}
           commit-message: "chore: manual dependency update"
           title: "Manual Dependency Update"
           body: "Updating Composer & NPM dependencies due to security vulnerabilities."
           labels: "dependencies"
-          reviewers: "Tayoo71" 
+          reviewers: "Tayoo71"
