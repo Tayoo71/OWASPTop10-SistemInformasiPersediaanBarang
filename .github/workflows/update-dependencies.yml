@@ -63,8 +63,10 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           branch: ${{ env.BRANCH_NAME }}
+          base: master
           commit-message: "chore: manual dependency update"
           title: "Manual Dependency Update"
           body: "Updating Composer & NPM dependencies due to security vulnerabilities."
           labels: "dependencies"
           reviewers: "Tayoo71"
+
