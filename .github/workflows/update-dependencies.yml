@@ -29,7 +29,7 @@ jobs:
         run: npm audit --audit-level=high || true
 
       - name: Install PHP Dependencies
-        run: composer update --no-interaction --prefer-dist --optimize-autoloader
+        run: composer update --no-interaction --prefer-dist --optimize-autoloader --prefer-stable --no-dev --no-suggest
 
       - name: Install Node.js Dependencies
         run: npm update
