@@ -1,0 +1,59 @@
+name: Manual Dependency Update
+
+on:
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up PHP & Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Check PHP Security Vulnerabilities
+        run: composer audit || true
+
+      - name: Check NPM Security Vulnerabilities
+        run: npm audit --audit-level=high || true
+
+      - name: Install PHP Dependencies
+        run: composer update --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node.js Dependencies
+        run: npm update
+
+      - name: Create Branch for Updates
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b update-dependencies-$(date +%Y%m%d%H%M%S)
+
+      - name: Commit Dependency Updates
+        run: |
+          git add composer.json composer.lock package.json package-lock.json
+          git commit -m "chore: manual dependency update"
+
+      - name: Push Changes to New Branch
+        run: git push origin HEAD
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: update-dependencies-${{ github.run_id }}
+          commit-message: "chore: manual dependency update"
+          title: "Manual Dependency Update"
+          body: "Updating Composer & NPM dependencies due to security vulnerabilities."
+          labels: "dependencies"
+          reviewers: "Tayoo71" 
