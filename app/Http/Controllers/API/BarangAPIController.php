@@ -66,7 +66,7 @@ class BarangAPIController extends Controller implements HasMiddleware
         });
 
         $this->logActivity(
-            'Mencari Stok Barang untuk Transaksi dengan Pencarian: ' . ($search ?? '-')
+            'Mencari Stok Barang untuk Fitur Transaksi dengan Pencarian: ' . ($search ?? '-')
                 . ' | Gudang: ' . ($gudang ?? 'Semua Gudang')
         );
 
