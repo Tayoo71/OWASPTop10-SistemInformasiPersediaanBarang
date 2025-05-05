@@ -5,6 +5,10 @@ on:
 
 jobs:
   update-dependencies:
+    permissions:
+      contents: read
+      pull-requests: write
+
     runs-on: ubuntu-latest
 
     steps:
@@ -14,13 +18,13 @@ jobs:
       - name: Set Up PHP & Composer
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           tools: composer:v2
 
       - name: Set Up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Check PHP Security Vulnerabilities
         run: composer audit || true
@@ -69,4 +73,3 @@ jobs:
           body: "Updating Composer & NPM dependencies due to security vulnerabilities."
           labels: "dependencies"
           reviewers: "Tayoo71"
-
