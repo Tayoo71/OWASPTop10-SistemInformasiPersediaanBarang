@@ -7,9 +7,11 @@ use Illuminate\Console\Command;
 use Spatie\Permission\Models\Role;
 use App\Actions\Fortify\CreateNewUser;
 use Spatie\Permission\Models\Permission;
+use App\Traits\LogActivity;
 
 class CreateAdminUser extends Command
 {
+    use LogActivity;
     /**
      * The name and signature of the console command.
      *
@@ -44,6 +46,12 @@ class CreateAdminUser extends Command
                 'status' => 'Aktif',
                 'role_id' => $userRole->id,
             ]);
+
+            $this->logActivity(
+                'Menambahkan User Admin baru melalui Artisan Command (CMD) dengan Username: ' . ($userid ?? '-') .
+                    ' | Role: ' . ($userRole->id ?? '-') .
+                    ' | Status: ' . ($status ?? '-')
+            );
 
             $this->info('Admin user created successfully');
         } catch (Exception $e) {

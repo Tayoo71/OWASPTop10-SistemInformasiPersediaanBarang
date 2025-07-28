@@ -57,7 +57,6 @@
     Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
     Header set Referrer-Policy "no-referrer-when-downgrade"
     Header set Permissions-Policy "accelerometer=(), autoplay=(self), camera=(), encrypted-media=(self), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(self), picture-in-picture=(self), publickey-credentials-get=(), sync-xhr=(self), usb=()"
-    Header set Expect-CT: enforce, max-age=31536000
     Header always unset X-Powered-By
     Header always unset server
     Header unset X-Powered-By
